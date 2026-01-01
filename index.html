@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMES</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hamburger span {
+            width: 28px;
+            height: 4px;
+            background: #fff;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Navigation Menu */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .nav.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .nav button {
+            padding: 25px 60px;
+            font-size: 32px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            min-width: 350px;
+        }
+
+        .nav button:hover {
+            transform: scale(1.05);
+        }
+
+        .nav .btn-pictionary { background: #e3f2fd; color: #1565c0; }
+        .nav .btn-charades { background: #f3e5f5; color: #7b1fa2; }
+        .nav .btn-taboo { background: #ffebee; color: #c62828; }
+
+        /* Game Screens */
+        .game {
+            display: none;
+            height: 100vh;
+        }
+
+        .game.active {
+            display: flex;
+        }
+
+        /* ========== PICTIONARY ========== */
+        #pictionary {
+            background: #f5f5f5;
+        }
+
+        #pictionary .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        #pictionary .word {
+            font-size: 120px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 12px;
+            margin-bottom: 60px;
+        }
+
+        #pictionary .hint {
+            font-size: 24px;
+            color: #888;
+        }
+
+        #pictionary .images {
+            width: 350px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow-y: auto;
+            align-items: center;
+        }
+
+        #pictionary .images img {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* ========== CHARADES ========== */
+        #charades {
+            background: #f5f5f5;
+        }
+
+        #charades .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        #charades .category {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        #charades .word {
+            font-size: 100px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 8px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        #charades .main-icon {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 40px;
+        }
+
+        #charades .hint {
+            font-size: 20px;
+            color: #888;
+        }
+
+        #charades .sidebar {
+            width: 380px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        #charades .sidebar-title {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #charades .clues {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        #charades .clue {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            width: 100%;
+        }
+
+        #charades .clue img {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        #charades .clue-text {
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* ========== TABOO ========== */
+        #taboo .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        #taboo .describe {
+            background: #e8f5e9;
+        }
+
+        #taboo .taboo-panel {
+            background: #ffebee;
+        }
+
+        #taboo .label {
+            font-size: 28px;
+            color: #666;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        #taboo .describe .label {
+            color: #2e7d32;
+        }
+
+        #taboo .taboo-panel .label {
+            color: #c62828;
+        }
+
+        #taboo .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        #taboo .describe .card {
+            border: 4px solid #4caf50;
+        }
+
+        #taboo .taboo-panel .card {
+            border: 4px solid #f44336;
+        }
+
+        #taboo .card img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        #taboo .card .word {
+            font-size: 64px;
+            font-weight: bold;
+            letter-spacing: 6px;
+        }
+
+        #taboo .describe .word {
+            color: #2e7d32;
+        }
+
+        #taboo .taboo-panel .word {
+            color: #c62828;
+        }
+
+        #taboo .hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #888;
+        }
+
+        #taboo .no-symbol {
+            position: relative;
+        }
+
+        #taboo .no-symbol::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 220px;
+            height: 220px;
+            border: 8px solid #f44336;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #taboo .no-symbol::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 8px;
+            background: #f44336;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <nav class="nav" id="nav">
+        <button class="btn-pictionary" onclick="selectGame('pictionary')">PICTIONARY</button>
+        <button class="btn-charades" onclick="selectGame('charades')">CHARADES</button>
+        <button class="btn-taboo" onclick="selectGame('taboo')">TABOO</button>
+    </nav>
+
+    <!-- PICTIONARY -->
+    <div id="pictionary" class="game active">
+        <div class="main">
+            <div class="word" id="p-word"></div>
+            <div class="hint">SPACE = NEW WORD &nbsp; ARROWS = HEAR WORD</div>
+        </div>
+        <div class="images">
+            <img id="p-img1" src="" alt="">
+            <img id="p-img2" src="" alt="">
+            <img id="p-img3" src="" alt="">
+        </div>
+    </div>
+
+    <!-- CHARADES -->
+    <div id="charades" class="game">
+        <div class="main">
+            <div class="category" id="c-category"></div>
+            <img class="main-icon" id="c-mainIcon" src="" alt="">
+            <div class="word" id="c-word"></div>
+            <div class="hint">SPACE = NEW WORD &nbsp; ARROWS = HEAR WORD</div>
+        </div>
+        <div class="sidebar">
+            <div class="sidebar-title">HOW TO ACT IT OUT</div>
+            <div class="clues" id="c-clues"></div>
+        </div>
+    </div>
+
+    <!-- TABOO -->
+    <div id="taboo" class="game">
+        <div class="panel describe">
+            <div class="label">DESCRIBE THIS</div>
+            <div class="card">
+                <img id="t-describeImg" src="" alt="">
+                <div class="word" id="t-describeWord"></div>
+            </div>
+        </div>
+        <div class="panel taboo-panel">
+            <div class="label">DON'T SAY</div>
+            <div class="card">
+                <div class="no-symbol">
+                    <img id="t-tabooImg" src="" alt="">
+                </div>
+                <div class="word" id="t-tabooWord"></div>
+            </div>
+        </div>
+        <div class="hint">SPACE = NEW WORD &nbsp; LEFT/RIGHT ARROW = HEAR WORD</div>
+    </div>
+
+    <script>
+        // ========== MENU & GAME SWITCHING ==========
+        let currentGame = 'pictionary';
+        let menuOpen = false;
+
+        function toggleMenu() {
+            menuOpen = !menuOpen;
+            document.getElementById('hamburger').classList.toggle('open', menuOpen);
+            document.getElementById('nav').classList.toggle('show', menuOpen);
+        }
+
+        function selectGame(game) {
+            showGame(game);
+            toggleMenu();
+        }
+
+        function showGame(game) {
+            currentGame = game;
+            document.querySelectorAll('.game').forEach(g => g.classList.remove('active'));
+            document.getElementById(game).classList.add('active');
+        }
+
+        // ========== PICTIONARY DATA ==========
+        const P_ICONS = {
+            "CAT": ["fluent-emoji-high-contrast:cat", "mdi:cat", "ph:cat"],
+            "DOG": ["fluent-emoji-high-contrast:dog", "mdi:dog", "ph:dog"],
+            "SUN": ["fluent-emoji-high-contrast:sun", "ph:sun", "tabler:sun"],
+            "HAT": ["fluent-emoji-high-contrast:top-hat", "mdi:hat-fedora", "ph:baseball-cap"],
+            "CUP": ["fluent-emoji-high-contrast:cup-with-straw", "mdi:cup", "ph:coffee"],
+            "BALL": ["fluent-emoji-high-contrast:soccer-ball", "mdi:basketball", "ph:football"],
+            "TREE": ["fluent-emoji-high-contrast:deciduous-tree", "mdi:tree", "ph:tree"],
+            "FISH": ["fluent-emoji-high-contrast:fish", "mdi:fish", "ph:fish"],
+            "BIRD": ["fluent-emoji-high-contrast:bird", "mdi:bird", "ph:bird"],
+            "BOOK": ["fluent-emoji-high-contrast:book", "mdi:book-open-variant", "ph:book"],
+            "CAKE": ["fluent-emoji-high-contrast:birthday-cake", "mdi:cake", "ph:cake"],
+            "STAR": ["fluent-emoji-high-contrast:star", "mdi:star", "ph:star"],
+            "MOON": ["fluent-emoji-high-contrast:full-moon", "mdi:moon-waning-crescent", "ph:moon"],
+            "DOOR": ["fluent-emoji-high-contrast:door", "mdi:door", "ph:door"],
+            "BOAT": ["fluent-emoji-high-contrast:sailboat", "mdi:sail-boat", "ph:boat"],
+            "FROG": ["fluent-emoji-high-contrast:frog", "mdi:frog", "game-icons:frog"],
+            "DUCK": ["fluent-emoji-high-contrast:duck", "mdi:duck", "twemoji:duck"],
+            "BEAR": ["fluent-emoji-high-contrast:bear", "mdi:teddy-bear", "twemoji:bear"],
+            "LION": ["fluent-emoji-high-contrast:lion", "mdi:fruit-pineapple", "twemoji:lion"],
+            "HAND": ["fluent-emoji-high-contrast:hand-with-fingers-splayed", "mdi:hand-back-left", "ph:hand"],
+            "FOOT": ["fluent-emoji-high-contrast:foot", "mdi:foot-print", "game-icons:foot"],
+            "EYE": ["fluent-emoji-high-contrast:eye", "mdi:eye", "ph:eye"],
+            "EAR": ["fluent-emoji-high-contrast:ear", "mdi:ear-hearing", "ph:ear"],
+            "BED": ["fluent-emoji-high-contrast:bed", "mdi:bed", "ph:bed"],
+            "CAR": ["fluent-emoji-high-contrast:automobile", "mdi:car", "ph:car"],
+            "BUS": ["fluent-emoji-high-contrast:bus", "mdi:bus", "ph:bus"],
+            "BIKE": ["fluent-emoji-high-contrast:bicycle", "mdi:bike", "ph:bicycle"],
+            "KITE": ["fluent-emoji-high-contrast:kite", "mdi:kite", "game-icons:kite"],
+            "RAIN": ["fluent-emoji-high-contrast:cloud-with-rain", "mdi:weather-rainy", "ph:cloud-rain"],
+            "SNOW": ["fluent-emoji-high-contrast:snowflake", "mdi:snowflake", "ph:snowflake"],
+            "LEAF": ["fluent-emoji-high-contrast:leaf-fluttering-in-wind", "mdi:leaf", "ph:leaf"],
+            "BELL": ["fluent-emoji-high-contrast:bell", "mdi:bell", "ph:bell"],
+            "DRUM": ["fluent-emoji-high-contrast:drum", "mdi:drum", "ph:metronome"],
+            "LAMP": ["fluent-emoji-high-contrast:lamp", "mdi:lamp", "ph:lamp"],
+            "SOCK": ["fluent-emoji-high-contrast:socks", "mdi:shoe-sneaker", "game-icons:socks"],
+            "SHOE": ["fluent-emoji-high-contrast:running-shoe", "mdi:shoe-formal", "ph:sneaker"],
+            "COAT": ["fluent-emoji-high-contrast:coat", "mdi:coat-rack", "ph:coat-hanger"],
+            "MILK": ["fluent-emoji-high-contrast:glass-of-milk", "mdi:cup-water", "game-icons:milk-carton"],
+            "APPLE": ["fluent-emoji-high-contrast:red-apple", "mdi:apple", "ph:apple-logo"],
+            "HOUSE": ["fluent-emoji-high-contrast:house", "mdi:home", "ph:house"],
+            "PLANE": ["fluent-emoji-high-contrast:airplane", "mdi:airplane", "ph:airplane"],
+            "TRAIN": ["fluent-emoji-high-contrast:locomotive", "mdi:train", "ph:train"],
+            "SPOON": ["fluent-emoji-high-contrast:spoon", "mdi:spoon-sugar", "game-icons:spoon"],
+            "FORK": ["fluent-emoji-high-contrast:fork-and-knife", "mdi:silverware-fork", "game-icons:fork"]
+        };
+        const P_WORDS = Object.keys(P_ICONS);
+        let pCurrent = "";
+
+        function pNewWord() {
+            let next;
+            do { next = P_WORDS[Math.floor(Math.random() * P_WORDS.length)]; } while (next === pCurrent && P_WORDS.length > 1);
+            pCurrent = next;
+            document.getElementById("p-word").textContent = pCurrent;
+            const icons = P_ICONS[pCurrent];
+            document.getElementById("p-img1").src = "https://api.iconify.design/" + icons[0] + ".svg?height=200";
+            document.getElementById("p-img2").src = "https://api.iconify.design/" + icons[1] + ".svg?height=200";
+            document.getElementById("p-img3").src = "https://api.iconify.design/" + icons[2] + ".svg?height=200";
+        }
+
+        // ========== CHARADES DATA ==========
+        const C_DATA = {
+            "ELEPHANT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:elephant", clues: [
+                { icon: "mdi:elephant", text: "SWING YOUR ARM LIKE A TRUNK" },
+                { icon: "game-icons:weight", text: "STOMP LIKE A BIG HEAVY ANIMAL" },
+                { icon: "mdi:ear-hearing", text: "SHOW BIG FLOPPY EARS" }
+            ]},
+            "MONKEY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:monkey", clues: [
+                { icon: "mdi:forest", text: "PRETEND TO CLIMB A TREE" },
+                { icon: "fluent-emoji-high-contrast:banana", text: "PRETEND TO EAT A BANANA" },
+                { icon: "mdi:arm-flex", text: "SCRATCH UNDER YOUR ARMS" }
+            ]},
+            "SNAKE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:snake", clues: [
+                { icon: "mdi:snake", text: "WIGGLE YOUR BODY SIDE TO SIDE" },
+                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE" },
+                { icon: "mdi:floor-plan", text: "CRAWL LOW ON THE GROUND" }
+            ]},
+            "BUTTERFLY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:butterfly", clues: [
+                { icon: "mdi:butterfly", text: "FLAP YOUR ARMS LIKE WINGS" },
+                { icon: "fluent-emoji-high-contrast:flower", text: "PRETEND TO LAND ON FLOWERS" },
+                { icon: "mdi:feather", text: "MOVE SOFTLY AND GENTLY" }
+            ]},
+            "FROG": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:frog", clues: [
+                { icon: "mdi:arrow-up-bold", text: "JUMP UP AND DOWN" },
+                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE FAST" },
+                { icon: "mdi:human-handsdown", text: "SQUAT DOWN LOW" }
+            ]},
+            "CHICKEN": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:chicken", clues: [
+                { icon: "mdi:egg", text: "PRETEND TO LAY AN EGG" },
+                { icon: "game-icons:chicken-leg", text: "FLAP YOUR BENT ARMS" },
+                { icon: "mdi:volume-high", text: "BOB YOUR HEAD AND CLUCK" }
+            ]},
+            "RABBIT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:rabbit", clues: [
+                { icon: "mdi:rabbit", text: "HOP AROUND" },
+                { icon: "fluent-emoji-high-contrast:carrot", text: "PRETEND TO NIBBLE A CARROT" },
+                { icon: "mdi:ear-hearing", text: "PUT HANDS UP LIKE LONG EARS" }
+            ]},
+            "FISH": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:fish", clues: [
+                { icon: "mdi:fish", text: "PUT HANDS TOGETHER AND SWIM" },
+                { icon: "mdi:water", text: "PRETEND TO BLOW BUBBLES" },
+                { icon: "mdi:waves", text: "WIGGLE LIKE SWIMMING" }
+            ]},
+            "BIRD": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:bird", clues: [
+                { icon: "mdi:bird", text: "FLAP YOUR ARMS LIKE WINGS" },
+                { icon: "mdi:music", text: "PRETEND TO CHIRP AND SING" },
+                { icon: "game-icons:nest-birds", text: "PRETEND TO PECK FOR FOOD" }
+            ]},
+            "LION": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:lion", clues: [
+                { icon: "mdi:volume-high", text: "ROAR LOUDLY" },
+                { icon: "game-icons:lion", text: "SHOW YOUR CLAWS" },
+                { icon: "mdi:hair-dryer", text: "SHAKE YOUR HEAD LIKE A MANE" }
+            ]},
+            "SLEEPING": { category: "ACTION", icon: "fluent-emoji-high-contrast:sleeping-face", clues: [
+                { icon: "mdi:sleep", text: "CLOSE YOUR EYES" },
+                { icon: "mdi:pillow", text: "PUT HANDS UNDER YOUR HEAD" },
+                { icon: "mdi:weather-night", text: "PRETEND TO SNORE" }
+            ]},
+            "EATING": { category: "ACTION", icon: "fluent-emoji-high-contrast:fork-and-knife", clues: [
+                { icon: "mdi:silverware-fork-knife", text: "PRETEND TO USE A FORK" },
+                { icon: "mdi:food-apple", text: "PRETEND TO CHEW FOOD" },
+                { icon: "mdi:hand-pointing-up", text: "BRING HAND TO MOUTH" }
+            ]},
+            "CRYING": { category: "ACTION", icon: "fluent-emoji-high-contrast:crying-face", clues: [
+                { icon: "mdi:emoticon-sad", text: "MAKE A SAD FACE" },
+                { icon: "mdi:water", text: "PRETEND TEARS ON CHEEKS" },
+                { icon: "mdi:hand-wave", text: "RUB YOUR EYES" }
+            ]},
+            "LAUGHING": { category: "ACTION", icon: "fluent-emoji-high-contrast:face-with-tears-of-joy", clues: [
+                { icon: "mdi:emoticon-happy", text: "SMILE REALLY BIG" },
+                { icon: "mdi:stomach", text: "HOLD YOUR BELLY" },
+                { icon: "mdi:hand-clap", text: "SLAP YOUR KNEE" }
+            ]},
+            "DANCING": { category: "ACTION", icon: "fluent-emoji-high-contrast:man-dancing", clues: [
+                { icon: "mdi:dance-ballroom", text: "MOVE YOUR FEET" },
+                { icon: "mdi:human-handsup", text: "WAVE YOUR ARMS" },
+                { icon: "mdi:music", text: "SPIN AROUND" }
+            ]},
+            "SWIMMING": { category: "ACTION", icon: "fluent-emoji-high-contrast:person-swimming", clues: [
+                { icon: "mdi:swim", text: "MOVE ARMS IN CIRCLES" },
+                { icon: "mdi:water", text: "PRETEND TO FLOAT" },
+                { icon: "mdi:waves", text: "KICK YOUR LEGS" }
+            ]},
+            "JUMPING": { category: "ACTION", icon: "fluent-emoji-high-contrast:person-running", clues: [
+                { icon: "mdi:arrow-up-bold", text: "JUMP UP HIGH" },
+                { icon: "mdi:human-handsup", text: "RAISE ARMS WHEN YOU JUMP" },
+                { icon: "mdi:foot-print", text: "LAND ON BOTH FEET" }
+            ]},
+            "SCHOOL": { category: "PLACE", icon: "fluent-emoji-high-contrast:school", clues: [
+                { icon: "mdi:book-open-variant", text: "PRETEND TO READ A BOOK" },
+                { icon: "mdi:pencil", text: "PRETEND TO WRITE" },
+                { icon: "mdi:human-male-board", text: "RAISE YOUR HAND" }
+            ]},
+            "BEACH": { category: "PLACE", icon: "fluent-emoji-high-contrast:beach-with-umbrella", clues: [
+                { icon: "mdi:waves", text: "PRETEND TO SWIM IN WAVES" },
+                { icon: "mdi:shovel", text: "DIG IN THE SAND" },
+                { icon: "fluent-emoji-high-contrast:sun", text: "SHIELD EYES FROM SUN" }
+            ]},
+            "AIRPLANE": { category: "THING", icon: "fluent-emoji-high-contrast:airplane", clues: [
+                { icon: "mdi:airplane", text: "SPREAD ARMS LIKE WINGS" },
+                { icon: "mdi:arrow-up", text: "PRETEND TO TAKE OFF" },
+                { icon: "mdi:volume-high", text: "MAKE AIRPLANE SOUNDS" }
+            ]},
+            "TRAIN": { category: "THING", icon: "fluent-emoji-high-contrast:locomotive", clues: [
+                { icon: "mdi:train", text: "MOVE ARMS LIKE WHEELS" },
+                { icon: "mdi:bugle", text: "PULL A HORN - CHOO CHOO" },
+                { icon: "mdi:arrow-right", text: "WALK IN A LINE" }
+            ]},
+            "TELEPHONE": { category: "THING", icon: "fluent-emoji-high-contrast:telephone-receiver", clues: [
+                { icon: "mdi:phone", text: "HOLD HAND TO YOUR EAR" },
+                { icon: "mdi:message", text: "PRETEND TO TALK" },
+                { icon: "mdi:dialpad", text: "PRESS BUTTONS" }
+            ]},
+            "CAMERA": { category: "THING", icon: "fluent-emoji-high-contrast:camera", clues: [
+                { icon: "mdi:camera", text: "HOLD UP TO YOUR EYE" },
+                { icon: "mdi:gesture-tap-button", text: "PRESS THE BUTTON - CLICK" },
+                { icon: "mdi:emoticon-happy", text: "SAY CHEESE" }
+            ]},
+            "UMBRELLA": { category: "THING", icon: "fluent-emoji-high-contrast:umbrella", clues: [
+                { icon: "mdi:umbrella", text: "HOLD IT OVER YOUR HEAD" },
+                { icon: "mdi:weather-rainy", text: "PRETEND IT IS RAINING" },
+                { icon: "mdi:arrow-expand", text: "PRETEND TO OPEN IT" }
+            ]},
+            "GUITAR": { category: "THING", icon: "fluent-emoji-high-contrast:guitar", clues: [
+                { icon: "mdi:guitar-acoustic", text: "HOLD IT AGAINST YOUR BODY" },
+                { icon: "mdi:hand-wave", text: "STRUM WITH YOUR HAND" },
+                { icon: "mdi:music", text: "PRETEND TO SING ALONG" }
+            ]},
+            "BALLOON": { category: "THING", icon: "fluent-emoji-high-contrast:balloon", clues: [
+                { icon: "mdi:balloon", text: "PRETEND TO BLOW IT UP" },
+                { icon: "mdi:arrow-up", text: "LET IT FLOAT UP" },
+                { icon: "mdi:gesture-tap-hold", text: "HOLD THE STRING" }
+            ]}
+        };
+        const C_WORDS = Object.keys(C_DATA);
+        let cCurrent = "";
+
+        function cNewWord() {
+            let next;
+            do { next = C_WORDS[Math.floor(Math.random() * C_WORDS.length)]; } while (next === cCurrent && C_WORDS.length > 1);
+            cCurrent = next;
+            const data = C_DATA[cCurrent];
+            document.getElementById("c-category").textContent = data.category;
+            document.getElementById("c-word").textContent = cCurrent;
+            document.getElementById("c-mainIcon").src = "https://api.iconify.design/" + data.icon + ".svg?height=180";
+            const cluesEl = document.getElementById("c-clues");
+            cluesEl.innerHTML = "";
+            data.clues.forEach(clue => {
+                const div = document.createElement("div");
+                div.className = "clue";
+                div.innerHTML = '<img src="https://api.iconify.design/' + clue.icon + '.svg?height=80" alt="">' +
+                                '<span class="clue-text">' + clue.text + '</span>';
+                cluesEl.appendChild(div);
+            });
+        }
+
+        // ========== TABOO DATA ==========
+        const T_DATA = [
+            { describe: { word: "MILK", icon: "fluent-emoji-high-contrast:glass-of-milk" }, taboo: { word: "COW", icon: "fluent-emoji-high-contrast:cow" } },
+            { describe: { word: "EGG", icon: "fluent-emoji-high-contrast:egg" }, taboo: { word: "CHICKEN", icon: "fluent-emoji-high-contrast:chicken" } },
+            { describe: { word: "HONEY", icon: "fluent-emoji-high-contrast:honey-pot" }, taboo: { word: "BEE", icon: "fluent-emoji-high-contrast:honeybee" } },
+            { describe: { word: "WOOL", icon: "fluent-emoji-high-contrast:yarn" }, taboo: { word: "SHEEP", icon: "fluent-emoji-high-contrast:ewe" } },
+            { describe: { word: "BONE", icon: "fluent-emoji-high-contrast:bone" }, taboo: { word: "DOG", icon: "fluent-emoji-high-contrast:dog" } },
+            { describe: { word: "CHEESE", icon: "fluent-emoji-high-contrast:cheese-wedge" }, taboo: { word: "MOUSE", icon: "fluent-emoji-high-contrast:mouse" } },
+            { describe: { word: "CARROT", icon: "fluent-emoji-high-contrast:carrot" }, taboo: { word: "RABBIT", icon: "fluent-emoji-high-contrast:rabbit" } },
+            { describe: { word: "BANANA", icon: "fluent-emoji-high-contrast:banana" }, taboo: { word: "MONKEY", icon: "fluent-emoji-high-contrast:monkey" } },
+            { describe: { word: "FISH", icon: "fluent-emoji-high-contrast:fish" }, taboo: { word: "CAT", icon: "fluent-emoji-high-contrast:cat" } },
+            { describe: { word: "NEST", icon: "game-icons:nest-birds" }, taboo: { word: "BIRD", icon: "fluent-emoji-high-contrast:bird" } },
+            { describe: { word: "RAIN", icon: "fluent-emoji-high-contrast:cloud-with-rain" }, taboo: { word: "CLOUD", icon: "fluent-emoji-high-contrast:cloud" } },
+            { describe: { word: "APPLE", icon: "fluent-emoji-high-contrast:red-apple" }, taboo: { word: "TREE", icon: "fluent-emoji-high-contrast:deciduous-tree" } },
+            { describe: { word: "LEAF", icon: "fluent-emoji-high-contrast:leaf-fluttering-in-wind" }, taboo: { word: "TREE", icon: "fluent-emoji-high-contrast:deciduous-tree" } },
+            { describe: { word: "FLOWER", icon: "fluent-emoji-high-contrast:sunflower" }, taboo: { word: "GARDEN", icon: "fluent-emoji-high-contrast:national-park" } },
+            { describe: { word: "SNOW", icon: "fluent-emoji-high-contrast:snowflake" }, taboo: { word: "COLD", icon: "fluent-emoji-high-contrast:cold-face" } },
+            { describe: { word: "STAR", icon: "fluent-emoji-high-contrast:star" }, taboo: { word: "NIGHT", icon: "fluent-emoji-high-contrast:night-with-stars" } },
+            { describe: { word: "MOON", icon: "fluent-emoji-high-contrast:full-moon" }, taboo: { word: "NIGHT", icon: "fluent-emoji-high-contrast:night-with-stars" } },
+            { describe: { word: "SUN", icon: "fluent-emoji-high-contrast:sun" }, taboo: { word: "HOT", icon: "fluent-emoji-high-contrast:hot-face" } },
+            { describe: { word: "WHEEL", icon: "fluent-emoji-high-contrast:wheel" }, taboo: { word: "CAR", icon: "fluent-emoji-high-contrast:automobile" } },
+            { describe: { word: "KEY", icon: "fluent-emoji-high-contrast:key" }, taboo: { word: "DOOR", icon: "fluent-emoji-high-contrast:door" } },
+            { describe: { word: "PILLOW", icon: "mdi:pillow" }, taboo: { word: "BED", icon: "fluent-emoji-high-contrast:bed" } },
+            { describe: { word: "CANDLE", icon: "fluent-emoji-high-contrast:candle" }, taboo: { word: "FIRE", icon: "fluent-emoji-high-contrast:fire" } },
+            { describe: { word: "BRUSH", icon: "fluent-emoji-high-contrast:toothbrush" }, taboo: { word: "TEETH", icon: "mdi:tooth" } },
+            { describe: { word: "SOAP", icon: "fluent-emoji-high-contrast:soap" }, taboo: { word: "BATH", icon: "fluent-emoji-high-contrast:bathtub" } },
+            { describe: { word: "SPOON", icon: "fluent-emoji-high-contrast:spoon" }, taboo: { word: "EAT", icon: "fluent-emoji-high-contrast:fork-and-knife" } },
+            { describe: { word: "CUP", icon: "fluent-emoji-high-contrast:cup-with-straw" }, taboo: { word: "DRINK", icon: "mdi:water" } },
+            { describe: { word: "BALL", icon: "fluent-emoji-high-contrast:soccer-ball" }, taboo: { word: "KICK", icon: "mdi:shoe-sneaker" } },
+            { describe: { word: "CRAYON", icon: "fluent-emoji-high-contrast:crayon" }, taboo: { word: "DRAW", icon: "mdi:draw" } },
+            { describe: { word: "GLASSES", icon: "fluent-emoji-high-contrast:glasses" }, taboo: { word: "EYES", icon: "fluent-emoji-high-contrast:eyes" } },
+            { describe: { word: "HAT", icon: "fluent-emoji-high-contrast:top-hat" }, taboo: { word: "HEAD", icon: "mdi:head" } },
+            { describe: { word: "SHOE", icon: "fluent-emoji-high-contrast:running-shoe" }, taboo: { word: "FOOT", icon: "fluent-emoji-high-contrast:foot" } },
+            { describe: { word: "GLOVE", icon: "fluent-emoji-high-contrast:gloves" }, taboo: { word: "HAND", icon: "fluent-emoji-high-contrast:hand-with-fingers-splayed" } },
+            { describe: { word: "TEARS", icon: "fluent-emoji-high-contrast:droplet" }, taboo: { word: "CRY", icon: "fluent-emoji-high-contrast:crying-face" } },
+            { describe: { word: "SMILE", icon: "fluent-emoji-high-contrast:grinning-face" }, taboo: { word: "HAPPY", icon: "fluent-emoji-high-contrast:smiling-face-with-hearts" } },
+            { describe: { word: "DOCTOR", icon: "fluent-emoji-high-contrast:health-worker" }, taboo: { word: "HOSPITAL", icon: "fluent-emoji-high-contrast:hospital" } },
+            { describe: { word: "TEACHER", icon: "mdi:human-male-board" }, taboo: { word: "SCHOOL", icon: "fluent-emoji-high-contrast:school" } },
+            { describe: { word: "PILOT", icon: "mdi:account-tie-hat" }, taboo: { word: "AIRPLANE", icon: "fluent-emoji-high-contrast:airplane" } },
+            { describe: { word: "SAND", icon: "mdi:beach" }, taboo: { word: "BEACH", icon: "fluent-emoji-high-contrast:beach-with-umbrella" } },
+            { describe: { word: "SWIM", icon: "fluent-emoji-high-contrast:person-swimming" }, taboo: { word: "POOL", icon: "mdi:pool" } }
+        ];
+        let tCurrent = -1;
+
+        function tNewWord() {
+            let next;
+            do { next = Math.floor(Math.random() * T_DATA.length); } while (next === tCurrent && T_DATA.length > 1);
+            tCurrent = next;
+            const pair = T_DATA[tCurrent];
+            document.getElementById("t-describeImg").src = "https://api.iconify.design/" + pair.describe.icon + ".svg?height=200";
+            document.getElementById("t-describeWord").textContent = pair.describe.word;
+            document.getElementById("t-tabooImg").src = "https://api.iconify.design/" + pair.taboo.icon + ".svg?height=200";
+            document.getElementById("t-tabooWord").textContent = pair.taboo.word;
+        }
+
+        // ========== SPEECH ==========
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.8;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // ========== KEYBOARD CONTROLS ==========
+        document.addEventListener("keydown", function(e) {
+            if (e.code === "Space") {
+                e.preventDefault();
+                if (currentGame === 'pictionary') pNewWord();
+                else if (currentGame === 'charades') cNewWord();
+                else if (currentGame === 'taboo') tNewWord();
+            }
+            if (e.code === "Digit1" || e.code === "Numpad1") showGame('pictionary');
+            if (e.code === "Digit2" || e.code === "Numpad2") showGame('charades');
+            if (e.code === "Digit3" || e.code === "Numpad3") showGame('taboo');
+
+            // Arrow keys for speech
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+                e.preventDefault();
+                if (currentGame === 'pictionary') {
+                    speak(pCurrent);
+                } else if (currentGame === 'charades') {
+                    speak(cCurrent);
+                } else if (currentGame === 'taboo') {
+                    const pair = T_DATA[tCurrent];
+                    if (e.code === "ArrowLeft") {
+                        speak(pair.describe.word);
+                    } else if (e.code === "ArrowRight") {
+                        speak(pair.taboo.word);
+                    }
+                }
+            }
+        });
+
+        // Initialize all games
+        pNewWord();
+        cNewWord();
+        tNewWord();
+    </script>
+</body>
+</html>

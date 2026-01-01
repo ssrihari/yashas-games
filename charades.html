@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHARADES</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .category {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .word {
+            font-size: 100px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 8px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .main-icon {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 40px;
+        }
+
+        .hint {
+            font-size: 20px;
+            color: #888;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .clues {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .clue {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            width: 100%;
+        }
+
+        .clue img {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .clue-text {
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="category" id="category"></div>
+        <img class="main-icon" id="mainIcon" src="" alt="">
+        <div class="word" id="word"></div>
+        <div class="hint">PRESS SPACE FOR NEW WORD</div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-title">HOW TO ACT IT OUT</div>
+        <div class="clues" id="clues"></div>
+    </div>
+
+    <script>
+        const CHARADES = {
+            // ANIMALS
+            "ELEPHANT": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:elephant",
+                clues: [
+                    { icon: "mdi:elephant", text: "SWING YOUR ARM LIKE A TRUNK" },
+                    { icon: "game-icons:weight", text: "STOMP LIKE A BIG HEAVY ANIMAL" },
+                    { icon: "mdi:ear-hearing", text: "SHOW BIG FLOPPY EARS" }
+                ]
+            },
+            "MONKEY": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:monkey",
+                clues: [
+                    { icon: "mdi:forest", text: "PRETEND TO CLIMB A TREE" },
+                    { icon: "fluent-emoji-high-contrast:banana", text: "PRETEND TO EAT A BANANA" },
+                    { icon: "mdi:arm-flex", text: "SCRATCH UNDER YOUR ARMS" }
+                ]
+            },
+            "SNAKE": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:snake",
+                clues: [
+                    { icon: "mdi:snake", text: "WIGGLE YOUR BODY SIDE TO SIDE" },
+                    { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE" },
+                    { icon: "mdi:floor-plan", text: "CRAWL LOW ON THE GROUND" }
+                ]
+            },
+            "BUTTERFLY": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:butterfly",
+                clues: [
+                    { icon: "mdi:butterfly", text: "FLAP YOUR ARMS LIKE WINGS" },
+                    { icon: "fluent-emoji-high-contrast:flower", text: "PRETEND TO LAND ON FLOWERS" },
+                    { icon: "mdi:feather", text: "MOVE SOFTLY AND GENTLY" }
+                ]
+            },
+            "FROG": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:frog",
+                clues: [
+                    { icon: "mdi:arrow-up-bold", text: "JUMP UP AND DOWN" },
+                    { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE FAST" },
+                    { icon: "mdi:human-handsdown", text: "SQUAT DOWN LOW" }
+                ]
+            },
+            "CHICKEN": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:chicken",
+                clues: [
+                    { icon: "mdi:egg", text: "PRETEND TO LAY AN EGG" },
+                    { icon: "game-icons:chicken-leg", text: "FLAP YOUR BENT ARMS" },
+                    { icon: "mdi:volume-high", text: "BOB YOUR HEAD AND CLUCK" }
+                ]
+            },
+            "RABBIT": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:rabbit",
+                clues: [
+                    { icon: "mdi:rabbit", text: "HOP AROUND" },
+                    { icon: "fluent-emoji-high-contrast:carrot", text: "PRETEND TO NIBBLE A CARROT" },
+                    { icon: "mdi:ear-hearing", text: "PUT HANDS UP LIKE LONG EARS" }
+                ]
+            },
+            "FISH": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:fish",
+                clues: [
+                    { icon: "mdi:fish", text: "PUT HANDS TOGETHER AND SWIM" },
+                    { icon: "mdi:water", text: "PRETEND TO BLOW BUBBLES" },
+                    { icon: "mdi:waves", text: "WIGGLE LIKE SWIMMING" }
+                ]
+            },
+            "BIRD": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:bird",
+                clues: [
+                    { icon: "mdi:bird", text: "FLAP YOUR ARMS LIKE WINGS" },
+                    { icon: "mdi:music", text: "PRETEND TO CHIRP AND SING" },
+                    { icon: "game-icons:nest-birds", text: "PRETEND TO PECK FOR FOOD" }
+                ]
+            },
+            "LION": {
+                category: "ANIMAL",
+                icon: "fluent-emoji-high-contrast:lion",
+                clues: [
+                    { icon: "mdi:volume-high", text: "ROAR LOUDLY" },
+                    { icon: "game-icons:lion", text: "SHOW YOUR CLAWS" },
+                    { icon: "mdi:hair-dryer", text: "SHAKE YOUR HEAD LIKE A MANE" }
+                ]
+            },
+
+            // ACTIONS
+            "SLEEPING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:sleeping-face",
+                clues: [
+                    { icon: "mdi:sleep", text: "CLOSE YOUR EYES" },
+                    { icon: "mdi:pillow", text: "PUT HANDS UNDER YOUR HEAD" },
+                    { icon: "mdi:weather-night", text: "PRETEND TO SNORE" }
+                ]
+            },
+            "EATING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:fork-and-knife",
+                clues: [
+                    { icon: "mdi:silverware-fork-knife", text: "PRETEND TO USE A FORK" },
+                    { icon: "mdi:food-apple", text: "PRETEND TO CHEW FOOD" },
+                    { icon: "mdi:hand-pointing-up", text: "BRING HAND TO MOUTH" }
+                ]
+            },
+            "CRYING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:crying-face",
+                clues: [
+                    { icon: "mdi:emoticon-sad", text: "MAKE A SAD FACE" },
+                    { icon: "mdi:water", text: "PRETEND TEARS ON CHEEKS" },
+                    { icon: "mdi:hand-wave", text: "RUB YOUR EYES" }
+                ]
+            },
+            "LAUGHING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:face-with-tears-of-joy",
+                clues: [
+                    { icon: "mdi:emoticon-happy", text: "SMILE REALLY BIG" },
+                    { icon: "mdi:stomach", text: "HOLD YOUR BELLY" },
+                    { icon: "mdi:hand-clap", text: "SLAP YOUR KNEE" }
+                ]
+            },
+            "DANCING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:man-dancing",
+                clues: [
+                    { icon: "mdi:dance-ballroom", text: "MOVE YOUR FEET" },
+                    { icon: "mdi:human-handsup", text: "WAVE YOUR ARMS" },
+                    { icon: "mdi:music", text: "SPIN AROUND" }
+                ]
+            },
+            "SWIMMING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:person-swimming",
+                clues: [
+                    { icon: "mdi:swim", text: "MOVE ARMS IN CIRCLES" },
+                    { icon: "mdi:water", text: "PRETEND TO FLOAT" },
+                    { icon: "mdi:waves", text: "KICK YOUR LEGS" }
+                ]
+            },
+            "JUMPING": {
+                category: "ACTION",
+                icon: "fluent-emoji-high-contrast:person-running",
+                clues: [
+                    { icon: "mdi:arrow-up-bold", text: "JUMP UP HIGH" },
+                    { icon: "mdi:human-handsup", text: "RAISE ARMS WHEN YOU JUMP" },
+                    { icon: "mdi:foot-print", text: "LAND ON BOTH FEET" }
+                ]
+            },
+
+            // PLACES
+            "SCHOOL": {
+                category: "PLACE",
+                icon: "fluent-emoji-high-contrast:school",
+                clues: [
+                    { icon: "mdi:book-open-variant", text: "PRETEND TO READ A BOOK" },
+                    { icon: "mdi:pencil", text: "PRETEND TO WRITE" },
+                    { icon: "mdi:human-male-board", text: "RAISE YOUR HAND" }
+                ]
+            },
+            "BEACH": {
+                category: "PLACE",
+                icon: "fluent-emoji-high-contrast:beach-with-umbrella",
+                clues: [
+                    { icon: "mdi:waves", text: "PRETEND TO SWIM IN WAVES" },
+                    { icon: "mdi:shovel", text: "DIG IN THE SAND" },
+                    { icon: "fluent-emoji-high-contrast:sun", text: "SHIELD EYES FROM SUN" }
+                ]
+            },
+            "HOSPITAL": {
+                category: "PLACE",
+                icon: "fluent-emoji-high-contrast:hospital",
+                clues: [
+                    { icon: "mdi:needle", text: "PRETEND TO GET A SHOT" },
+                    { icon: "mdi:stethoscope", text: "LISTEN TO HEARTBEAT" },
+                    { icon: "mdi:bandage", text: "PUT ON A BANDAGE" }
+                ]
+            },
+            "PARK": {
+                category: "PLACE",
+                icon: "fluent-emoji-high-contrast:national-park",
+                clues: [
+                    { icon: "mdi:slide", text: "PRETEND TO GO DOWN A SLIDE" },
+                    { icon: "mdi:seesaw", text: "PRETEND TO BE ON A SWING" },
+                    { icon: "mdi:run", text: "RUN AROUND PLAYING" }
+                ]
+            },
+
+            // THINGS
+            "AIRPLANE": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:airplane",
+                clues: [
+                    { icon: "mdi:airplane", text: "SPREAD ARMS LIKE WINGS" },
+                    { icon: "mdi:arrow-up", text: "PRETEND TO TAKE OFF" },
+                    { icon: "mdi:volume-high", text: "MAKE AIRPLANE SOUNDS" }
+                ]
+            },
+            "TRAIN": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:locomotive",
+                clues: [
+                    { icon: "mdi:train", text: "MOVE ARMS LIKE WHEELS" },
+                    { icon: "mdi:bugle", text: "PULL A HORN - CHOO CHOO" },
+                    { icon: "mdi:arrow-right", text: "WALK IN A LINE" }
+                ]
+            },
+            "TELEPHONE": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:telephone-receiver",
+                clues: [
+                    { icon: "mdi:phone", text: "HOLD HAND TO YOUR EAR" },
+                    { icon: "mdi:message", text: "PRETEND TO TALK" },
+                    { icon: "mdi:dialpad", text: "PRESS BUTTONS" }
+                ]
+            },
+            "CAMERA": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:camera",
+                clues: [
+                    { icon: "mdi:camera", text: "HOLD UP TO YOUR EYE" },
+                    { icon: "mdi:gesture-tap-button", text: "PRESS THE BUTTON - CLICK" },
+                    { icon: "mdi:emoticon-happy", text: "SAY CHEESE" }
+                ]
+            },
+            "UMBRELLA": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:umbrella",
+                clues: [
+                    { icon: "mdi:umbrella", text: "HOLD IT OVER YOUR HEAD" },
+                    { icon: "mdi:weather-rainy", text: "PRETEND IT IS RAINING" },
+                    { icon: "mdi:arrow-expand", text: "PRETEND TO OPEN IT" }
+                ]
+            },
+            "GUITAR": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:guitar",
+                clues: [
+                    { icon: "mdi:guitar-acoustic", text: "HOLD IT AGAINST YOUR BODY" },
+                    { icon: "mdi:hand-wave", text: "STRUM WITH YOUR HAND" },
+                    { icon: "mdi:music", text: "PRETEND TO SING ALONG" }
+                ]
+            },
+            "BOOK": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:book",
+                clues: [
+                    { icon: "mdi:book-open-variant", text: "PRETEND TO HOLD A BOOK" },
+                    { icon: "mdi:hand-wave", text: "TURN THE PAGES" },
+                    { icon: "mdi:eye", text: "LOOK DOWN AND READ" }
+                ]
+            },
+            "BALLOON": {
+                category: "THING",
+                icon: "fluent-emoji-high-contrast:balloon",
+                clues: [
+                    { icon: "mdi:balloon", text: "PRETEND TO BLOW IT UP" },
+                    { icon: "mdi:arrow-up", text: "LET IT FLOAT UP" },
+                    { icon: "mdi:gesture-tap-hold", text: "HOLD THE STRING" }
+                ]
+            }
+        };
+
+        const WORDS = Object.keys(CHARADES);
+        let current = "";
+
+        const categoryEl = document.getElementById("category");
+        const wordEl = document.getElementById("word");
+        const mainIconEl = document.getElementById("mainIcon");
+        const cluesEl = document.getElementById("clues");
+
+        function iconUrl(icon) {
+            return "https://api.iconify.design/" + icon + ".svg?height=80";
+        }
+
+        function loadWord() {
+            const data = CHARADES[current];
+            categoryEl.textContent = data.category;
+            wordEl.textContent = current;
+            mainIconEl.src = "https://api.iconify.design/" + data.icon + ".svg?height=180";
+
+            cluesEl.innerHTML = "";
+            data.clues.forEach(clue => {
+                const div = document.createElement("div");
+                div.className = "clue";
+                div.innerHTML = '<img src="' + iconUrl(clue.icon) + '" alt="">' +
+                                '<span class="clue-text">' + clue.text + '</span>';
+                cluesEl.appendChild(div);
+            });
+        }
+
+        function newWord() {
+            let next;
+            do {
+                next = WORDS[Math.floor(Math.random() * WORDS.length)];
+            } while (next === current && WORDS.length > 1);
+
+            current = next;
+            loadWord();
+        }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.code === "Space") {
+                e.preventDefault();
+                newWord();
+            }
+        });
+
+        newWord();
+    </script>
+</body>
+</html>

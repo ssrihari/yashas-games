@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TABOO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .describe {
+            background: #e8f5e9;
+        }
+
+        .taboo {
+            background: #ffebee;
+        }
+
+        .label {
+            font-size: 28px;
+            color: #666;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .describe .label {
+            color: #2e7d32;
+        }
+
+        .taboo .label {
+            color: #c62828;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .describe .card {
+            border: 4px solid #4caf50;
+        }
+
+        .taboo .card {
+            border: 4px solid #f44336;
+        }
+
+        .card img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        .card .word {
+            font-size: 64px;
+            font-weight: bold;
+            letter-spacing: 6px;
+        }
+
+        .describe .word {
+            color: #2e7d32;
+        }
+
+        .taboo .word {
+            color: #c62828;
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #888;
+        }
+
+        .no-symbol {
+            position: relative;
+        }
+
+        .no-symbol::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 220px;
+            height: 220px;
+            border: 8px solid #f44336;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .no-symbol::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 8px;
+            background: #f44336;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="panel describe">
+        <div class="label">DESCRIBE THIS</div>
+        <div class="card">
+            <img id="describeImg" src="" alt="">
+            <div class="word" id="describeWord"></div>
+        </div>
+    </div>
+
+    <div class="panel taboo">
+        <div class="label">DON'T SAY</div>
+        <div class="card">
+            <div class="no-symbol">
+                <img id="tabooImg" src="" alt="">
+            </div>
+            <div class="word" id="tabooWord"></div>
+        </div>
+    </div>
+
+    <div class="hint">PRESS SPACE FOR NEW WORD</div>
+
+    <script>
+        const TABOO = [
+            // Food & Animals
+            { describe: { word: "MILK", icon: "fluent-emoji-high-contrast:glass-of-milk" }, taboo: { word: "COW", icon: "fluent-emoji-high-contrast:cow" } },
+            { describe: { word: "EGG", icon: "fluent-emoji-high-contrast:egg" }, taboo: { word: "CHICKEN", icon: "fluent-emoji-high-contrast:chicken" } },
+            { describe: { word: "HONEY", icon: "fluent-emoji-high-contrast:honey-pot" }, taboo: { word: "BEE", icon: "fluent-emoji-high-contrast:honeybee" } },
+            { describe: { word: "WOOL", icon: "fluent-emoji-high-contrast:yarn" }, taboo: { word: "SHEEP", icon: "fluent-emoji-high-contrast:ewe" } },
+            { describe: { word: "BONE", icon: "fluent-emoji-high-contrast:bone" }, taboo: { word: "DOG", icon: "fluent-emoji-high-contrast:dog" } },
+            { describe: { word: "CHEESE", icon: "fluent-emoji-high-contrast:cheese-wedge" }, taboo: { word: "MOUSE", icon: "fluent-emoji-high-contrast:mouse" } },
+            { describe: { word: "CARROT", icon: "fluent-emoji-high-contrast:carrot" }, taboo: { word: "RABBIT", icon: "fluent-emoji-high-contrast:rabbit" } },
+            { describe: { word: "BANANA", icon: "fluent-emoji-high-contrast:banana" }, taboo: { word: "MONKEY", icon: "fluent-emoji-high-contrast:monkey" } },
+            { describe: { word: "FISH", icon: "fluent-emoji-high-contrast:fish" }, taboo: { word: "CAT", icon: "fluent-emoji-high-contrast:cat" } },
+            { describe: { word: "NEST", icon: "game-icons:nest-birds" }, taboo: { word: "BIRD", icon: "fluent-emoji-high-contrast:bird" } },
+
+            // Nature
+            { describe: { word: "RAIN", icon: "fluent-emoji-high-contrast:cloud-with-rain" }, taboo: { word: "CLOUD", icon: "fluent-emoji-high-contrast:cloud" } },
+            { describe: { word: "APPLE", icon: "fluent-emoji-high-contrast:red-apple" }, taboo: { word: "TREE", icon: "fluent-emoji-high-contrast:deciduous-tree" } },
+            { describe: { word: "LEAF", icon: "fluent-emoji-high-contrast:leaf-fluttering-in-wind" }, taboo: { word: "TREE", icon: "fluent-emoji-high-contrast:deciduous-tree" } },
+            { describe: { word: "FLOWER", icon: "fluent-emoji-high-contrast:sunflower" }, taboo: { word: "GARDEN", icon: "fluent-emoji-high-contrast:national-park" } },
+            { describe: { word: "SNOW", icon: "fluent-emoji-high-contrast:snowflake" }, taboo: { word: "COLD", icon: "fluent-emoji-high-contrast:cold-face" } },
+            { describe: { word: "STAR", icon: "fluent-emoji-high-contrast:star" }, taboo: { word: "NIGHT", icon: "fluent-emoji-high-contrast:night-with-stars" } },
+            { describe: { word: "MOON", icon: "fluent-emoji-high-contrast:full-moon" }, taboo: { word: "NIGHT", icon: "fluent-emoji-high-contrast:night-with-stars" } },
+            { describe: { word: "SUN", icon: "fluent-emoji-high-contrast:sun" }, taboo: { word: "HOT", icon: "fluent-emoji-high-contrast:hot-face" } },
+
+            // Things & Objects
+            { describe: { word: "WHEEL", icon: "fluent-emoji-high-contrast:wheel" }, taboo: { word: "CAR", icon: "fluent-emoji-high-contrast:automobile" } },
+            { describe: { word: "KEY", icon: "fluent-emoji-high-contrast:key" }, taboo: { word: "DOOR", icon: "fluent-emoji-high-contrast:door" } },
+            { describe: { word: "PILLOW", icon: "mdi:pillow" }, taboo: { word: "BED", icon: "fluent-emoji-high-contrast:bed" } },
+            { describe: { word: "CANDLE", icon: "fluent-emoji-high-contrast:candle" }, taboo: { word: "FIRE", icon: "fluent-emoji-high-contrast:fire" } },
+            { describe: { word: "BRUSH", icon: "fluent-emoji-high-contrast:toothbrush" }, taboo: { word: "TEETH", icon: "mdi:tooth" } },
+            { describe: { word: "SOAP", icon: "fluent-emoji-high-contrast:soap" }, taboo: { word: "BATH", icon: "fluent-emoji-high-contrast:bathtub" } },
+            { describe: { word: "SPOON", icon: "fluent-emoji-high-contrast:spoon" }, taboo: { word: "EAT", icon: "fluent-emoji-high-contrast:fork-and-knife" } },
+            { describe: { word: "CUP", icon: "fluent-emoji-high-contrast:cup-with-straw" }, taboo: { word: "DRINK", icon: "mdi:water" } },
+            { describe: { word: "BALL", icon: "fluent-emoji-high-contrast:soccer-ball" }, taboo: { word: "KICK", icon: "mdi:shoe-sneaker" } },
+            { describe: { word: "CRAYON", icon: "fluent-emoji-high-contrast:crayon" }, taboo: { word: "DRAW", icon: "mdi:draw" } },
+
+            // Body & Actions
+            { describe: { word: "GLASSES", icon: "fluent-emoji-high-contrast:glasses" }, taboo: { word: "EYES", icon: "fluent-emoji-high-contrast:eyes" } },
+            { describe: { word: "HAT", icon: "fluent-emoji-high-contrast:top-hat" }, taboo: { word: "HEAD", icon: "mdi:head" } },
+            { describe: { word: "SHOE", icon: "fluent-emoji-high-contrast:running-shoe" }, taboo: { word: "FOOT", icon: "fluent-emoji-high-contrast:foot" } },
+            { describe: { word: "GLOVE", icon: "fluent-emoji-high-contrast:gloves" }, taboo: { word: "HAND", icon: "fluent-emoji-high-contrast:hand-with-fingers-splayed" } },
+            { describe: { word: "TEARS", icon: "fluent-emoji-high-contrast:droplet" }, taboo: { word: "CRY", icon: "fluent-emoji-high-contrast:crying-face" } },
+            { describe: { word: "SMILE", icon: "fluent-emoji-high-contrast:grinning-face" }, taboo: { word: "HAPPY", icon: "fluent-emoji-high-contrast:smiling-face-with-hearts" } },
+
+            // Places & Transport
+            { describe: { word: "DOCTOR", icon: "fluent-emoji-high-contrast:health-worker" }, taboo: { word: "HOSPITAL", icon: "fluent-emoji-high-contrast:hospital" } },
+            { describe: { word: "TEACHER", icon: "mdi:human-male-board" }, taboo: { word: "SCHOOL", icon: "fluent-emoji-high-contrast:school" } },
+            { describe: { word: "PILOT", icon: "mdi:account-tie-hat" }, taboo: { word: "AIRPLANE", icon: "fluent-emoji-high-contrast:airplane" } },
+            { describe: { word: "SAND", icon: "mdi:beach" }, taboo: { word: "BEACH", icon: "fluent-emoji-high-contrast:beach-with-umbrella" } },
+            { describe: { word: "SWIM", icon: "fluent-emoji-high-contrast:person-swimming" }, taboo: { word: "POOL", icon: "mdi:pool" } }
+        ];
+
+        let current = -1;
+
+        const describeImg = document.getElementById("describeImg");
+        const describeWord = document.getElementById("describeWord");
+        const tabooImg = document.getElementById("tabooImg");
+        const tabooWord = document.getElementById("tabooWord");
+
+        function iconUrl(icon, size) {
+            return "https://api.iconify.design/" + icon + ".svg?height=" + size;
+        }
+
+        function newWord() {
+            let next;
+            do {
+                next = Math.floor(Math.random() * TABOO.length);
+            } while (next === current && TABOO.length > 1);
+
+            current = next;
+            const pair = TABOO[current];
+
+            describeImg.src = iconUrl(pair.describe.icon, 200);
+            describeWord.textContent = pair.describe.word;
+            tabooImg.src = iconUrl(pair.taboo.icon, 200);
+            tabooWord.textContent = pair.taboo.word;
+        }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.code === "Space") {
+                e.preventDefault();
+                newWord();
+            }
+        });
+
+        newWord();
+    </script>
+</body>
+</html>
