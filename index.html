@@ -436,58 +436,307 @@
 
         // ========== PICTIONARY DATA ==========
         const P_ICONS = {
+            // ANIMALS
             "CAT": ["fluent-emoji-high-contrast:cat", "mdi:cat", "ph:cat"],
             "DOG": ["fluent-emoji-high-contrast:dog", "mdi:dog", "ph:dog"],
-            "SUN": ["fluent-emoji-high-contrast:sun", "ph:sun", "tabler:sun"],
-            "HAT": ["fluent-emoji-high-contrast:top-hat", "mdi:hat-fedora", "ph:baseball-cap"],
-            "CUP": ["fluent-emoji-high-contrast:cup-with-straw", "mdi:cup", "ph:coffee"],
-            "BALL": ["fluent-emoji-high-contrast:soccer-ball", "mdi:basketball", "ph:football"],
-            "TREE": ["fluent-emoji-high-contrast:deciduous-tree", "mdi:tree", "ph:tree"],
             "FISH": ["fluent-emoji-high-contrast:fish", "mdi:fish", "ph:fish"],
             "BIRD": ["fluent-emoji-high-contrast:bird", "mdi:bird", "ph:bird"],
-            "BOOK": ["fluent-emoji-high-contrast:book", "mdi:book-open-variant", "ph:book"],
-            "CAKE": ["fluent-emoji-high-contrast:birthday-cake", "mdi:cake", "ph:cake"],
-            "STAR": ["fluent-emoji-high-contrast:star", "mdi:star", "ph:star"],
-            "MOON": ["fluent-emoji-high-contrast:full-moon", "mdi:moon-waning-crescent", "ph:moon"],
-            "DOOR": ["fluent-emoji-high-contrast:door", "mdi:door", "ph:door"],
-            "BOAT": ["fluent-emoji-high-contrast:sailboat", "mdi:sail-boat", "ph:boat"],
             "FROG": ["fluent-emoji-high-contrast:frog", "mdi:frog", "game-icons:frog"],
             "DUCK": ["fluent-emoji-high-contrast:duck", "mdi:duck", "twemoji:duck"],
             "BEAR": ["fluent-emoji-high-contrast:bear", "mdi:teddy-bear", "twemoji:bear"],
-            "LION": ["fluent-emoji-high-contrast:lion", "mdi:fruit-pineapple", "twemoji:lion"],
+            "LION": ["fluent-emoji-high-contrast:lion", "game-icons:lion", "twemoji:lion"],
+            "COW": ["fluent-emoji-high-contrast:cow", "mdi:cow", "game-icons:cow"],
+            "PIG": ["fluent-emoji-high-contrast:pig", "mdi:pig", "game-icons:pig"],
+            "SHEEP": ["fluent-emoji-high-contrast:ewe", "mdi:sheep", "game-icons:sheep"],
+            "HORSE": ["fluent-emoji-high-contrast:horse", "mdi:horse", "game-icons:horse-head"],
+            "MOUSE": ["fluent-emoji-high-contrast:mouse", "mdi:mouse", "game-icons:mouse"],
+            "RABBIT": ["fluent-emoji-high-contrast:rabbit", "mdi:rabbit", "game-icons:rabbit"],
+            "MONKEY": ["fluent-emoji-high-contrast:monkey", "mdi:monkey", "game-icons:monkey"],
+            "ELEPHANT": ["fluent-emoji-high-contrast:elephant", "mdi:elephant", "game-icons:elephant"],
+            "GIRAFFE": ["fluent-emoji-high-contrast:giraffe", "twemoji:giraffe", "noto:giraffe"],
+            "ZEBRA": ["fluent-emoji-high-contrast:zebra", "twemoji:zebra", "noto:zebra"],
+            "TIGER": ["fluent-emoji-high-contrast:tiger", "mdi:cat", "game-icons:tiger-head"],
+            "SNAKE": ["fluent-emoji-high-contrast:snake", "mdi:snake", "game-icons:snake"],
+            "TURTLE": ["fluent-emoji-high-contrast:turtle", "mdi:turtle", "game-icons:turtle"],
+            "CRAB": ["fluent-emoji-high-contrast:crab", "mdi:crab", "game-icons:crab"],
+            "WHALE": ["fluent-emoji-high-contrast:whale", "mdi:whale", "game-icons:whale-tail"],
+            "SHARK": ["fluent-emoji-high-contrast:shark", "mdi:shark", "game-icons:shark-jaws"],
+            "OCTOPUS": ["fluent-emoji-high-contrast:octopus", "mdi:octopus", "game-icons:octopus"],
+            "BEE": ["fluent-emoji-high-contrast:honeybee", "mdi:bee", "game-icons:bee"],
+            "BUTTERFLY": ["fluent-emoji-high-contrast:butterfly", "mdi:butterfly", "game-icons:butterfly"],
+            "SNAIL": ["fluent-emoji-high-contrast:snail", "mdi:snail", "game-icons:snail"],
+            "ANT": ["fluent-emoji-high-contrast:ant", "mdi:ant", "game-icons:ant"],
+            "SPIDER": ["fluent-emoji-high-contrast:spider", "mdi:spider", "game-icons:spider-alt"],
+            "OWL": ["fluent-emoji-high-contrast:owl", "mdi:owl", "game-icons:owl"],
+            "PENGUIN": ["fluent-emoji-high-contrast:penguin", "mdi:penguin", "game-icons:penguin"],
+            "CHICKEN": ["fluent-emoji-high-contrast:chicken", "mdi:egg", "game-icons:chicken"],
+            "ROOSTER": ["fluent-emoji-high-contrast:rooster", "mdi:bird", "game-icons:rooster"],
+            "PARROT": ["fluent-emoji-high-contrast:parrot", "mdi:bird", "game-icons:parrot-head"],
+            "BAT": ["fluent-emoji-high-contrast:bat", "mdi:bat", "game-icons:bat"],
+            "DEER": ["fluent-emoji-high-contrast:deer", "mdi:deer", "game-icons:deer"],
+            "FOX": ["fluent-emoji-high-contrast:fox", "mdi:fox", "game-icons:fox-head"],
+            "WOLF": ["fluent-emoji-high-contrast:wolf", "mdi:dog", "game-icons:wolf-head"],
+            "PANDA": ["fluent-emoji-high-contrast:panda", "mdi:panda", "game-icons:panda"],
+            "KOALA": ["fluent-emoji-high-contrast:koala", "twemoji:koala", "noto:koala"],
+            "KANGAROO": ["fluent-emoji-high-contrast:kangaroo", "twemoji:kangaroo", "game-icons:kangaroo"],
+            "GORILLA": ["fluent-emoji-high-contrast:gorilla", "twemoji:gorilla", "game-icons:gorilla"],
+            "CROCODILE": ["fluent-emoji-high-contrast:crocodile", "mdi:crocodile", "game-icons:crocodile"],
+            "HIPPO": ["fluent-emoji-high-contrast:hippopotamus", "twemoji:hippopotamus", "game-icons:hippo"],
+            "CAMEL": ["fluent-emoji-high-contrast:camel", "mdi:camel", "game-icons:camel-head"],
+            "DOLPHIN": ["fluent-emoji-high-contrast:dolphin", "mdi:dolphin", "game-icons:dolphin"],
+            "LADYBUG": ["fluent-emoji-high-contrast:lady-beetle", "mdi:ladybug", "game-icons:ladybug"],
+            "WORM": ["fluent-emoji-high-contrast:worm", "mdi:snake", "game-icons:worms"],
+
+            // FOOD
+            "APPLE": ["fluent-emoji-high-contrast:red-apple", "mdi:apple", "game-icons:apple-core"],
+            "BANANA": ["fluent-emoji-high-contrast:banana", "mdi:fruit-banana", "game-icons:banana"],
+            "ORANGE": ["fluent-emoji-high-contrast:tangerine", "mdi:fruit-citrus", "game-icons:orange-slice"],
+            "GRAPES": ["fluent-emoji-high-contrast:grapes", "mdi:fruit-grapes", "game-icons:grapes"],
+            "CHERRY": ["fluent-emoji-high-contrast:cherries", "mdi:fruit-cherries", "game-icons:cherries"],
+            "LEMON": ["fluent-emoji-high-contrast:lemon", "mdi:fruit-citrus", "game-icons:lemon"],
+            "PEACH": ["fluent-emoji-high-contrast:peach", "twemoji:peach", "noto:peach"],
+            "PEAR": ["fluent-emoji-high-contrast:pear", "mdi:fruit-pear", "game-icons:pear"],
+            "WATERMELON": ["fluent-emoji-high-contrast:watermelon", "mdi:fruit-watermelon", "game-icons:watermelon"],
+            "STRAWBERRY": ["fluent-emoji-high-contrast:strawberry", "mdi:fruit-strawberry", "game-icons:strawberry"],
+            "PINEAPPLE": ["fluent-emoji-high-contrast:pineapple", "mdi:fruit-pineapple", "game-icons:pineapple"],
+            "CARROT": ["fluent-emoji-high-contrast:carrot", "mdi:carrot", "game-icons:carrot"],
+            "CORN": ["fluent-emoji-high-contrast:ear-of-corn", "mdi:corn", "game-icons:corn"],
+            "TOMATO": ["fluent-emoji-high-contrast:tomato", "mdi:food-apple", "game-icons:tomato"],
+            "POTATO": ["fluent-emoji-high-contrast:potato", "mdi:food", "game-icons:potato"],
+            "ONION": ["fluent-emoji-high-contrast:onion", "mdi:food", "game-icons:onion"],
+            "MUSHROOM": ["fluent-emoji-high-contrast:mushroom", "mdi:mushroom", "game-icons:mushroom"],
+            "BROCCOLI": ["fluent-emoji-high-contrast:broccoli", "mdi:food-broccoli", "game-icons:broccoli"],
+            "PIZZA": ["fluent-emoji-high-contrast:pizza", "mdi:pizza", "game-icons:pizza-slice"],
+            "BURGER": ["fluent-emoji-high-contrast:hamburger", "mdi:hamburger", "game-icons:hamburger"],
+            "HOTDOG": ["fluent-emoji-high-contrast:hot-dog", "mdi:sausage", "game-icons:hot-dog"],
+            "TACO": ["fluent-emoji-high-contrast:taco", "mdi:taco", "game-icons:taco"],
+            "SANDWICH": ["fluent-emoji-high-contrast:sandwich", "mdi:food-croissant", "game-icons:sandwich"],
+            "BREAD": ["fluent-emoji-high-contrast:bread", "mdi:bread-slice", "game-icons:sliced-bread"],
+            "CHEESE": ["fluent-emoji-high-contrast:cheese-wedge", "mdi:cheese", "game-icons:cheese-wedge"],
+            "EGG": ["fluent-emoji-high-contrast:egg", "mdi:egg", "game-icons:egg"],
+            "BACON": ["fluent-emoji-high-contrast:bacon", "mdi:food-steak", "game-icons:bacon"],
+            "COOKIE": ["fluent-emoji-high-contrast:cookie", "mdi:cookie", "game-icons:cookie"],
+            "CAKE": ["fluent-emoji-high-contrast:birthday-cake", "mdi:cake", "ph:cake"],
+            "DONUT": ["fluent-emoji-high-contrast:doughnut", "mdi:food-drumstick", "game-icons:donut"],
+            "CANDY": ["fluent-emoji-high-contrast:candy", "mdi:candy", "game-icons:candy"],
+            "LOLLIPOP": ["fluent-emoji-high-contrast:lollipop", "mdi:candy", "game-icons:lollipop"],
+            "ICE CREAM": ["fluent-emoji-high-contrast:ice-cream", "mdi:ice-cream", "game-icons:ice-cream-cone"],
+            "POPCORN": ["fluent-emoji-high-contrast:popcorn", "mdi:popcorn", "game-icons:popcorn"],
+            "PRETZEL": ["fluent-emoji-high-contrast:pretzel", "mdi:food", "game-icons:pretzel"],
+            "HONEY": ["fluent-emoji-high-contrast:honey-pot", "mdi:bee", "game-icons:honey-jar"],
+            "MILK": ["fluent-emoji-high-contrast:glass-of-milk", "mdi:cup-water", "game-icons:milk-carton"],
+            "JUICE": ["fluent-emoji-high-contrast:beverage-box", "mdi:cup", "game-icons:orange-slice"],
+            "COFFEE": ["fluent-emoji-high-contrast:hot-beverage", "mdi:coffee", "ph:coffee"],
+            "TEA": ["fluent-emoji-high-contrast:teacup-without-handle", "mdi:tea", "game-icons:tea"],
+
+            // VEHICLES
+            "CAR": ["fluent-emoji-high-contrast:automobile", "mdi:car", "ph:car"],
+            "BUS": ["fluent-emoji-high-contrast:bus", "mdi:bus", "ph:bus"],
+            "TRUCK": ["fluent-emoji-high-contrast:pickup-truck", "mdi:truck", "game-icons:truck"],
+            "BIKE": ["fluent-emoji-high-contrast:bicycle", "mdi:bike", "ph:bicycle"],
+            "TRAIN": ["fluent-emoji-high-contrast:locomotive", "mdi:train", "ph:train"],
+            "PLANE": ["fluent-emoji-high-contrast:airplane", "mdi:airplane", "ph:airplane"],
+            "BOAT": ["fluent-emoji-high-contrast:sailboat", "mdi:sail-boat", "ph:boat"],
+            "SHIP": ["fluent-emoji-high-contrast:ship", "mdi:ferry", "game-icons:cargo-ship"],
+            "ROCKET": ["fluent-emoji-high-contrast:rocket", "mdi:rocket", "game-icons:rocket"],
+            "HELICOPTER": ["fluent-emoji-high-contrast:helicopter", "mdi:helicopter", "game-icons:helicopter"],
+            "TRACTOR": ["fluent-emoji-high-contrast:tractor", "mdi:tractor", "game-icons:tractor"],
+            "AMBULANCE": ["fluent-emoji-high-contrast:ambulance", "mdi:ambulance", "game-icons:ambulance"],
+            "FIRE TRUCK": ["fluent-emoji-high-contrast:fire-engine", "mdi:fire-truck", "game-icons:fire-truck"],
+            "POLICE CAR": ["fluent-emoji-high-contrast:police-car", "mdi:car-emergency", "game-icons:police-car"],
+            "TAXI": ["fluent-emoji-high-contrast:taxi", "mdi:taxi", "game-icons:taxi"],
+            "MOTORCYCLE": ["fluent-emoji-high-contrast:motorcycle", "mdi:motorbike", "game-icons:motorcycle"],
+            "SCOOTER": ["fluent-emoji-high-contrast:motor-scooter", "mdi:scooter", "game-icons:scooter"],
+            "SKATEBOARD": ["fluent-emoji-high-contrast:skateboard", "mdi:skateboard", "game-icons:skateboard"],
+
+            // NATURE
+            "SUN": ["fluent-emoji-high-contrast:sun", "ph:sun", "tabler:sun"],
+            "MOON": ["fluent-emoji-high-contrast:full-moon", "mdi:moon-waning-crescent", "ph:moon"],
+            "STAR": ["fluent-emoji-high-contrast:star", "mdi:star", "ph:star"],
+            "CLOUD": ["fluent-emoji-high-contrast:cloud", "mdi:cloud", "ph:cloud"],
+            "RAIN": ["fluent-emoji-high-contrast:cloud-with-rain", "mdi:weather-rainy", "ph:cloud-rain"],
+            "SNOW": ["fluent-emoji-high-contrast:snowflake", "mdi:snowflake", "ph:snowflake"],
+            "RAINBOW": ["fluent-emoji-high-contrast:rainbow", "mdi:rainbow", "game-icons:rainbow"],
+            "LIGHTNING": ["fluent-emoji-high-contrast:cloud-with-lightning", "mdi:lightning-bolt", "game-icons:lightning-storm"],
+            "TORNADO": ["fluent-emoji-high-contrast:tornado", "mdi:weather-tornado", "game-icons:tornado"],
+            "TREE": ["fluent-emoji-high-contrast:deciduous-tree", "mdi:tree", "ph:tree"],
+            "FLOWER": ["fluent-emoji-high-contrast:sunflower", "mdi:flower", "game-icons:flower-pot"],
+            "LEAF": ["fluent-emoji-high-contrast:leaf-fluttering-in-wind", "mdi:leaf", "ph:leaf"],
+            "GRASS": ["fluent-emoji-high-contrast:sheaf-of-rice", "mdi:grass", "game-icons:grass"],
+            "MOUNTAIN": ["fluent-emoji-high-contrast:mountain", "mdi:mountain", "game-icons:mountains"],
+            "VOLCANO": ["fluent-emoji-high-contrast:volcano", "mdi:volcano", "game-icons:volcano"],
+            "OCEAN": ["fluent-emoji-high-contrast:water-wave", "mdi:waves", "game-icons:wave-surfer"],
+            "RIVER": ["fluent-emoji-high-contrast:water-wave", "mdi:water", "game-icons:river"],
+            "DESERT": ["fluent-emoji-high-contrast:desert", "mdi:cactus", "game-icons:desert"],
+            "ISLAND": ["fluent-emoji-high-contrast:desert-island", "mdi:island", "game-icons:island"],
+            "FOREST": ["fluent-emoji-high-contrast:evergreen-tree", "mdi:forest", "game-icons:forest"],
+            "CACTUS": ["fluent-emoji-high-contrast:cactus", "mdi:cactus", "game-icons:cactus"],
+            "PALM TREE": ["fluent-emoji-high-contrast:palm-tree", "mdi:palm-tree", "game-icons:palm-tree"],
+            "FIRE": ["fluent-emoji-high-contrast:fire", "mdi:fire", "game-icons:fire"],
+            "WATER": ["fluent-emoji-high-contrast:droplet", "mdi:water", "game-icons:drop"],
+            "EARTH": ["fluent-emoji-high-contrast:globe-showing-americas", "mdi:earth", "game-icons:earth-america"],
+
+            // OBJECTS - HOME
+            "HOUSE": ["fluent-emoji-high-contrast:house", "mdi:home", "ph:house"],
+            "DOOR": ["fluent-emoji-high-contrast:door", "mdi:door", "ph:door"],
+            "WINDOW": ["fluent-emoji-high-contrast:window", "mdi:window-closed", "game-icons:window"],
+            "KEY": ["fluent-emoji-high-contrast:key", "mdi:key", "ph:key"],
+            "BED": ["fluent-emoji-high-contrast:bed", "mdi:bed", "ph:bed"],
+            "CHAIR": ["fluent-emoji-high-contrast:chair", "mdi:chair-rolling", "game-icons:wooden-chair"],
+            "TABLE": ["fluent-emoji-high-contrast:round-pushpin", "mdi:table-furniture", "game-icons:round-table"],
+            "COUCH": ["fluent-emoji-high-contrast:couch-and-lamp", "mdi:sofa", "game-icons:sofa"],
+            "LAMP": ["fluent-emoji-high-contrast:lamp", "mdi:lamp", "ph:lamp"],
+            "CLOCK": ["fluent-emoji-high-contrast:alarm-clock", "mdi:clock", "ph:clock"],
+            "MIRROR": ["fluent-emoji-high-contrast:mirror", "mdi:mirror", "game-icons:mirror-mirror"],
+            "BATHTUB": ["fluent-emoji-high-contrast:bathtub", "mdi:bathtub", "game-icons:bathtub"],
+            "TOILET": ["fluent-emoji-high-contrast:toilet", "mdi:toilet", "game-icons:toilet-paper"],
+            "SHOWER": ["fluent-emoji-high-contrast:shower", "mdi:shower", "game-icons:shower"],
+            "SOAP": ["fluent-emoji-high-contrast:soap", "mdi:hand-wash", "game-icons:soap"],
+            "TOWEL": ["fluent-emoji-high-contrast:towel", "mdi:paper-roll", "game-icons:towel"],
+            "TOOTHBRUSH": ["fluent-emoji-high-contrast:toothbrush", "mdi:toothbrush", "game-icons:toothbrush"],
+            "PILLOW": ["mdi:pillow", "mdi:sleep", "game-icons:pillow"],
+            "BLANKET": ["fluent-emoji-high-contrast:bed", "mdi:bed", "game-icons:bed"],
+
+            // OBJECTS - KITCHEN
+            "CUP": ["fluent-emoji-high-contrast:cup-with-straw", "mdi:cup", "ph:coffee"],
+            "PLATE": ["fluent-emoji-high-contrast:shallow-pan-of-food", "mdi:silverware-variant", "game-icons:pie"],
+            "BOWL": ["fluent-emoji-high-contrast:bowl-with-spoon", "mdi:bowl", "game-icons:bowl"],
+            "SPOON": ["fluent-emoji-high-contrast:spoon", "mdi:spoon-sugar", "game-icons:spoon"],
+            "FORK": ["fluent-emoji-high-contrast:fork-and-knife", "mdi:silverware-fork", "game-icons:fork"],
+            "KNIFE": ["fluent-emoji-high-contrast:kitchen-knife", "mdi:knife", "game-icons:kitchen-knives"],
+            "POT": ["fluent-emoji-high-contrast:pot-of-food", "mdi:pot-steam", "game-icons:cauldron"],
+            "PAN": ["fluent-emoji-high-contrast:cooking", "mdi:pan", "game-icons:frying-pan"],
+            "FRIDGE": ["fluent-emoji-high-contrast:ice-cube", "mdi:fridge", "game-icons:freezer"],
+            "OVEN": ["fluent-emoji-high-contrast:cooking", "mdi:stove", "game-icons:gas-stove"],
+            "BLENDER": ["fluent-emoji-high-contrast:beverage-box", "mdi:blender", "game-icons:manual-juicer"],
+
+            // OBJECTS - CLOTHING
+            "HAT": ["fluent-emoji-high-contrast:top-hat", "mdi:hat-fedora", "ph:baseball-cap"],
+            "SHOE": ["fluent-emoji-high-contrast:running-shoe", "mdi:shoe-formal", "ph:sneaker"],
+            "SOCK": ["fluent-emoji-high-contrast:socks", "mdi:shoe-sneaker", "game-icons:socks"],
+            "COAT": ["fluent-emoji-high-contrast:coat", "mdi:coat-rack", "game-icons:coat"],
+            "SHIRT": ["fluent-emoji-high-contrast:t-shirt", "mdi:tshirt-crew", "game-icons:t-shirt"],
+            "PANTS": ["fluent-emoji-high-contrast:jeans", "mdi:account-arrow-down", "game-icons:trousers"],
+            "DRESS": ["fluent-emoji-high-contrast:dress", "mdi:tshirt-crew", "game-icons:dress"],
+            "GLASSES": ["fluent-emoji-high-contrast:glasses", "mdi:glasses", "game-icons:sunglasses"],
+            "GLOVES": ["fluent-emoji-high-contrast:gloves", "mdi:hand-back-left", "game-icons:gloves"],
+            "SCARF": ["fluent-emoji-high-contrast:scarf", "mdi:scarf", "game-icons:scarf"],
+            "BOOTS": ["fluent-emoji-high-contrast:hiking-boot", "mdi:shoe-heel", "game-icons:boots"],
+            "BELT": ["fluent-emoji-high-contrast:hole", "mdi:circle", "game-icons:belt"],
+            "TIE": ["fluent-emoji-high-contrast:necktie", "mdi:tie", "game-icons:tie"],
+            "CROWN": ["fluent-emoji-high-contrast:crown", "mdi:crown", "game-icons:crown"],
+            "RING": ["fluent-emoji-high-contrast:ring", "mdi:ring", "game-icons:ring"],
+            "WATCH": ["fluent-emoji-high-contrast:watch", "mdi:watch", "game-icons:wrist-watch"],
+            "UMBRELLA": ["fluent-emoji-high-contrast:umbrella", "mdi:umbrella", "game-icons:umbrella"],
+            "BAG": ["fluent-emoji-high-contrast:handbag", "mdi:bag-personal", "game-icons:school-bag"],
+            "BACKPACK": ["fluent-emoji-high-contrast:backpack", "mdi:bag-personal", "game-icons:backpack"],
+
+            // OBJECTS - TOYS & PLAY
+            "BALL": ["fluent-emoji-high-contrast:soccer-ball", "mdi:basketball", "ph:football"],
+            "KITE": ["fluent-emoji-high-contrast:kite", "mdi:kite", "game-icons:kite"],
+            "DOLL": ["fluent-emoji-high-contrast:teddy-bear", "mdi:teddy-bear", "game-icons:doll-face"],
+            "ROBOT": ["fluent-emoji-high-contrast:robot", "mdi:robot", "game-icons:robot-golem"],
+            "BALLOON": ["fluent-emoji-high-contrast:balloon", "mdi:balloon", "game-icons:balloon"],
+            "BLOCKS": ["fluent-emoji-high-contrast:bricks", "mdi:cube", "game-icons:cube"],
+            "PUZZLE": ["fluent-emoji-high-contrast:puzzle-piece", "mdi:puzzle", "game-icons:jigsaw-piece"],
+            "SLIDE": ["fluent-emoji-high-contrast:playground-slide", "mdi:slide", "game-icons:playground"],
+            "SWING": ["mdi:gondola", "mdi:seesaw", "game-icons:outdoor-bench"],
+            "DRUM": ["fluent-emoji-high-contrast:drum", "mdi:drum", "game-icons:drum"],
+            "GUITAR": ["fluent-emoji-high-contrast:guitar", "mdi:guitar-acoustic", "game-icons:guitar"],
+            "PIANO": ["fluent-emoji-high-contrast:musical-keyboard", "mdi:piano", "game-icons:piano-keys"],
+            "TRUMPET": ["fluent-emoji-high-contrast:trumpet", "mdi:trumpet", "game-icons:trumpet"],
+            "BELL": ["fluent-emoji-high-contrast:bell", "mdi:bell", "ph:bell"],
+
+            // OBJECTS - TOOLS & ITEMS
+            "BOOK": ["fluent-emoji-high-contrast:book", "mdi:book-open-variant", "ph:book"],
+            "PENCIL": ["fluent-emoji-high-contrast:pencil", "mdi:pencil", "game-icons:pencil"],
+            "CRAYON": ["fluent-emoji-high-contrast:crayon", "mdi:draw", "game-icons:crayon"],
+            "SCISSORS": ["fluent-emoji-high-contrast:scissors", "mdi:scissors-cutting", "game-icons:scissors"],
+            "PAPER": ["fluent-emoji-high-contrast:page-facing-up", "mdi:file", "game-icons:paper"],
+            "RULER": ["fluent-emoji-high-contrast:straight-ruler", "mdi:ruler", "game-icons:ruler"],
+            "BRUSH": ["fluent-emoji-high-contrast:paintbrush", "mdi:brush", "game-icons:paint-brush"],
+            "CAMERA": ["fluent-emoji-high-contrast:camera", "mdi:camera", "ph:camera"],
+            "PHONE": ["fluent-emoji-high-contrast:mobile-phone", "mdi:cellphone", "ph:phone"],
+            "TV": ["fluent-emoji-high-contrast:television", "mdi:television", "game-icons:tv"],
+            "COMPUTER": ["fluent-emoji-high-contrast:laptop", "mdi:laptop", "game-icons:laptop"],
+            "FLASHLIGHT": ["fluent-emoji-high-contrast:flashlight", "mdi:flashlight", "game-icons:flashlight"],
+            "CANDLE": ["fluent-emoji-high-contrast:candle", "mdi:candle", "game-icons:candle"],
+            "HAMMER": ["fluent-emoji-high-contrast:hammer", "mdi:hammer", "game-icons:hammer"],
+            "SAW": ["fluent-emoji-high-contrast:saw", "mdi:hand-saw", "game-icons:hand-saw"],
+            "WRENCH": ["fluent-emoji-high-contrast:wrench", "mdi:wrench", "game-icons:wrench"],
+            "MAGNET": ["fluent-emoji-high-contrast:magnet", "mdi:magnet", "game-icons:magnet"],
+
+            // BODY PARTS
             "HAND": ["fluent-emoji-high-contrast:hand-with-fingers-splayed", "mdi:hand-back-left", "ph:hand"],
             "FOOT": ["fluent-emoji-high-contrast:foot", "mdi:foot-print", "game-icons:foot"],
             "EYE": ["fluent-emoji-high-contrast:eye", "mdi:eye", "ph:eye"],
             "EAR": ["fluent-emoji-high-contrast:ear", "mdi:ear-hearing", "ph:ear"],
-            "BED": ["fluent-emoji-high-contrast:bed", "mdi:bed", "ph:bed"],
-            "CAR": ["fluent-emoji-high-contrast:automobile", "mdi:car", "ph:car"],
-            "BUS": ["fluent-emoji-high-contrast:bus", "mdi:bus", "ph:bus"],
-            "BIKE": ["fluent-emoji-high-contrast:bicycle", "mdi:bike", "ph:bicycle"],
-            "KITE": ["fluent-emoji-high-contrast:kite", "mdi:kite", "game-icons:kite"],
-            "RAIN": ["fluent-emoji-high-contrast:cloud-with-rain", "mdi:weather-rainy", "ph:cloud-rain"],
-            "SNOW": ["fluent-emoji-high-contrast:snowflake", "mdi:snowflake", "ph:snowflake"],
-            "LEAF": ["fluent-emoji-high-contrast:leaf-fluttering-in-wind", "mdi:leaf", "ph:leaf"],
-            "BELL": ["fluent-emoji-high-contrast:bell", "mdi:bell", "ph:bell"],
-            "DRUM": ["fluent-emoji-high-contrast:drum", "mdi:drum", "ph:metronome"],
-            "LAMP": ["fluent-emoji-high-contrast:lamp", "mdi:lamp", "ph:lamp"],
-            "SOCK": ["fluent-emoji-high-contrast:socks", "mdi:shoe-sneaker", "game-icons:socks"],
-            "SHOE": ["fluent-emoji-high-contrast:running-shoe", "mdi:shoe-formal", "ph:sneaker"],
-            "COAT": ["fluent-emoji-high-contrast:coat", "mdi:coat-rack", "ph:coat-hanger"],
-            "MILK": ["fluent-emoji-high-contrast:glass-of-milk", "mdi:cup-water", "game-icons:milk-carton"],
-            "APPLE": ["fluent-emoji-high-contrast:red-apple", "mdi:apple", "ph:apple-logo"],
-            "HOUSE": ["fluent-emoji-high-contrast:house", "mdi:home", "ph:house"],
-            "PLANE": ["fluent-emoji-high-contrast:airplane", "mdi:airplane", "ph:airplane"],
-            "TRAIN": ["fluent-emoji-high-contrast:locomotive", "mdi:train", "ph:train"],
-            "SPOON": ["fluent-emoji-high-contrast:spoon", "mdi:spoon-sugar", "game-icons:spoon"],
-            "FORK": ["fluent-emoji-high-contrast:fork-and-knife", "mdi:silverware-fork", "game-icons:fork"]
+            "NOSE": ["fluent-emoji-high-contrast:nose", "mdi:scent", "game-icons:nose-front"],
+            "MOUTH": ["fluent-emoji-high-contrast:mouth", "mdi:mouth", "game-icons:mouth"],
+            "TONGUE": ["fluent-emoji-high-contrast:tongue", "mdi:tongue", "game-icons:tongue"],
+            "TOOTH": ["fluent-emoji-high-contrast:tooth", "mdi:tooth", "game-icons:tooth"],
+            "HEART": ["fluent-emoji-high-contrast:red-heart", "mdi:heart", "ph:heart"],
+            "BRAIN": ["fluent-emoji-high-contrast:brain", "mdi:brain", "game-icons:brain"],
+            "BONE": ["fluent-emoji-high-contrast:bone", "mdi:bone", "game-icons:bone"],
+            "MUSCLE": ["fluent-emoji-high-contrast:flexed-biceps", "mdi:arm-flex", "game-icons:biceps"],
+
+            // BUILDINGS & PLACES
+            "SCHOOL": ["fluent-emoji-high-contrast:school", "mdi:school", "game-icons:graduate-cap"],
+            "HOSPITAL": ["fluent-emoji-high-contrast:hospital", "mdi:hospital-building", "game-icons:hospital"],
+            "CHURCH": ["fluent-emoji-high-contrast:church", "mdi:church", "game-icons:church"],
+            "CASTLE": ["fluent-emoji-high-contrast:castle", "mdi:castle", "game-icons:castle"],
+            "TENT": ["fluent-emoji-high-contrast:tent", "mdi:tent", "game-icons:camping-tent"],
+            "BRIDGE": ["fluent-emoji-high-contrast:bridge-at-night", "mdi:bridge", "game-icons:bridge"],
+            "STADIUM": ["fluent-emoji-high-contrast:stadium", "mdi:stadium", "game-icons:stadium"],
+            "FACTORY": ["fluent-emoji-high-contrast:factory", "mdi:factory", "game-icons:factory"],
+            "LIGHTHOUSE": ["fluent-emoji-high-contrast:lighthouse", "mdi:lighthouse", "game-icons:lighthouse"],
+
+            // SPACE & FANTASY
+            "ROCKET": ["fluent-emoji-high-contrast:rocket", "mdi:rocket", "game-icons:rocket"],
+            "PLANET": ["fluent-emoji-high-contrast:ringed-planet", "mdi:planet-ring", "game-icons:planet-core"],
+            "ALIEN": ["fluent-emoji-high-contrast:alien", "mdi:alien", "game-icons:alien-stare"],
+            "DRAGON": ["fluent-emoji-high-contrast:dragon", "mdi:dragon", "game-icons:dragon-head"],
+            "UNICORN": ["fluent-emoji-high-contrast:unicorn", "mdi:unicorn", "game-icons:unicorn"],
+            "GHOST": ["fluent-emoji-high-contrast:ghost", "mdi:ghost", "game-icons:ghost"],
+            "WIZARD": ["fluent-emoji-high-contrast:mage", "mdi:wizard-hat", "game-icons:wizard-face"],
+            "FAIRY": ["fluent-emoji-high-contrast:fairy", "mdi:butterfly", "game-icons:fairy"],
+            "MERMAID": ["fluent-emoji-high-contrast:mermaid", "mdi:fish", "game-icons:mermaid"],
+            "PIRATE": ["fluent-emoji-high-contrast:pirate-flag", "mdi:pirate", "game-icons:pirate-skull"],
+            "NINJA": ["fluent-emoji-high-contrast:ninja", "mdi:ninja", "game-icons:ninja-head"],
+            "PRINCESS": ["fluent-emoji-high-contrast:princess", "mdi:crown", "game-icons:queen-crown"],
+            "KING": ["fluent-emoji-high-contrast:prince", "mdi:crown", "game-icons:king"],
+
+            // MISC
+            "GIFT": ["fluent-emoji-high-contrast:wrapped-gift", "mdi:gift", "game-icons:gift"],
+            "FLAG": ["fluent-emoji-high-contrast:triangular-flag", "mdi:flag", "game-icons:flag"],
+            "TROPHY": ["fluent-emoji-high-contrast:trophy", "mdi:trophy", "game-icons:trophy"],
+            "MEDAL": ["fluent-emoji-high-contrast:sports-medal", "mdi:medal", "game-icons:medal"],
+            "MONEY": ["fluent-emoji-high-contrast:money-bag", "mdi:cash", "game-icons:money-stack"],
+            "DIAMOND": ["fluent-emoji-high-contrast:gem-stone", "mdi:diamond-stone", "game-icons:diamond"],
+            "ANCHOR": ["fluent-emoji-high-contrast:anchor", "mdi:anchor", "game-icons:anchor"],
+            "COMPASS": ["fluent-emoji-high-contrast:compass", "mdi:compass", "game-icons:compass"],
+            "MAP": ["fluent-emoji-high-contrast:world-map", "mdi:map", "game-icons:treasure-map"],
+            "LETTER": ["fluent-emoji-high-contrast:envelope", "mdi:email", "game-icons:envelope"],
+            "PACKAGE": ["fluent-emoji-high-contrast:package", "mdi:package", "game-icons:cardboard-box"]
         };
         const P_WORDS = Object.keys(P_ICONS);
         let pCurrent = "";
+        let pDeck = [];
+
+        function shuffle(array) {
+            const arr = array.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
 
         function pNewWord() {
-            let next;
-            do { next = P_WORDS[Math.floor(Math.random() * P_WORDS.length)]; } while (next === pCurrent && P_WORDS.length > 1);
-            pCurrent = next;
+            if (pDeck.length === 0) {
+                pDeck = shuffle(P_WORDS);
+            }
+            pCurrent = pDeck.pop();
             document.getElementById("p-word").textContent = pCurrent;
             const icons = P_ICONS[pCurrent];
             document.getElementById("p-img1").src = "https://api.iconify.design/" + icons[0] + ".svg?height=200";
@@ -497,40 +746,16 @@
 
         // ========== CHARADES DATA ==========
         const C_DATA = {
-            "ELEPHANT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:elephant", clues: [
-                { icon: "mdi:elephant", text: "SWING YOUR ARM LIKE A TRUNK" },
-                { icon: "game-icons:weight", text: "STOMP LIKE A BIG HEAVY ANIMAL" },
-                { icon: "mdi:ear-hearing", text: "SHOW BIG FLOPPY EARS" }
+            // ANIMALS - All great for acting!
+            "CAT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:cat", clues: [
+                { icon: "mdi:cat", text: "LICK YOUR PAW" },
+                { icon: "mdi:sleep", text: "CURL UP AND NAP" },
+                { icon: "mdi:volume-high", text: "SAY MEOW" }
             ]},
-            "MONKEY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:monkey", clues: [
-                { icon: "mdi:forest", text: "PRETEND TO CLIMB A TREE" },
-                { icon: "fluent-emoji-high-contrast:banana", text: "PRETEND TO EAT A BANANA" },
-                { icon: "mdi:arm-flex", text: "SCRATCH UNDER YOUR ARMS" }
-            ]},
-            "SNAKE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:snake", clues: [
-                { icon: "mdi:snake", text: "WIGGLE YOUR BODY SIDE TO SIDE" },
-                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE" },
-                { icon: "mdi:floor-plan", text: "CRAWL LOW ON THE GROUND" }
-            ]},
-            "BUTTERFLY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:butterfly", clues: [
-                { icon: "mdi:butterfly", text: "FLAP YOUR ARMS LIKE WINGS" },
-                { icon: "fluent-emoji-high-contrast:flower", text: "PRETEND TO LAND ON FLOWERS" },
-                { icon: "mdi:feather", text: "MOVE SOFTLY AND GENTLY" }
-            ]},
-            "FROG": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:frog", clues: [
-                { icon: "mdi:arrow-up-bold", text: "JUMP UP AND DOWN" },
-                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE FAST" },
-                { icon: "mdi:human-handsdown", text: "SQUAT DOWN LOW" }
-            ]},
-            "CHICKEN": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:chicken", clues: [
-                { icon: "mdi:egg", text: "PRETEND TO LAY AN EGG" },
-                { icon: "game-icons:chicken-leg", text: "FLAP YOUR BENT ARMS" },
-                { icon: "mdi:volume-high", text: "BOB YOUR HEAD AND CLUCK" }
-            ]},
-            "RABBIT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:rabbit", clues: [
-                { icon: "mdi:rabbit", text: "HOP AROUND" },
-                { icon: "fluent-emoji-high-contrast:carrot", text: "PRETEND TO NIBBLE A CARROT" },
-                { icon: "mdi:ear-hearing", text: "PUT HANDS UP LIKE LONG EARS" }
+            "DOG": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:dog", clues: [
+                { icon: "mdi:dog", text: "WAG YOUR TAIL" },
+                { icon: "mdi:bone", text: "PRETEND TO DIG A HOLE" },
+                { icon: "mdi:volume-high", text: "BARK LIKE A DOG" }
             ]},
             "FISH": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:fish", clues: [
                 { icon: "mdi:fish", text: "PUT HANDS TOGETHER AND SWIM" },
@@ -542,11 +767,178 @@
                 { icon: "mdi:music", text: "PRETEND TO CHIRP AND SING" },
                 { icon: "game-icons:nest-birds", text: "PRETEND TO PECK FOR FOOD" }
             ]},
+            "FROG": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:frog", clues: [
+                { icon: "mdi:arrow-up-bold", text: "JUMP UP AND DOWN" },
+                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE FAST" },
+                { icon: "mdi:human-handsdown", text: "SQUAT DOWN LOW" }
+            ]},
+            "DUCK": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:duck", clues: [
+                { icon: "mdi:duck", text: "WADDLE SIDE TO SIDE" },
+                { icon: "mdi:volume-high", text: "SAY QUACK QUACK" },
+                { icon: "mdi:water", text: "PRETEND TO SWIM" }
+            ]},
+            "BEAR": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:bear", clues: [
+                { icon: "mdi:paw", text: "SHOW BIG CLAWS" },
+                { icon: "mdi:volume-high", text: "GROWL LIKE A BEAR" },
+                { icon: "mdi:walk", text: "WALK SLOWLY AND HEAVY" }
+            ]},
             "LION": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:lion", clues: [
                 { icon: "mdi:volume-high", text: "ROAR LOUDLY" },
                 { icon: "game-icons:lion", text: "SHOW YOUR CLAWS" },
                 { icon: "mdi:hair-dryer", text: "SHAKE YOUR HEAD LIKE A MANE" }
             ]},
+            "COW": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:cow", clues: [
+                { icon: "mdi:cow", text: "SAY MOO" },
+                { icon: "mdi:grass", text: "PRETEND TO EAT GRASS" },
+                { icon: "mdi:water", text: "PRETEND TO GIVE MILK" }
+            ]},
+            "PIG": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:pig", clues: [
+                { icon: "mdi:pig", text: "OINK OINK" },
+                { icon: "mdi:nose", text: "PUSH NOSE UP LIKE A SNOUT" },
+                { icon: "mdi:water", text: "ROLL IN THE MUD" }
+            ]},
+            "SHEEP": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:ewe", clues: [
+                { icon: "mdi:sheep", text: "SAY BAAA" },
+                { icon: "mdi:hair-dryer", text: "SHOW FLUFFY WOOL" },
+                { icon: "mdi:grass", text: "PRETEND TO EAT GRASS" }
+            ]},
+            "HORSE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:horse", clues: [
+                { icon: "mdi:horse", text: "GALLOP AROUND" },
+                { icon: "mdi:volume-high", text: "NEIGH LIKE A HORSE" },
+                { icon: "mdi:foot-print", text: "STOMP YOUR HOOVES" }
+            ]},
+            "MOUSE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:mouse", clues: [
+                { icon: "mdi:mouse", text: "MAKE YOURSELF TINY" },
+                { icon: "mdi:cheese", text: "NIBBLE ON CHEESE" },
+                { icon: "mdi:run", text: "SCURRY AROUND FAST" }
+            ]},
+            "RABBIT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:rabbit", clues: [
+                { icon: "mdi:rabbit", text: "HOP AROUND" },
+                { icon: "fluent-emoji-high-contrast:carrot", text: "PRETEND TO NIBBLE A CARROT" },
+                { icon: "mdi:ear-hearing", text: "PUT HANDS UP LIKE LONG EARS" }
+            ]},
+            "MONKEY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:monkey", clues: [
+                { icon: "mdi:forest", text: "PRETEND TO CLIMB A TREE" },
+                { icon: "fluent-emoji-high-contrast:banana", text: "PRETEND TO EAT A BANANA" },
+                { icon: "mdi:arm-flex", text: "SCRATCH UNDER YOUR ARMS" }
+            ]},
+            "ELEPHANT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:elephant", clues: [
+                { icon: "mdi:elephant", text: "SWING YOUR ARM LIKE A TRUNK" },
+                { icon: "game-icons:weight", text: "STOMP LIKE A BIG HEAVY ANIMAL" },
+                { icon: "mdi:ear-hearing", text: "SHOW BIG FLOPPY EARS" }
+            ]},
+            "GIRAFFE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:giraffe", clues: [
+                { icon: "mdi:arrow-up", text: "STRETCH YOUR NECK UP HIGH" },
+                { icon: "mdi:tree", text: "EAT LEAVES FROM A TALL TREE" },
+                { icon: "mdi:walk", text: "WALK WITH LONG LEGS" }
+            ]},
+            "TIGER": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:tiger", clues: [
+                { icon: "mdi:cat", text: "PROWL LIKE A BIG CAT" },
+                { icon: "mdi:volume-high", text: "GROWL FIERCELY" },
+                { icon: "mdi:paw", text: "SHOW YOUR CLAWS" }
+            ]},
+            "SNAKE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:snake", clues: [
+                { icon: "mdi:snake", text: "WIGGLE YOUR BODY SIDE TO SIDE" },
+                { icon: "game-icons:tongue", text: "STICK OUT YOUR TONGUE" },
+                { icon: "mdi:floor-plan", text: "CRAWL LOW ON THE GROUND" }
+            ]},
+            "TURTLE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:turtle", clues: [
+                { icon: "mdi:turtle", text: "WALK VERY SLOWLY" },
+                { icon: "mdi:shield", text: "HIDE IN YOUR SHELL" },
+                { icon: "mdi:swim", text: "PADDLE YOUR FLIPPERS" }
+            ]},
+            "CRAB": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:crab", clues: [
+                { icon: "mdi:crab", text: "WALK SIDEWAYS" },
+                { icon: "mdi:scissors-cutting", text: "PINCH WITH YOUR CLAWS" },
+                { icon: "mdi:beach", text: "SCUTTLE ON THE SAND" }
+            ]},
+            "SHARK": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:shark", clues: [
+                { icon: "mdi:shark", text: "PUT HAND ON HEAD LIKE A FIN" },
+                { icon: "mdi:swim", text: "SWIM AROUND HUNTING" },
+                { icon: "mdi:tooth", text: "SHOW YOUR SHARP TEETH" }
+            ]},
+            "OCTOPUS": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:octopus", clues: [
+                { icon: "mdi:octopus", text: "WAVE ALL YOUR ARMS" },
+                { icon: "mdi:swim", text: "SWIM AND SQUIRT INK" },
+                { icon: "mdi:gesture", text: "WIGGLE LIKE TENTACLES" }
+            ]},
+            "BEE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:honeybee", clues: [
+                { icon: "mdi:bee", text: "BUZZ AROUND" },
+                { icon: "mdi:flower", text: "VISIT FLOWERS" },
+                { icon: "mdi:bee", text: "PRETEND TO STING" }
+            ]},
+            "BUTTERFLY": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:butterfly", clues: [
+                { icon: "mdi:butterfly", text: "FLAP YOUR ARMS LIKE WINGS" },
+                { icon: "fluent-emoji-high-contrast:flower", text: "PRETEND TO LAND ON FLOWERS" },
+                { icon: "mdi:feather", text: "MOVE SOFTLY AND GENTLY" }
+            ]},
+            "SNAIL": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:snail", clues: [
+                { icon: "mdi:snail", text: "MOVE VERY VERY SLOWLY" },
+                { icon: "mdi:home", text: "CARRY YOUR SHELL ON YOUR BACK" },
+                { icon: "mdi:gesture-tap", text: "PUT OUT YOUR ANTENNAE" }
+            ]},
+            "SPIDER": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:spider", clues: [
+                { icon: "mdi:spider", text: "CRAWL WITH EIGHT LEGS" },
+                { icon: "mdi:web", text: "PRETEND TO SPIN A WEB" },
+                { icon: "mdi:arrow-down", text: "HANG FROM A THREAD" }
+            ]},
+            "OWL": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:owl", clues: [
+                { icon: "mdi:owl", text: "SAY HOO HOO" },
+                { icon: "mdi:eye", text: "MAKE BIG ROUND EYES" },
+                { icon: "mdi:rotate-right", text: "TURN YOUR HEAD AROUND" }
+            ]},
+            "PENGUIN": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:penguin", clues: [
+                { icon: "mdi:penguin", text: "WADDLE WITH ARMS AT SIDES" },
+                { icon: "mdi:swim", text: "SLIDE ON YOUR BELLY" },
+                { icon: "mdi:snowflake", text: "SHIVER IN THE COLD" }
+            ]},
+            "CHICKEN": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:chicken", clues: [
+                { icon: "mdi:egg", text: "PRETEND TO LAY AN EGG" },
+                { icon: "game-icons:chicken-leg", text: "FLAP YOUR BENT ARMS" },
+                { icon: "mdi:volume-high", text: "BOB YOUR HEAD AND CLUCK" }
+            ]},
+            "ROOSTER": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:rooster", clues: [
+                { icon: "mdi:bird", text: "COCK-A-DOODLE-DOO" },
+                { icon: "mdi:weather-sunny", text: "WAKE UP IN THE MORNING" },
+                { icon: "mdi:walk", text: "STRUT AROUND PROUDLY" }
+            ]},
+            "BAT": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:bat", clues: [
+                { icon: "mdi:bat", text: "FLAP YOUR WINGS AT NIGHT" },
+                { icon: "mdi:arrow-down", text: "HANG UPSIDE DOWN" },
+                { icon: "mdi:volume-high", text: "MAKE SQUEAKY SOUNDS" }
+            ]},
+            "DEER": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:deer", clues: [
+                { icon: "mdi:deer", text: "PUT HANDS ON HEAD LIKE ANTLERS" },
+                { icon: "mdi:run", text: "LEAP AND BOUND" },
+                { icon: "mdi:ear-hearing", text: "LISTEN CAREFULLY" }
+            ]},
+            "WOLF": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:wolf", clues: [
+                { icon: "mdi:dog", text: "HOWL AT THE MOON" },
+                { icon: "mdi:run", text: "RUN IN A PACK" },
+                { icon: "mdi:volume-high", text: "AWOOOO" }
+            ]},
+            "KANGAROO": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:kangaroo", clues: [
+                { icon: "mdi:arrow-up-bold", text: "HOP ON TWO FEET" },
+                { icon: "mdi:bag-personal", text: "SHOW YOUR POUCH" },
+                { icon: "mdi:boxing-glove", text: "BOX WITH YOUR PAWS" }
+            ]},
+            "GORILLA": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:gorilla", clues: [
+                { icon: "mdi:human", text: "BEAT YOUR CHEST" },
+                { icon: "mdi:walk", text: "WALK ON YOUR KNUCKLES" },
+                { icon: "mdi:arm-flex", text: "SHOW YOUR MUSCLES" }
+            ]},
+            "CROCODILE": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:crocodile", clues: [
+                { icon: "mdi:crocodile", text: "SNAP YOUR JAWS" },
+                { icon: "mdi:swim", text: "SWIM LIKE A LOG" },
+                { icon: "mdi:floor-plan", text: "CRAWL LOW" }
+            ]},
+            "DOLPHIN": { category: "ANIMAL", icon: "fluent-emoji-high-contrast:dolphin", clues: [
+                { icon: "mdi:dolphin", text: "JUMP OUT OF WATER" },
+                { icon: "mdi:swim", text: "SWIM GRACEFULLY" },
+                { icon: "mdi:volume-high", text: "MAKE CLICKING SOUNDS" }
+            ]},
+
+            // ACTIONS - Perfect for charades!
             "SLEEPING": { category: "ACTION", icon: "fluent-emoji-high-contrast:sleeping-face", clues: [
                 { icon: "mdi:sleep", text: "CLOSE YOUR EYES" },
                 { icon: "mdi:pillow", text: "PUT HANDS UNDER YOUR HEAD" },
@@ -582,59 +974,235 @@
                 { icon: "mdi:human-handsup", text: "RAISE ARMS WHEN YOU JUMP" },
                 { icon: "mdi:foot-print", text: "LAND ON BOTH FEET" }
             ]},
-            "SCHOOL": { category: "PLACE", icon: "fluent-emoji-high-contrast:school", clues: [
-                { icon: "mdi:book-open-variant", text: "PRETEND TO READ A BOOK" },
-                { icon: "mdi:pencil", text: "PRETEND TO WRITE" },
-                { icon: "mdi:human-male-board", text: "RAISE YOUR HAND" }
+            "RUNNING": { category: "ACTION", icon: "fluent-emoji-high-contrast:person-running", clues: [
+                { icon: "mdi:run", text: "MOVE YOUR LEGS FAST" },
+                { icon: "mdi:arm-flex", text: "PUMP YOUR ARMS" },
+                { icon: "mdi:speedometer", text: "GO REALLY FAST" }
             ]},
-            "BEACH": { category: "PLACE", icon: "fluent-emoji-high-contrast:beach-with-umbrella", clues: [
-                { icon: "mdi:waves", text: "PRETEND TO SWIM IN WAVES" },
-                { icon: "mdi:shovel", text: "DIG IN THE SAND" },
-                { icon: "fluent-emoji-high-contrast:sun", text: "SHIELD EYES FROM SUN" }
+            "CLIMBING": { category: "ACTION", icon: "fluent-emoji-high-contrast:person-climbing", clues: [
+                { icon: "mdi:arrow-up", text: "REACH UP HIGH" },
+                { icon: "mdi:hand-back-left", text: "GRAB AND PULL" },
+                { icon: "mdi:foot-print", text: "STEP UP" }
             ]},
-            "AIRPLANE": { category: "THING", icon: "fluent-emoji-high-contrast:airplane", clues: [
+            "FLYING": { category: "ACTION", icon: "fluent-emoji-high-contrast:airplane", clues: [
+                { icon: "mdi:airplane", text: "SPREAD YOUR ARMS WIDE" },
+                { icon: "mdi:arrow-up", text: "ZOOM AROUND" },
+                { icon: "mdi:bird", text: "SOAR THROUGH THE AIR" }
+            ]},
+            "THROWING": { category: "ACTION", icon: "fluent-emoji-high-contrast:softball", clues: [
+                { icon: "mdi:baseball", text: "WIND UP YOUR ARM" },
+                { icon: "mdi:gesture", text: "RELEASE THE BALL" },
+                { icon: "mdi:arrow-right", text: "WATCH IT FLY" }
+            ]},
+            "CATCHING": { category: "ACTION", icon: "fluent-emoji-high-contrast:softball", clues: [
+                { icon: "mdi:hand-back-left", text: "HOLD OUT YOUR HANDS" },
+                { icon: "mdi:eye", text: "WATCH CAREFULLY" },
+                { icon: "mdi:gesture", text: "GRAB IT" }
+            ]},
+            "KICKING": { category: "ACTION", icon: "fluent-emoji-high-contrast:soccer-ball", clues: [
+                { icon: "mdi:soccer", text: "SWING YOUR LEG" },
+                { icon: "mdi:foot-print", text: "HIT WITH YOUR FOOT" },
+                { icon: "mdi:arrow-right", text: "BALL GOES FAR" }
+            ]},
+            "BRUSHING TEETH": { category: "ACTION", icon: "fluent-emoji-high-contrast:toothbrush", clues: [
+                { icon: "mdi:toothbrush", text: "MOVE HAND BACK AND FORTH" },
+                { icon: "mdi:tooth", text: "CLEAN YOUR TEETH" },
+                { icon: "mdi:emoticon-happy", text: "BIG SMILE" }
+            ]},
+            "WASHING HANDS": { category: "ACTION", icon: "fluent-emoji-high-contrast:soap", clues: [
+                { icon: "mdi:hand-wash", text: "RUB HANDS TOGETHER" },
+                { icon: "mdi:water", text: "USE WATER" },
+                { icon: "mdi:hand-wave", text: "SCRUB SCRUB" }
+            ]},
+            "READING": { category: "ACTION", icon: "fluent-emoji-high-contrast:book", clues: [
+                { icon: "mdi:book-open-variant", text: "HOLD A BOOK" },
+                { icon: "mdi:eye", text: "LOOK AT THE PAGES" },
+                { icon: "mdi:hand-wave", text: "TURN PAGES" }
+            ]},
+            "WRITING": { category: "ACTION", icon: "fluent-emoji-high-contrast:pencil", clues: [
+                { icon: "mdi:pencil", text: "HOLD A PENCIL" },
+                { icon: "mdi:gesture", text: "MOVE HAND ON PAPER" },
+                { icon: "mdi:file", text: "MAKE WORDS" }
+            ]},
+            "PAINTING": { category: "ACTION", icon: "fluent-emoji-high-contrast:paintbrush", clues: [
+                { icon: "mdi:brush", text: "HOLD A BRUSH" },
+                { icon: "mdi:palette", text: "DIP IN PAINT" },
+                { icon: "mdi:gesture", text: "STROKE UP AND DOWN" }
+            ]},
+            "COOKING": { category: "ACTION", icon: "fluent-emoji-high-contrast:cooking", clues: [
+                { icon: "mdi:pot", text: "STIR THE POT" },
+                { icon: "mdi:stove", text: "STAND BY THE STOVE" },
+                { icon: "mdi:silverware-fork-knife", text: "TASTE THE FOOD" }
+            ]},
+            "DRIVING": { category: "ACTION", icon: "fluent-emoji-high-contrast:automobile", clues: [
+                { icon: "mdi:steering", text: "HOLD THE WHEEL" },
+                { icon: "mdi:car", text: "BEEP THE HORN" },
+                { icon: "mdi:eye", text: "LOOK AT THE ROAD" }
+            ]},
+            "SINGING": { category: "ACTION", icon: "fluent-emoji-high-contrast:microphone", clues: [
+                { icon: "mdi:microphone", text: "HOLD A MICROPHONE" },
+                { icon: "mdi:music", text: "OPEN YOUR MOUTH WIDE" },
+                { icon: "mdi:volume-high", text: "LA LA LA" }
+            ]},
+            "HUGGING": { category: "ACTION", icon: "fluent-emoji-high-contrast:people-hugging", clues: [
+                { icon: "mdi:human-greeting", text: "WRAP YOUR ARMS" },
+                { icon: "mdi:heart", text: "SQUEEZE TIGHT" },
+                { icon: "mdi:emoticon-happy", text: "FEEL HAPPY" }
+            ]},
+            "WAVING": { category: "ACTION", icon: "fluent-emoji-high-contrast:waving-hand", clues: [
+                { icon: "mdi:hand-wave", text: "MOVE HAND SIDE TO SIDE" },
+                { icon: "mdi:emoticon-happy", text: "SAY HELLO OR BYE" },
+                { icon: "mdi:eye", text: "LOOK AT SOMEONE" }
+            ]},
+            "CLAPPING": { category: "ACTION", icon: "fluent-emoji-high-contrast:clapping-hands", clues: [
+                { icon: "mdi:hand-clap", text: "HIT HANDS TOGETHER" },
+                { icon: "mdi:music", text: "MAKE A RHYTHM" },
+                { icon: "mdi:party-popper", text: "CELEBRATE" }
+            ]},
+            "YAWNING": { category: "ACTION", icon: "fluent-emoji-high-contrast:yawning-face", clues: [
+                { icon: "mdi:sleep", text: "OPEN MOUTH WIDE" },
+                { icon: "mdi:weather-night", text: "YOU ARE SLEEPY" },
+                { icon: "mdi:gesture", text: "STRETCH YOUR ARMS" }
+            ]},
+            "SNEEZING": { category: "ACTION", icon: "fluent-emoji-high-contrast:sneezing-face", clues: [
+                { icon: "mdi:emoticon-sick", text: "SCRUNCH YOUR FACE" },
+                { icon: "mdi:volume-high", text: "ACHOO" },
+                { icon: "mdi:hand-back-left", text: "COVER YOUR NOSE" }
+            ]},
+            "HIDING": { category: "ACTION", icon: "fluent-emoji-high-contrast:see-no-evil-monkey", clues: [
+                { icon: "mdi:eye-off", text: "COVER YOUR EYES" },
+                { icon: "mdi:human-handsdown", text: "DUCK DOWN LOW" },
+                { icon: "mdi:gesture", text: "STAY VERY STILL" }
+            ]},
+            "SKATING": { category: "ACTION", icon: "fluent-emoji-high-contrast:ice-skate", clues: [
+                { icon: "mdi:skate", text: "GLIDE ON ONE FOOT" },
+                { icon: "mdi:gesture", text: "ARMS OUT FOR BALANCE" },
+                { icon: "mdi:arrow-right", text: "SLIDE FORWARD" }
+            ]},
+            "SKIING": { category: "ACTION", icon: "fluent-emoji-high-contrast:skier", clues: [
+                { icon: "mdi:ski", text: "HOLD POLES" },
+                { icon: "mdi:arrow-down", text: "GO DOWN THE MOUNTAIN" },
+                { icon: "mdi:snowflake", text: "IN THE SNOW" }
+            ]},
+
+            // VEHICLES - Easy to mime!
+            "PLANE": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:airplane", clues: [
                 { icon: "mdi:airplane", text: "SPREAD ARMS LIKE WINGS" },
                 { icon: "mdi:arrow-up", text: "PRETEND TO TAKE OFF" },
                 { icon: "mdi:volume-high", text: "MAKE AIRPLANE SOUNDS" }
             ]},
-            "TRAIN": { category: "THING", icon: "fluent-emoji-high-contrast:locomotive", clues: [
+            "TRAIN": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:locomotive", clues: [
                 { icon: "mdi:train", text: "MOVE ARMS LIKE WHEELS" },
                 { icon: "mdi:bugle", text: "PULL A HORN - CHOO CHOO" },
                 { icon: "mdi:arrow-right", text: "WALK IN A LINE" }
             ]},
-            "TELEPHONE": { category: "THING", icon: "fluent-emoji-high-contrast:telephone-receiver", clues: [
-                { icon: "mdi:phone", text: "HOLD HAND TO YOUR EAR" },
-                { icon: "mdi:message", text: "PRETEND TO TALK" },
-                { icon: "mdi:dialpad", text: "PRESS BUTTONS" }
+            "BOAT": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:sailboat", clues: [
+                { icon: "mdi:sail-boat", text: "PRETEND TO ROW" },
+                { icon: "mdi:waves", text: "ROCK SIDE TO SIDE" },
+                { icon: "mdi:water", text: "ON THE WATER" }
             ]},
-            "CAMERA": { category: "THING", icon: "fluent-emoji-high-contrast:camera", clues: [
-                { icon: "mdi:camera", text: "HOLD UP TO YOUR EYE" },
-                { icon: "mdi:gesture-tap-button", text: "PRESS THE BUTTON - CLICK" },
-                { icon: "mdi:emoticon-happy", text: "SAY CHEESE" }
+            "ROCKET": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:rocket", clues: [
+                { icon: "mdi:rocket", text: "COUNT DOWN 3 2 1 BLAST OFF" },
+                { icon: "mdi:arrow-up", text: "SHOOT UP TO SPACE" },
+                { icon: "mdi:star", text: "FLY TO THE STARS" }
             ]},
-            "UMBRELLA": { category: "THING", icon: "fluent-emoji-high-contrast:umbrella", clues: [
-                { icon: "mdi:umbrella", text: "HOLD IT OVER YOUR HEAD" },
-                { icon: "mdi:weather-rainy", text: "PRETEND IT IS RAINING" },
-                { icon: "mdi:arrow-expand", text: "PRETEND TO OPEN IT" }
+            "HELICOPTER": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:helicopter", clues: [
+                { icon: "mdi:helicopter", text: "SPIN YOUR ARM ABOVE HEAD" },
+                { icon: "mdi:arrow-up", text: "GO STRAIGHT UP" },
+                { icon: "mdi:volume-high", text: "WHOP WHOP WHOP" }
             ]},
-            "GUITAR": { category: "THING", icon: "fluent-emoji-high-contrast:guitar", clues: [
-                { icon: "mdi:guitar-acoustic", text: "HOLD IT AGAINST YOUR BODY" },
-                { icon: "mdi:hand-wave", text: "STRUM WITH YOUR HAND" },
-                { icon: "mdi:music", text: "PRETEND TO SING ALONG" }
+            "BIKE": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:bicycle", clues: [
+                { icon: "mdi:bike", text: "PEDAL WITH YOUR FEET" },
+                { icon: "mdi:bell", text: "RING THE BELL" },
+                { icon: "mdi:steering", text: "HOLD THE HANDLEBARS" }
             ]},
-            "BALLOON": { category: "THING", icon: "fluent-emoji-high-contrast:balloon", clues: [
-                { icon: "mdi:balloon", text: "PRETEND TO BLOW IT UP" },
-                { icon: "mdi:arrow-up", text: "LET IT FLOAT UP" },
-                { icon: "mdi:gesture-tap-hold", text: "HOLD THE STRING" }
+            "MOTORCYCLE": { category: "VEHICLE", icon: "fluent-emoji-high-contrast:motorcycle", clues: [
+                { icon: "mdi:motorbike", text: "REV THE ENGINE" },
+                { icon: "mdi:steering", text: "HOLD THE HANDLEBARS" },
+                { icon: "mdi:volume-high", text: "VROOM VROOM" }
+            ]},
+
+            // CHARACTERS - Fun to act!
+            "DRAGON": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:dragon", clues: [
+                { icon: "mdi:dragon", text: "BREATHE FIRE" },
+                { icon: "mdi:bird", text: "FLAP BIG WINGS" },
+                { icon: "mdi:volume-high", text: "ROAR LOUDLY" }
+            ]},
+            "UNICORN": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:unicorn", clues: [
+                { icon: "mdi:unicorn", text: "PUT FINGER ON HEAD LIKE HORN" },
+                { icon: "mdi:horse", text: "GALLOP AROUND" },
+                { icon: "mdi:auto-fix", text: "MAKE MAGIC" }
+            ]},
+            "GHOST": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:ghost", clues: [
+                { icon: "mdi:ghost", text: "SAY BOO" },
+                { icon: "mdi:gesture", text: "FLOAT AROUND" },
+                { icon: "mdi:eye-off", text: "BE SPOOKY" }
+            ]},
+            "WIZARD": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:mage", clues: [
+                { icon: "mdi:wizard-hat", text: "WEAR A POINTY HAT" },
+                { icon: "mdi:magic-staff", text: "WAVE YOUR WAND" },
+                { icon: "mdi:auto-fix", text: "CAST A SPELL" }
+            ]},
+            "PIRATE": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:pirate-flag", clues: [
+                { icon: "mdi:pirate", text: "COVER ONE EYE" },
+                { icon: "mdi:sword", text: "HOLD YOUR SWORD" },
+                { icon: "mdi:volume-high", text: "SAY ARRR" }
+            ]},
+            "NINJA": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:ninja", clues: [
+                { icon: "mdi:ninja", text: "SNEAK AROUND QUIETLY" },
+                { icon: "mdi:karate", text: "DO KARATE MOVES" },
+                { icon: "mdi:eye-off", text: "HIDE IN SHADOWS" }
+            ]},
+            "PRINCESS": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:princess", clues: [
+                { icon: "mdi:crown", text: "WEAR A TIARA" },
+                { icon: "mdi:hand-wave", text: "WAVE TO YOUR SUBJECTS" },
+                { icon: "mdi:castle", text: "LIVE IN A CASTLE" }
+            ]},
+            "ROBOT": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:robot", clues: [
+                { icon: "mdi:robot", text: "MOVE LIKE A ROBOT" },
+                { icon: "mdi:volume-high", text: "BEEP BOOP" },
+                { icon: "mdi:gesture", text: "STIFF ARMS AND LEGS" }
+            ]},
+            "SUPERHERO": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:superhero", clues: [
+                { icon: "mdi:arm-flex", text: "SHOW YOUR MUSCLES" },
+                { icon: "mdi:run", text: "FLY THROUGH THE AIR" },
+                { icon: "mdi:shield", text: "SAVE THE DAY" }
+            ]},
+            "COWBOY": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:cowboy-hat-face", clues: [
+                { icon: "mdi:hat-fedora", text: "TIP YOUR HAT" },
+                { icon: "mdi:horse", text: "RIDE A HORSE" },
+                { icon: "mdi:gesture", text: "SWING A LASSO" }
+            ]},
+            "FIREFIGHTER": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:fire-engine", clues: [
+                { icon: "mdi:fire-truck", text: "CLIMB THE LADDER" },
+                { icon: "mdi:water", text: "SPRAY THE HOSE" },
+                { icon: "mdi:fire", text: "PUT OUT FIRES" }
+            ]},
+            "DOCTOR": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:health-worker", clues: [
+                { icon: "mdi:stethoscope", text: "LISTEN TO HEARTBEAT" },
+                { icon: "mdi:needle", text: "GIVE A SHOT" },
+                { icon: "mdi:bandage", text: "PUT ON BANDAGE" }
+            ]},
+            "TEACHER": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:school", clues: [
+                { icon: "mdi:human-male-board", text: "WRITE ON THE BOARD" },
+                { icon: "mdi:book-open-variant", text: "READ A BOOK" },
+                { icon: "mdi:hand-pointing-up", text: "CALL ON STUDENTS" }
+            ]},
+            "BABY": { category: "CHARACTER", icon: "fluent-emoji-high-contrast:baby", clues: [
+                { icon: "mdi:baby-face", text: "CRY WAAA WAAA" },
+                { icon: "mdi:walk", text: "CRAWL ON THE FLOOR" },
+                { icon: "mdi:gesture", text: "SUCK YOUR THUMB" }
             ]}
         };
         const C_WORDS = Object.keys(C_DATA);
         let cCurrent = "";
+        let cDeck = [];
 
         function cNewWord() {
-            let next;
-            do { next = C_WORDS[Math.floor(Math.random() * C_WORDS.length)]; } while (next === cCurrent && C_WORDS.length > 1);
-            cCurrent = next;
+            if (cDeck.length === 0) {
+                cDeck = shuffle(C_WORDS);
+            }
+            cCurrent = cDeck.pop();
             const data = C_DATA[cCurrent];
             document.getElementById("c-category").textContent = data.category;
             document.getElementById("c-word").textContent = cCurrent;
@@ -693,11 +1261,13 @@
             { describe: { word: "SWIM", icon: "fluent-emoji-high-contrast:person-swimming" }, taboo: { word: "POOL", icon: "mdi:pool" } }
         ];
         let tCurrent = -1;
+        let tDeck = [];
 
         function tNewWord() {
-            let next;
-            do { next = Math.floor(Math.random() * T_DATA.length); } while (next === tCurrent && T_DATA.length > 1);
-            tCurrent = next;
+            if (tDeck.length === 0) {
+                tDeck = shuffle([...Array(T_DATA.length).keys()]);
+            }
+            tCurrent = tDeck.pop();
             const pair = T_DATA[tCurrent];
             document.getElementById("t-describeImg").src = "https://api.iconify.design/" + pair.describe.icon + ".svg?height=200";
             document.getElementById("t-describeWord").textContent = pair.describe.word;
