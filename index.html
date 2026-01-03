@@ -673,6 +673,84 @@
             document.getElementById(game).classList.add('active');
         }
 
+        // ========== URL HASH SUPPORT ==========
+        let hashLoaded = { pictionary: null, charades: null, taboo: null };
+
+        function updateHash() {
+            let word = '';
+            if (currentGame === 'pictionary') word = pCurrent;
+            else if (currentGame === 'charades') word = cCurrent;
+            else if (currentGame === 'taboo') word = T_DATA[tCurrent].describe.word;
+            history.replaceState(null, '', '#' + currentGame + '/' + encodeURIComponent(word));
+        }
+
+        function loadFromHash() {
+            const hash = window.location.hash.slice(1);
+            if (!hash) return false;
+
+            const parts = hash.split('/');
+            if (parts.length !== 2) return false;
+
+            const game = parts[0];
+            const word = decodeURIComponent(parts[1]).toUpperCase();
+
+            if (game === 'pictionary' && P_ICONS[word]) {
+                showGame('pictionary');
+                pShowWord(word);
+                hashLoaded.pictionary = word;
+                return true;
+            } else if (game === 'charades' && C_DATA[word]) {
+                showGame('charades');
+                cShowWord(word);
+                hashLoaded.charades = word;
+                return true;
+            } else if (game === 'taboo') {
+                const idx = T_DATA.findIndex(t => t.describe.word === word);
+                if (idx !== -1) {
+                    showGame('taboo');
+                    tShowWord(idx);
+                    hashLoaded.taboo = idx;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function pShowWord(word) {
+            pCurrent = word;
+            document.getElementById("p-word").textContent = pCurrent;
+            const icons = P_ICONS[pCurrent];
+            document.getElementById("p-img1").src = "https://api.iconify.design/" + icons[0] + ".svg?height=200";
+            document.getElementById("p-img2").src = "https://api.iconify.design/" + icons[1] + ".svg?height=200";
+            document.getElementById("p-img3").src = "https://api.iconify.design/" + icons[2] + ".svg?height=200";
+        }
+
+        function cShowWord(word) {
+            cCurrent = word;
+            const data = C_DATA[cCurrent];
+            document.getElementById("c-category").textContent = data.category;
+            document.getElementById("c-word").textContent = cCurrent;
+            document.getElementById("c-mainIcon").src = "https://api.iconify.design/" + data.icon + ".svg?height=180";
+            const cluesEl = document.getElementById("c-clues");
+            cluesEl.innerHTML = "";
+            data.clues.forEach(clue => {
+                const div = document.createElement("div");
+                div.className = "clue";
+                div.innerHTML = '<img src="https://api.iconify.design/' + clue.icon + '.svg?height=80" alt="">' +
+                                '<span class="clue-text">' + clue.text + '</span>';
+                cluesEl.appendChild(div);
+            });
+        }
+
+        function tShowWord(idx) {
+            tCurrent = idx;
+            const pair = T_DATA[tCurrent];
+            document.getElementById("t-describeImg").src = "https://api.iconify.design/" + pair.describe.icon + ".svg?height=200";
+            document.getElementById("t-describeWord").textContent = pair.describe.word;
+            document.getElementById("t-tabooImg").src = "https://api.iconify.design/" + pair.taboo.icon + ".svg?height=200";
+            document.getElementById("t-tabooWord").textContent = pair.taboo.word;
+        }
+
         // Touch control functions
         function nextWord() {
             if (currentGame === 'pictionary') pNewWord();
@@ -992,15 +1070,17 @@
         }
 
         function pNewWord() {
+            // Put hash-loaded word back into deck
+            if (hashLoaded.pictionary) {
+                pDeck.push(hashLoaded.pictionary);
+                hashLoaded.pictionary = null;
+            }
             if (pDeck.length === 0) {
                 pDeck = shuffle(P_WORDS);
             }
             pCurrent = pDeck.pop();
-            document.getElementById("p-word").textContent = pCurrent;
-            const icons = P_ICONS[pCurrent];
-            document.getElementById("p-img1").src = "https://api.iconify.design/" + icons[0] + ".svg?height=200";
-            document.getElementById("p-img2").src = "https://api.iconify.design/" + icons[1] + ".svg?height=200";
-            document.getElementById("p-img3").src = "https://api.iconify.design/" + icons[2] + ".svg?height=200";
+            pShowWord(pCurrent);
+            updateHash();
         }
 
         // ========== CHARADES DATA ==========
@@ -1458,23 +1538,17 @@
         let cDeck = [];
 
         function cNewWord() {
+            // Put hash-loaded word back into deck
+            if (hashLoaded.charades) {
+                cDeck.push(hashLoaded.charades);
+                hashLoaded.charades = null;
+            }
             if (cDeck.length === 0) {
                 cDeck = shuffle(C_WORDS);
             }
             cCurrent = cDeck.pop();
-            const data = C_DATA[cCurrent];
-            document.getElementById("c-category").textContent = data.category;
-            document.getElementById("c-word").textContent = cCurrent;
-            document.getElementById("c-mainIcon").src = "https://api.iconify.design/" + data.icon + ".svg?height=180";
-            const cluesEl = document.getElementById("c-clues");
-            cluesEl.innerHTML = "";
-            data.clues.forEach(clue => {
-                const div = document.createElement("div");
-                div.className = "clue";
-                div.innerHTML = '<img src="https://api.iconify.design/' + clue.icon + '.svg?height=80" alt="">' +
-                                '<span class="clue-text">' + clue.text + '</span>';
-                cluesEl.appendChild(div);
-            });
+            cShowWord(cCurrent);
+            updateHash();
         }
 
         // ========== TABOO DATA ==========
@@ -1523,15 +1597,17 @@
         let tDeck = [];
 
         function tNewWord() {
+            // Put hash-loaded index back into deck
+            if (hashLoaded.taboo !== null) {
+                tDeck.push(hashLoaded.taboo);
+                hashLoaded.taboo = null;
+            }
             if (tDeck.length === 0) {
                 tDeck = shuffle([...Array(T_DATA.length).keys()]);
             }
             tCurrent = tDeck.pop();
-            const pair = T_DATA[tCurrent];
-            document.getElementById("t-describeImg").src = "https://api.iconify.design/" + pair.describe.icon + ".svg?height=200";
-            document.getElementById("t-describeWord").textContent = pair.describe.word;
-            document.getElementById("t-tabooImg").src = "https://api.iconify.design/" + pair.taboo.icon + ".svg?height=200";
-            document.getElementById("t-tabooWord").textContent = pair.taboo.word;
+            tShowWord(tCurrent);
+            updateHash();
         }
 
         // ========== SPEECH ==========
@@ -1576,9 +1652,23 @@
         });
 
         // Initialize all games
-        pNewWord();
-        cNewWord();
-        tNewWord();
+        if (!loadFromHash()) {
+            pNewWord();
+        }
+        // Initialize other games in background (without updating hash)
+        if (!cCurrent) {
+            cDeck = shuffle(C_WORDS);
+            cCurrent = cDeck.pop();
+            cShowWord(cCurrent);
+        }
+        if (tCurrent === -1) {
+            tDeck = shuffle([...Array(T_DATA.length).keys()]);
+            tCurrent = tDeck.pop();
+            tShowWord(tCurrent);
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('hashchange', loadFromHash);
     </script>
 </body>
 </html>
