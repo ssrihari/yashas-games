@@ -353,12 +353,12 @@
         /* ========== TOUCH CONTROLS ========== */
         .controls {
             display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            justify-content: center;
+            align-items: center;
             gap: 15px;
-            z-index: 100;
+            padding: 15px;
+            background: #eee;
+            flex-shrink: 0;
         }
 
         .controls button {
@@ -441,12 +441,8 @@
             }
 
             #pictionary .images img {
-                width: 90px;
-                height: 90px;
-            }
-
-            #pictionary .images {
-                padding-bottom: 80px;
+                width: 100px;
+                height: 100px;
             }
 
             /* CHARADES mobile */
@@ -508,7 +504,6 @@
 
             #charades .clues {
                 gap: 10px;
-                padding-bottom: 80px;
             }
 
             /* TABOO mobile */
@@ -557,10 +552,6 @@
                 width: 110px;
                 height: 5px;
             }
-
-            #taboo .taboo-panel {
-                padding-bottom: 80px;
-            }
         }
 
         /* Extra small screens */
@@ -597,17 +588,6 @@
         <button class="btn-taboo" onclick="selectGame('taboo')">TABOO</button>
     </nav>
 
-    <!-- Touch Controls -->
-    <div class="controls" id="controls-default">
-        <button class="btn-speak" onclick="speakCurrent()">HEAR</button>
-        <button class="btn-next" onclick="nextWord()">NEXT</button>
-    </div>
-    <div class="controls" id="controls-taboo" style="display:none;">
-        <button class="btn-speak-left" onclick="speakTabooLeft()">LEFT</button>
-        <button class="btn-next" onclick="nextWord()">NEXT</button>
-        <button class="btn-speak-right" onclick="speakTabooRight()">RIGHT</button>
-    </div>
-
     <!-- PICTIONARY -->
     <div id="pictionary" class="game active">
         <div class="main">
@@ -618,6 +598,10 @@
             <img id="p-img1" src="" alt="">
             <img id="p-img2" src="" alt="">
             <img id="p-img3" src="" alt="">
+        </div>
+        <div class="controls">
+            <button class="btn-speak" onclick="speakCurrent()">HEAR</button>
+            <button class="btn-next" onclick="nextWord()">NEXT</button>
         </div>
     </div>
 
@@ -632,6 +616,10 @@
         <div class="sidebar">
             <div class="sidebar-title">HOW TO ACT IT OUT</div>
             <div class="clues" id="c-clues"></div>
+        </div>
+        <div class="controls">
+            <button class="btn-speak" onclick="speakCurrent()">HEAR</button>
+            <button class="btn-next" onclick="nextWord()">NEXT</button>
         </div>
     </div>
 
@@ -654,6 +642,11 @@
             </div>
         </div>
         <div class="hint">SPACE = NEW WORD &nbsp; LEFT/RIGHT ARROW = HEAR WORD</div>
+        <div class="controls controls-taboo">
+            <button class="btn-speak-left" onclick="speakTabooLeft()">LEFT</button>
+            <button class="btn-next" onclick="nextWord()">NEXT</button>
+            <button class="btn-speak-right" onclick="speakTabooRight()">RIGHT</button>
+        </div>
     </div>
 
     <script>
@@ -676,14 +669,6 @@
             currentGame = game;
             document.querySelectorAll('.game').forEach(g => g.classList.remove('active'));
             document.getElementById(game).classList.add('active');
-            // Toggle control sets for mobile
-            if (game === 'taboo') {
-                document.getElementById('controls-default').style.display = 'none';
-                document.getElementById('controls-taboo').style.display = '';
-            } else {
-                document.getElementById('controls-default').style.display = '';
-                document.getElementById('controls-taboo').style.display = 'none';
-            }
         }
 
         // Touch control functions

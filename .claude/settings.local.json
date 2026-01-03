@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(for word in cat dog sun hat cup ball tree fish bird book cake star moon door boat frog duck bear lion hand foot nose eye ear bed car bus bike kite rain snow leaf bell drum lamp sock shoe coat milk apple house plane train spoon fork)",
+      "Bash(do echo '=== $word ===' curl -s \"https://api.iconify.design/search?query=$word&limit=10\")",
+      "Bash('words=cat dog sun hat cup ball tree fish bird book cake star moon door boat frog duck bear lion hand foot eye ear bed car bus bike kite rain snow leaf bell drum lamp sock shoe coat milk apple house plane train spoon fork' for word in $words)",
+      "Bash(do echo '=== $word ===')",
+      "Bash(done)"
+    ]
+  }
+}
