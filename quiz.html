@@ -5,84 +5,204 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QUIZ</title>
     <style>
+        :root {
+            --ink: #17233d;
+            --navy: #18274b;
+            --paper: #fffdf7;
+            --cream: #f7ebc9;
+            --yellow: #ffd84d;
+            --blue: #54c7ec;
+            --green: #45b969;
+            --red: #e95c55;
+        }
         * { box-sizing: border-box; }
         body {
             margin: 0;
             min-height: 100vh;
-            background: #f5f5f5;
-            color: #222;
-            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at 10% 18%, rgba(255,216,77,.45) 0 7%, transparent 7.2%),
+                radial-gradient(circle at 91% 84%, rgba(84,199,236,.35) 0 9%, transparent 9.2%),
+                var(--cream);
+            color: var(--ink);
+            font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
             display: flex;
             flex-direction: column;
         }
         header {
-            padding: 18px 24px;
-            background: #222;
+            padding: 16px clamp(20px, 3vw, 48px);
+            background: var(--navy);
             color: white;
+            border-bottom: 7px solid var(--yellow);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            gap: 24px;
+            box-shadow: 0 6px 0 rgba(23,35,61,.12);
         }
-        h1 { margin: 0; font-size: 28px; }
-        .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        h1 {
+            margin: 0;
+            font-size: clamp(30px, 3vw, 46px);
+            line-height: 1;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transform: rotate(-2deg);
+        }
+        h1::before { content: "★"; color: var(--yellow); margin-right: 12px; }
+        .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+        .controls label {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #b8c6e5;
+            margin-left: 5px;
+        }
+        .score {
+            display: flex;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+        .score .right, .score .wrong {
+            padding: 9px 13px;
+            border-radius: 999px;
+            color: white;
+        }
+        .score .right { background: var(--green); }
+        .score .wrong { background: var(--red); }
         select, button {
             font: inherit;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            padding: 10px 14px;
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 15px;
             background: white;
-            color: #222;
+            color: var(--ink);
             cursor: pointer;
         }
-        select:focus, button:focus { outline: 4px solid #8ecbff; outline-offset: 2px; }
-        .tv-mode select:focus, .tv-mode button:focus { outline: 6px solid #00e5ff; outline-offset: 5px; }
-        .tv-mode header { padding: 24px 34px; }
-        .tv-mode h1 { font-size: 36px; }
-        .tv-mode .controls { gap: 16px; }
-        .tv-mode select { min-width: 190px; font-size: 24px; padding: 14px 16px; }
-        .tv-mode label { font-size: 22px; }
-        .tv-mode main { padding-top: 58px; }
-        .tv-mode .status { font-size: 26px; }
-        .tv-mode .hint { font-size: 26px; }
-        main {
-            width: min(1000px, 100%);
-            margin: auto;
-            padding: 45px 24px 30px;
-            text-align: center;
+        select { font-weight: bold; box-shadow: inset 0 0 0 2px #ccd4e5; }
+        select:focus, button:focus {
+            outline: 5px solid var(--blue);
+            outline-offset: 4px;
         }
-        .status { color: #666; font-size: 20px; margin-bottom: 28px; }
-        .question {
-            font-size: clamp(32px, 5vw, 64px);
-            line-height: 1.15;
+        main {
+            width: min(1120px, calc(100% - 48px));
+            margin: clamp(24px, 4vh, 52px) auto;
+            padding: clamp(28px, 4vw, 52px);
+            text-align: center;
+            background: var(--paper);
+            border: 4px solid var(--ink);
+            border-radius: 28px;
+            box-shadow: 12px 12px 0 var(--ink);
+        }
+        main:focus { outline: none; }
+        .status {
+            display: inline-block;
+            color: var(--navy);
+            background: #dff5fc;
+            border: 2px solid var(--blue);
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: clamp(16px, 1.6vw, 21px);
             font-weight: bold;
-            margin: 0 auto 35px;
-            max-width: 900px;
+            margin-bottom: clamp(24px, 4vh, 42px);
+        }
+        .question {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(36px, 5vw, 68px);
+            line-height: 1.08;
+            font-weight: bold;
+            margin: 0 auto clamp(30px, 5vh, 52px);
+            max-width: 950px;
+            text-wrap: balance;
         }
         .choices {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            max-width: 850px;
+            gap: 20px;
+            max-width: 930px;
             margin: 0 auto;
         }
         .choice {
-            min-height: 90px;
-            font-size: clamp(22px, 3vw, 34px);
+            position: relative;
+            min-height: 104px;
+            padding: 18px 20px;
+            font-size: clamp(22px, 2.5vw, 34px);
             font-weight: bold;
-            border: 3px solid #bbb;
+            border: 3px solid var(--ink);
+            border-radius: 18px;
             background: white;
+            box-shadow: 0 7px 0 var(--ink);
+            transition: transform .12s ease, box-shadow .12s ease, background .2s ease;
         }
-        .choice.correct { background: #9be7a5; border-color: #238636; }
-        .choice.wrong { background: #ffd1d1; border-color: #c62828; }
-        .hint { margin-top: 38px; font-size: 22px; color: #777; }
-        .nav-buttons { margin-top: 24px; display: flex; justify-content: center; gap: 12px; }
-        .nav-buttons button { font-size: 20px; }
-        @media (max-width: 700px) {
+        .choice::before {
+            content: attr(data-letter);
+            display: inline-grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background: var(--yellow);
+            color: var(--ink);
+            font-size: 20px;
+            vertical-align: middle;
+        }
+        .choice.correct::before { content: "✓"; background: var(--green); color: white; }
+        .choice.wrong::before { content: "✕"; background: var(--red); color: white; }
+        .choice:hover { background: #fff7ce; transform: translateY(-3px); box-shadow: 0 10px 0 var(--ink); }
+        .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink); }
+        .choice.correct {
+            background: #bcebc7;
+            border-color: #23783b;
+            box-shadow: 0 7px 0 #23783b;
+            color: #124b25;
+            animation: pop .35s ease-out;
+        }
+        .choice.wrong {
+            background: #ffd4d1;
+            border-color: #a93232;
+            box-shadow: 0 7px 0 #a93232;
+            color: #761f1f;
+            animation: shake .3s ease-out;
+        }
+        .hint {
+            margin-top: clamp(34px, 5vh, 52px);
+            font-size: clamp(15px, 1.5vw, 19px);
+            font-weight: bold;
+            letter-spacing: .06em;
+            color: #6c7690;
+        }
+        .nav-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 14px; }
+        .nav-buttons button {
+            min-width: 150px;
+            padding: 12px 22px;
+            background: var(--navy);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #081228;
+        }
+        .nav-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #081228; }
+        .tv-mode select:focus, .tv-mode button:focus { outline: 7px solid #00e5ff; outline-offset: 6px; }
+        .tv-mode header { padding: 22px 38px; }
+        .tv-mode .controls { gap: 16px; }
+        .tv-mode select { min-width: 180px; font-size: 22px; padding: 14px 16px; }
+        .tv-mode .controls label { font-size: 18px; }
+        .tv-mode .score { font-size: 22px; }
+        .tv-mode .hint { font-size: 22px; }
+        @keyframes pop { 50% { transform: scale(1.08) rotate(-1deg); } }
+        @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @media (max-width: 800px) {
             header { align-items: flex-start; flex-direction: column; }
-            main { padding-top: 28px; }
+            .controls { justify-content: flex-start; }
+            main { width: calc(100% - 28px); padding: 28px 18px; box-shadow: 7px 7px 0 var(--ink); }
             .choices { grid-template-columns: 1fr; }
-            .choice { min-height: 65px; }
+            .choice { min-height: 70px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
     </style>
 </head>
@@ -90,6 +210,7 @@
     <header>
         <h1>QUIZ</h1>
         <div class="controls">
+            <div class="score" id="score"><span class="right">✓ Right: 0</span><span class="wrong">✕ Wrong: 0</span></div>
             <label for="category">Category</label>
             <select id="category">
                 <option value="random">Random</option>
@@ -214,12 +335,19 @@
         let deck = [];
         let position = -1;
         let answered = false;
+        let rightAnswers = 0;
+        let wrongAnswers = 0;
 
         const category = document.getElementById('category');
         const difficulty = document.getElementById('difficulty');
         const question = document.getElementById('question');
         const choices = document.getElementById('choices');
         const status = document.getElementById('status');
+        const score = document.getElementById('score');
+
+        function updateScore() {
+            score.innerHTML = `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
+        }
 
         function shuffle(items) {
             for (let i = items.length - 1; i > 0; i--) {
@@ -259,7 +387,8 @@
                 const button = document.createElement('button');
                 button.className = 'choice';
                 button.tabIndex = -1;
-                button.textContent = `${String.fromCharCode(65 + index)}) ${choice}`;
+                button.dataset.letter = String.fromCharCode(65 + index);
+                button.textContent = choice;
                 button.addEventListener('click', () => chooseAnswer(index));
                 choices.appendChild(button);
             });
@@ -278,6 +407,9 @@
             if (answered) return;
             answered = true;
             const item = currentQuestions()[deck[position]];
+            if (index === item.x) rightAnswers++;
+            else wrongAnswers++;
+            updateScore();
             [...choices.children].forEach((button, choiceIndex) => {
                 if (choiceIndex === item.x) button.classList.add('correct');
                 if (choiceIndex === index && choiceIndex !== item.x) button.classList.add('wrong');
