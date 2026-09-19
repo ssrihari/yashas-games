@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZ</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f5f5;
+            color: #222;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            padding: 18px 24px;
+            background: #222;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        h1 { margin: 0; font-size: 28px; }
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        select, button {
+            font: inherit;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: white;
+            color: #222;
+            cursor: pointer;
+        }
+        select:focus, button:focus { outline: 4px solid #8ecbff; outline-offset: 2px; }
+        main {
+            width: min(1000px, 100%);
+            margin: auto;
+            padding: 45px 24px 30px;
+            text-align: center;
+        }
+        .status { color: #666; font-size: 20px; margin-bottom: 28px; }
+        .question {
+            font-size: clamp(32px, 5vw, 64px);
+            line-height: 1.15;
+            font-weight: bold;
+            margin: 0 auto 35px;
+            max-width: 900px;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        .choice {
+            min-height: 90px;
+            font-size: clamp(22px, 3vw, 34px);
+            font-weight: bold;
+            border: 3px solid #bbb;
+            background: white;
+        }
+        .choice.correct { background: #9be7a5; border-color: #238636; }
+        .choice.wrong { background: #ffd1d1; border-color: #c62828; }
+        .hint { margin-top: 38px; font-size: 22px; color: #777; }
+        .nav-buttons { margin-top: 24px; display: flex; justify-content: center; gap: 12px; }
+        .nav-buttons button { font-size: 20px; }
+        @media (max-width: 700px) {
+            header { align-items: flex-start; flex-direction: column; }
+            main { padding-top: 28px; }
+            .choices { grid-template-columns: 1fr; }
+            .choice { min-height: 65px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>QUIZ</h1>
+        <div class="controls">
+            <label for="category">Category</label>
+            <select id="category">
+                <option value="random">Random</option>
+                <option value="Math">Math</option>
+                <option value="Spelling">Spelling</option>
+                <option value="Space">Space</option>
+            </select>
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty">
+                <option value="random">Random</option>
+                <option value="1">1 - Easy</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5 - Tricky</option>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <div class="status" id="status"></div>
+        <div class="question" id="question"></div>
+        <div class="choices" id="choices"></div>
+        <div class="hint">PRESS SPACE TO SHOW THE ANSWER · S TO HEAR THE QUESTION · USE ← → TO CHANGE QUESTION</div>
+        <div class="nav-buttons">
+            <button id="previous">← Previous</button>
+            <button id="next">Next →</button>
+        </div>
+    </main>
+
+    <script>
+        const QUESTIONS = [
+            // Difficulty 1
+            {c:'Math',d:1,q:'What is 1 + 2?',a:['2','3','4'],x:1},
+            {c:'Math',d:1,q:'Which number is bigger: 3 or 5?',a:['3','5'],x:1},
+            {c:'Math',d:1,q:'What comes after 6?',a:['5','7','8'],x:1},
+            {c:'Math',d:1,q:'How many sides does a triangle have?',a:['3','4','5'],x:0},
+            {c:'Math',d:1,q:'What is 5 − 1?',a:['3','4','5'],x:1},
+            {c:'Spelling',d:1,q:'Which word is spelled correctly?',a:['Dog','Dawg','Dok'],x:0},
+            {c:'Spelling',d:1,q:'What letter does “ball” start with?',a:['B','D','P'],x:0},
+            {c:'Spelling',d:1,q:'Fill in the missing letter: c_t',a:['a','e','i'],x:0},
+            {c:'Spelling',d:1,q:'Which word rhymes with “cat”?',a:['Hat','Dog','Sun'],x:0},
+            {c:'Spelling',d:1,q:'How do you spell something you wear on your foot?',a:['Shoe','Shoo','Shu'],x:0},
+            {c:'Space',d:1,q:'What do we live on?',a:['Earth','Mars','The Moon'],x:0},
+            {c:'Space',d:1,q:'What shines during the day?',a:['The Sun','The Moon','A star'],x:0},
+            {c:'Space',d:1,q:'Is the Moon a planet?',a:['Yes','No'],x:1},
+            {c:'Space',d:1,q:'What color is the sky on a clear day?',a:['Blue','Green','Purple'],x:0},
+            {c:'Space',d:1,q:'What do astronauts wear in space?',a:['Spacesuits','Pajamas','Raincoats'],x:0},
+
+            // Difficulty 2
+            {c:'Math',d:2,q:'What is 4 + 5?',a:['8','9','10'],x:1},
+            {c:'Math',d:2,q:'What is 10 − 3?',a:['6','7','8'],x:1},
+            {c:'Math',d:2,q:'What comes next: 2, 4, 6, __?',a:['7','8','9'],x:1},
+            {c:'Math',d:2,q:'How many sides does a square have?',a:['3','4','5'],x:1},
+            {c:'Math',d:2,q:'Which is smaller?',a:['8','6'],x:1},
+            {c:'Spelling',d:2,q:'Which word is spelled correctly?',a:['Fish','Fissh','Fich'],x:0},
+            {c:'Spelling',d:2,q:'Fill in the missing letter: d_g',a:['a','o','u'],x:1},
+            {c:'Spelling',d:2,q:'Which word rhymes with “sun”?',a:['Run','Sit','Red'],x:0},
+            {c:'Spelling',d:2,q:'What is the opposite of “big”?',a:['Tall','Small','Wide'],x:1},
+            {c:'Spelling',d:2,q:'How do you spell the color?',a:['Blu','Blue','Bloo'],x:1},
+            {c:'Space',d:2,q:'What is the name of our star?',a:['The Sun','Mars','Saturn'],x:0},
+            {c:'Space',d:2,q:'Which one is a planet?',a:['Earth','Moon','Sun'],x:0},
+            {c:'Space',d:2,q:'What shape does the Moon look like when it is full?',a:['A circle','A square','A triangle'],x:0},
+            {c:'Space',d:2,q:'What can you see in the night sky?',a:['Stars','Rainbows only','Clouds only'],x:0},
+            {c:'Space',d:2,q:'Do astronauts float in space?',a:['Yes','No'],x:0},
+
+            // Difficulty 3
+            {c:'Math',d:3,q:'What is 7 + 6?',a:['12','13','14'],x:1},
+            {c:'Math',d:3,q:'What is 14 − 5?',a:['8','9','10'],x:1},
+            {c:'Math',d:3,q:'What comes next: 5, 10, 15, __?',a:['18','20','25'],x:1},
+            {c:'Math',d:3,q:'You have 2 groups of 3 blocks. How many blocks?',a:['5','6','7'],x:1},
+            {c:'Math',d:3,q:'Which number is even?',a:['7','9','12'],x:2},
+            {c:'Spelling',d:3,q:'Which word is spelled correctly?',a:['Because','Becaus','Becose'],x:0},
+            {c:'Spelling',d:3,q:'Which word means the opposite of “hot”?',a:['Warm','Cold','Fast'],x:1},
+            {c:'Spelling',d:3,q:'Which word has two syllables?',a:['Cat','Apple','Dog'],x:1},
+            {c:'Spelling',d:3,q:'Which word rhymes with “cake”?',a:['Bike','Make','Book'],x:1},
+            {c:'Spelling',d:3,q:'Which word means the opposite of “up”?',a:['Over','Down','Around'],x:1},
+            {c:'Space',d:3,q:'Which planet is known for its rings?',a:['Mars','Saturn','Earth'],x:1},
+            {c:'Space',d:3,q:'Which planet is closest to the Sun?',a:['Mercury','Earth','Neptune'],x:0},
+            {c:'Space',d:3,q:'What is the Moon’s light really?',a:['Reflected sunlight','Fire','A flashlight'],x:0},
+            {c:'Space',d:3,q:'What is a rocket used for?',a:['Going into space','Sailing on water','Digging holes'],x:0},
+            {c:'Space',d:3,q:'Which is bigger?',a:['Earth','The Sun'],x:1},
+
+            // Difficulty 4
+            {c:'Math',d:4,q:'What is 18 + 7?',a:['24','25','26'],x:1},
+            {c:'Math',d:4,q:'What is 20 − 9?',a:['10','11','12'],x:1},
+            {c:'Math',d:4,q:'What comes next: 3, 6, 9, 12, __?',a:['14','15','16'],x:1},
+            {c:'Math',d:4,q:'What is 2 + 2 + 2 + 2?',a:['6','8','10'],x:1},
+            {c:'Math',d:4,q:'Sam has 12 cookies and gives away 4. How many are left?',a:['7','8','9'],x:1},
+            {c:'Spelling',d:4,q:'Which word is spelled correctly?',a:['Little','Littel','Litil'],x:0},
+            {c:'Spelling',d:4,q:'Which word means the same as “quick”?',a:['Fast','Slow','Quiet'],x:0},
+            {c:'Spelling',d:4,q:'What is the plural of “box”?',a:['Boxs','Boxes','Boxies'],x:1},
+            {c:'Spelling',d:4,q:'Which word starts with the same sound as “chair”?',a:['Cheese','Cat','Ship'],x:0},
+            {c:'Spelling',d:4,q:'Fill in the missing letter: pl_y',a:['a','e','i'],x:0},
+            {c:'Space',d:4,q:'Which planet is called the Red Planet?',a:['Mars','Venus','Jupiter'],x:0},
+            {c:'Space',d:4,q:'What causes daytime and nighttime on Earth?',a:['Earth spinning','The Moon moving','Clouds moving'],x:0},
+            {c:'Space',d:4,q:'What is the largest planet in our solar system?',a:['Earth','Jupiter','Mars'],x:1},
+            {c:'Space',d:4,q:'What do we call a person who travels into space?',a:['Astronaut','Sailor','Explorer'],x:0},
+            {c:'Space',d:4,q:'Which object orbits Earth?',a:['The Moon','The Sun','Mars'],x:0},
+
+            // Difficulty 5
+            {c:'Math',d:5,q:'What is 15 − 7?',a:['6','8','9'],x:1},
+            {c:'Math',d:5,q:'What is 9 + 8?',a:['16','17','18'],x:1},
+            {c:'Math',d:5,q:'Mia has 3 bags with 2 apples in each. How many apples?',a:['5','6','8'],x:1},
+            {c:'Math',d:5,q:'What comes next: 20, 18, 16, 14, __?',a:['12','13','10'],x:0},
+            {c:'Math',d:5,q:'Which number is odd?',a:['12','16','19'],x:2},
+            {c:'Spelling',d:5,q:'Which word is spelled correctly?',a:['Friend','Frend','Freind'],x:0},
+            {c:'Spelling',d:5,q:'What is the opposite of “early”?',a:['Late','Light','Long'],x:0},
+            {c:'Spelling',d:5,q:'Which word has three syllables?',a:['Elephant','Cat','Playground'],x:0},
+            {c:'Spelling',d:5,q:'Which word means the same as “tiny”?',a:['Huge','Small','Heavy'],x:1},
+            {c:'Spelling',d:5,q:'Which word is spelled correctly?',a:['Beautiful','Beautifull','Beauteful'],x:0},
+            {c:'Space',d:5,q:'Why does the Moon appear to shine?',a:['It reflects sunlight','It is on fire','It has light bulbs'],x:0},
+            {c:'Space',d:5,q:'Which planet is famous for its big red spot?',a:['Jupiter','Venus','Mercury'],x:0},
+            {c:'Space',d:5,q:'What is the path a planet travels around the Sun called?',a:['An orbit','A tunnel','A ladder'],x:0},
+            {c:'Space',d:5,q:'Why do astronauts need spacesuits?',a:['To help them breathe and stay safe','To make them fly','To keep rain off'],x:0},
+            {c:'Space',d:5,q:'Which planet is farthest from the Sun?',a:['Neptune','Earth','Mars'],x:0}
+        ];
+
+        let deck = [];
+        let position = -1;
+        let answered = false;
+
+        const category = document.getElementById('category');
+        const difficulty = document.getElementById('difficulty');
+        const question = document.getElementById('question');
+        const choices = document.getElementById('choices');
+        const status = document.getElementById('status');
+
+        function shuffle(items) {
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+            return items;
+        }
+
+        function matchingQuestions() {
+            return QUESTIONS.filter(item =>
+                (category.value === 'random' || item.c === category.value) &&
+                (difficulty.value === 'random' || item.d === Number(difficulty.value))
+            );
+        }
+
+        function rebuildDeck() {
+            deck = shuffle(matchingQuestions().map((_, index) => index));
+            position = 0;
+            showQuestion();
+        }
+
+        function currentQuestions() {
+            return matchingQuestions();
+        }
+
+        function showQuestion() {
+            const list = currentQuestions();
+            if (!list.length) return;
+            const item = list[deck[position]];
+            answered = false;
+            question.textContent = item.q;
+            status.textContent = `${item.c} · Difficulty ${item.d} · Question ${position + 1} of ${list.length}`;
+            choices.innerHTML = '';
+            item.a.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice';
+                button.textContent = `${String.fromCharCode(65 + index)}) ${choice}`;
+                choices.appendChild(button);
+            });
+        }
+
+        function revealAnswer() {
+            if (answered) return;
+            answered = true;
+            const item = currentQuestions()[deck[position]];
+            [...choices.children].forEach((button, index) => {
+                if (index === item.x) button.classList.add('correct');
+            });
+        }
+
+        function move(step) {
+            const list = currentQuestions();
+            if (!list.length) return;
+            position = (position + step + list.length) % list.length;
+            showQuestion();
+        }
+
+        category.addEventListener('change', rebuildDeck);
+        difficulty.addEventListener('change', rebuildDeck);
+        document.getElementById('previous').addEventListener('click', () => move(-1));
+        document.getElementById('next').addEventListener('click', () => move(1));
+        function speakQuestion() {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(question.textContent);
+            utterance.rate = 0.8;
+            utterance.pitch = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        document.addEventListener('keydown', event => {
+            if (event.code === 'Space') { event.preventDefault(); revealAnswer(); }
+            if (event.code === 'KeyS') { event.preventDefault(); speakQuestion(); }
+            if (event.code === 'ArrowLeft') move(-1);
+            if (event.code === 'ArrowRight') move(1);
+        });
+
+        rebuildDeck();
+    </script>
+</body>
+</html>
