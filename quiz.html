@@ -38,6 +38,7 @@
             justify-content: space-between;
             gap: 24px;
             box-shadow: 0 6px 0 rgba(23,35,61,.12);
+            flex-shrink: 0;
         }
         h1 {
             margin: 0;
@@ -50,7 +51,7 @@
         h1::before { content: "★"; color: var(--yellow); margin-right: 12px; }
         .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
         .controls label {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             letter-spacing: .1em;
             text-transform: uppercase;
@@ -60,7 +61,7 @@
         .score {
             display: flex;
             gap: 8px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             white-space: nowrap;
             margin-right: 8px;
@@ -72,6 +73,14 @@
         }
         .score .right { background: var(--green); }
         .score .wrong { background: var(--red); }
+        .done-button {
+            padding: 10px 18px;
+            background: var(--yellow);
+            color: var(--ink);
+            font-weight: bold;
+            box-shadow: 0 4px 0 #b78600;
+        }
+        .done-button:active { transform: translateY(3px); box-shadow: 0 1px 0 #b78600; }
         select, button {
             font: inherit;
             border: 0;
@@ -87,8 +96,9 @@
             outline-offset: 4px;
         }
         main {
-            width: min(1120px, calc(100% - 48px));
-            margin: clamp(24px, 4vh, 52px) auto;
+            width: min(1280px, calc(100% - 48px));
+            margin: auto;
+            flex-shrink: 0;
             padding: clamp(28px, 4vw, 52px);
             text-align: center;
             background: var(--paper);
@@ -110,7 +120,7 @@
         }
         .question {
             font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(36px, 5vw, 68px);
+            font-size: clamp(36px, 5vw, 76px);
             line-height: 1.08;
             font-weight: bold;
             margin: 0 auto clamp(30px, 5vh, 52px);
@@ -123,6 +133,10 @@
             gap: 20px;
             max-width: 930px;
             margin: 0 auto;
+        }
+        .choices.two-options {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: 630px;
         }
         .choice {
             position: relative;
@@ -185,6 +199,91 @@
             box-shadow: 0 5px 0 #081228;
         }
         .nav-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #081228; }
+        .results {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            background: rgba(8, 18, 40, .82);
+        }
+        .results[hidden] { display: none; }
+        .results-card {
+            width: min(1000px, 100%);
+            max-height: calc(100vh - 56px);
+            overflow: auto;
+            padding: clamp(28px, 4vw, 52px);
+            background: var(--paper);
+            border: 4px solid var(--ink);
+            border-radius: 28px;
+            box-shadow: 12px 12px 0 var(--yellow);
+            text-align: center;
+        }
+        .results-card h2 {
+            margin: 0 0 10px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(42px, 5vw, 68px);
+        }
+        .results-summary {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin: 24px 0 34px;
+        }
+        .result-number {
+            min-width: 150px;
+            padding: 15px 20px;
+            border-radius: 18px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .result-number strong { display: block; font-size: 38px; }
+        .result-number.right { background: var(--green); }
+        .result-number.wrong { background: var(--red); }
+        .result-number.total { background: var(--navy); }
+        .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; text-align: left; }
+        .chart h3 { margin: 0 0 16px; font-size: 24px; }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+        }
+        .chart-label { font-weight: bold; }
+        .bar {
+            position: relative;
+            display: flex;
+            height: 30px;
+            overflow: hidden;
+            background: #e5e8ef;
+            border: 2px solid var(--ink);
+            border-radius: 999px;
+        }
+        .bar-right { background: var(--green); }
+        .bar-wrong { background: var(--red); }
+        .bar-count {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: var(--ink);
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 1px white;
+        }
+        .results-actions { margin-top: 34px; }
+        .results-actions button {
+            padding: 14px 28px;
+            background: var(--navy);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #081228;
+        }
         .tv-mode select:focus, .tv-mode button:focus { outline: 7px solid #00e5ff; outline-offset: 6px; }
         .tv-mode header { padding: 22px 38px; }
         .tv-mode .controls { gap: 16px; }
@@ -192,14 +291,29 @@
         .tv-mode .controls label { font-size: 18px; }
         .tv-mode .score { font-size: 22px; }
         .tv-mode .hint { font-size: 22px; }
+        .tv-mode .results-card { width: min(1100px, 100%); }
+        .tv-mode .chart-label, .tv-mode .bar-count { font-size: 18px; }
+        .tv-mode .bar { height: 36px; }
         @keyframes pop { 50% { transform: scale(1.08) rotate(-1deg); } }
         @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @media (max-width: 800px) {
             header { align-items: flex-start; flex-direction: column; }
-            .controls { justify-content: flex-start; }
+            .controls {
+                display: grid;
+                grid-template-columns: auto minmax(0, 1fr);
+                justify-content: stretch;
+                width: 100%;
+            }
+            .controls .score { grid-column: 1 / -1; }
+            .controls label { margin-left: 0; }
+            .controls select { width: 100%; }
             main { width: calc(100% - 28px); padding: 28px 18px; box-shadow: 7px 7px 0 var(--ink); }
-            .choices { grid-template-columns: 1fr; }
+            .status { padding-inline: 12px; font-size: 14px; }
+            .choices, .choices.two-options { grid-template-columns: 1fr; max-width: 930px; }
             .choice { min-height: 70px; }
+            .charts { grid-template-columns: 1fr; }
+            .results { padding: 14px; }
+            .results-card { max-height: calc(100vh - 28px); padding: 28px 18px; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -211,6 +325,7 @@
         <h1>QUIZ</h1>
         <div class="controls">
             <div class="score" id="score"><span class="right">✓ Right: 0</span><span class="wrong">✕ Wrong: 0</span></div>
+            <button class="done-button" id="done">Done</button>
             <label for="category">Category</label>
             <select id="category">
                 <option value="random">Random</option>
@@ -240,6 +355,26 @@
             <button id="next">Next →</button>
         </div>
     </main>
+
+    <div class="results" id="results" role="dialog" aria-modal="true" aria-labelledby="results-title" hidden>
+        <section class="results-card" id="results-card" tabindex="-1">
+            <h2 id="results-title">Great playing!</h2>
+            <div class="results-summary" id="results-summary"></div>
+            <div class="charts">
+                <div class="chart">
+                    <h3>By category</h3>
+                    <div id="category-chart"></div>
+                </div>
+                <div class="chart">
+                    <h3>By difficulty</h3>
+                    <div id="difficulty-chart"></div>
+                </div>
+            </div>
+            <div class="results-actions">
+                <button id="keep-playing">Keep playing</button>
+            </div>
+        </section>
+    </div>
 
     <script>
         const isTv = /Android TV|GoogleTV|SmartTV|HbbTV|BRAVIA|Tizen|webOS|NetCast/i.test(navigator.userAgent);
@@ -337,6 +472,14 @@
         let answered = false;
         let rightAnswers = 0;
         let wrongAnswers = 0;
+        const categoryStats = {
+            Math: {right: 0, wrong: 0},
+            Spelling: {right: 0, wrong: 0},
+            Space: {right: 0, wrong: 0}
+        };
+        const difficultyStats = Object.fromEntries(
+            [1, 2, 3, 4, 5].map(level => [level, {right: 0, wrong: 0}])
+        );
 
         const category = document.getElementById('category');
         const difficulty = document.getElementById('difficulty');
@@ -344,6 +487,7 @@
         const choices = document.getElementById('choices');
         const status = document.getElementById('status');
         const score = document.getElementById('score');
+        const results = document.getElementById('results');
 
         function updateScore() {
             score.innerHTML = `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
@@ -383,6 +527,7 @@
             question.textContent = item.q;
             status.textContent = `${item.c} · Difficulty ${item.d} · Question ${position + 1} of ${list.length}`;
             choices.innerHTML = '';
+            choices.classList.toggle('two-options', item.a.length === 2);
             item.a.forEach((choice, index) => {
                 const button = document.createElement('button');
                 button.className = 'choice';
@@ -407,8 +552,15 @@
             if (answered) return;
             answered = true;
             const item = currentQuestions()[deck[position]];
-            if (index === item.x) rightAnswers++;
-            else wrongAnswers++;
+            if (index === item.x) {
+                rightAnswers++;
+                categoryStats[item.c].right++;
+                difficultyStats[item.d].right++;
+            } else {
+                wrongAnswers++;
+                categoryStats[item.c].wrong++;
+                difficultyStats[item.d].wrong++;
+            }
             updateScore();
             [...choices.children].forEach((button, choiceIndex) => {
                 if (choiceIndex === item.x) button.classList.add('correct');
@@ -417,6 +569,45 @@
             status.textContent = index === item.x
                 ? 'Correct! 🎉'
                 : `Not quite — the answer is ${item.a[item.x]}`;
+        }
+
+        function chartRows(items) {
+            return items.map(([label, values]) => {
+                const total = values.right + values.wrong;
+                const rightWidth = total ? (values.right / total) * 100 : 0;
+                const wrongWidth = total ? (values.wrong / total) * 100 : 0;
+                const count = total ? `${values.right} right · ${values.wrong} wrong` : 'Not played';
+                return `
+                    <div class="chart-row">
+                        <div class="chart-label">${label}</div>
+                        <div class="bar" aria-label="${label}: ${count}">
+                            <span class="bar-right" style="width:${rightWidth}%"></span>
+                            <span class="bar-wrong" style="width:${wrongWidth}%"></span>
+                            <span class="bar-count">${count}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function showResults() {
+            const total = rightAnswers + wrongAnswers;
+            document.getElementById('results-summary').innerHTML = `
+                <div class="result-number total"><strong>${total}</strong>Answered</div>
+                <div class="result-number right"><strong>${rightAnswers}</strong>Right</div>
+                <div class="result-number wrong"><strong>${wrongAnswers}</strong>Wrong</div>`;
+            document.getElementById('category-chart').innerHTML = chartRows(Object.entries(categoryStats));
+            document.getElementById('difficulty-chart').innerHTML = chartRows(
+                Object.entries(difficultyStats).map(([level, values]) => [`Level ${level}`, values])
+            );
+            results.hidden = false;
+            const resultsCard = document.getElementById('results-card');
+            resultsCard.focus();
+            resultsCard.scrollTop = 0;
+        }
+
+        function hideResults() {
+            results.hidden = true;
+            document.getElementById('done').focus();
         }
 
         function move(step) {
@@ -428,6 +619,8 @@
 
         category.addEventListener('change', rebuildDeck);
         difficulty.addEventListener('change', rebuildDeck);
+        document.getElementById('done').addEventListener('click', showResults);
+        document.getElementById('keep-playing').addEventListener('click', hideResults);
         document.getElementById('previous').addEventListener('click', () => move(-1));
         document.getElementById('next').addEventListener('click', () => move(1));
         function speakQuestion() {
@@ -448,6 +641,14 @@
             const down = event.key === 'ArrowDown' || event.keyCode === 40 || event.keyCode === 20;
             const enter = event.key === 'Enter' || event.keyCode === 13 || event.keyCode === 66;
             const space = event.code === 'Space' || event.keyCode === 32 || event.keyCode === 62;
+
+            if (!results.hidden) {
+                if (event.key === 'Escape' || event.keyCode === 27 || event.keyCode === 4 || space || enter) {
+                    event.preventDefault();
+                    hideResults();
+                }
+                return;
+            }
 
             // Let the TV remote operate the category and difficulty menus normally.
             if (event.target.matches('select, input, textarea')) return;
