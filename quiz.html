@@ -96,6 +96,7 @@
             outline-offset: 4px;
         }
         main {
+            position: relative;
             width: min(1280px, calc(100% - 48px));
             margin: auto;
             flex-shrink: 0;
@@ -107,17 +108,28 @@
             box-shadow: 12px 12px 0 var(--ink);
         }
         main:focus { outline: none; }
-        .status {
-            display: inline-block;
-            color: var(--navy);
-            background: #dff5fc;
-            border: 2px solid var(--blue);
-            border-radius: 999px;
-            padding: 8px 18px;
-            font-size: clamp(16px, 1.6vw, 21px);
+        .meta {
+            position: absolute;
+            top: 20px;
+            left: 28px;
+            color: #7b8499;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: clamp(24px, 4vh, 42px);
+            letter-spacing: .08em;
+            text-transform: uppercase;
         }
+        .status {
+            position: absolute;
+            top: 16px;
+            right: 26px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: var(--yellow);
+            color: var(--ink);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .status:empty { display: none; }
         .question {
             font-family: Georgia, "Times New Roman", serif;
             font-size: clamp(36px, 5vw, 76px);
@@ -291,6 +303,8 @@
         .tv-mode .controls label { font-size: 18px; }
         .tv-mode .score { font-size: 22px; }
         .tv-mode .hint { font-size: 22px; }
+        .tv-mode .meta { font-size: 18px; }
+        .tv-mode .status { font-size: 22px; }
         .tv-mode .results-card { width: min(1100px, 100%); }
         .tv-mode .chart-label, .tv-mode .bar-count { font-size: 18px; }
         .tv-mode .bar { height: 36px; }
@@ -305,10 +319,12 @@
                 width: 100%;
             }
             .controls .score { grid-column: 1 / -1; }
+            .controls .done-button { grid-column: 1 / -1; width: 100%; }
             .controls label { margin-left: 0; }
             .controls select { width: 100%; }
-            main { width: calc(100% - 28px); padding: 28px 18px; box-shadow: 7px 7px 0 var(--ink); }
-            .status { padding-inline: 12px; font-size: 14px; }
+            main { width: calc(100% - 28px); padding: 80px 18px 28px; box-shadow: 7px 7px 0 var(--ink); }
+            .meta { top: 18px; left: 20px; max-width: calc(100% - 40px); font-size: 12px; }
+            .status { top: 42px; right: 18px; padding: 6px 11px; font-size: 14px; }
             .choices, .choices.two-options { grid-template-columns: 1fr; max-width: 930px; }
             .choice { min-height: 70px; }
             .charts { grid-template-columns: 1fr; }
@@ -346,7 +362,8 @@
     </header>
 
     <main id="game" tabindex="-1">
-        <div class="status" id="status"></div>
+        <div class="meta" id="meta"></div>
+        <div class="status" id="status" aria-live="polite"></div>
         <div class="question" id="question"></div>
         <div class="choices" id="choices"></div>
         <div class="hint">PRESS SPACE / OK TO SHOW THE ANSWER · S TO HEAR · USE ← → TO CHANGE</div>
@@ -485,6 +502,7 @@
         const difficulty = document.getElementById('difficulty');
         const question = document.getElementById('question');
         const choices = document.getElementById('choices');
+        const meta = document.getElementById('meta');
         const status = document.getElementById('status');
         const score = document.getElementById('score');
         const results = document.getElementById('results');
@@ -525,7 +543,8 @@
             const item = list[deck[position]];
             answered = false;
             question.textContent = item.q;
-            status.textContent = `${item.c} · Difficulty ${item.d} · Question ${position + 1} of ${list.length}`;
+            meta.textContent = `${item.c} · Level ${item.d} · ${position + 1}/${list.length}`;
+            status.textContent = '';
             choices.innerHTML = '';
             choices.classList.toggle('two-options', item.a.length === 2);
             item.a.forEach((choice, index) => {
