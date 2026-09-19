@@ -366,7 +366,7 @@
         <div class="status" id="status" aria-live="polite"></div>
         <div class="question" id="question"></div>
         <div class="choices" id="choices"></div>
-        <div class="hint">PRESS SPACE / OK TO SHOW THE ANSWER · S TO HEAR · USE ← → TO CHANGE</div>
+        <div class="hint">SPACE / OK = SHOW ANSWER · AUTO-NEXT IN 5S · S = HEAR · ← → = MOVE</div>
         <div class="nav-buttons">
             <button id="previous">← Previous</button>
             <button id="next">Next →</button>
@@ -489,6 +489,9 @@
         let answered = false;
         let rightAnswers = 0;
         let wrongAnswers = 0;
+        let advanceInterval = null;
+        let audioContext = null;
+        const answers = new Map();
         const categoryStats = {
             Math: {right: 0, wrong: 0},
             Spelling: {right: 0, wrong: 0},
@@ -506,6 +509,7 @@
         const status = document.getElementById('status');
         const score = document.getElementById('score');
         const results = document.getElementById('results');
+        const nextButton = document.getElementById('next');
 
         function updateScore() {
             score.innerHTML = `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
@@ -537,11 +541,48 @@
             return matchingQuestions();
         }
 
+        function clearAdvanceTimer() {
+            if (advanceInterval) clearInterval(advanceInterval);
+            advanceInterval = null;
+            nextButton.textContent = 'Next →';
+        }
+
+        function startAdvanceTimer() {
+            clearAdvanceTimer();
+            let seconds = 5;
+            nextButton.textContent = `Next → ${seconds}`;
+            advanceInterval = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearAdvanceTimer();
+                    move(1);
+                } else {
+                    nextButton.textContent = `Next → ${seconds}`;
+                }
+            }, 1000);
+        }
+
+        function paintAnswer(item, selectedIndex) {
+            [...choices.children].forEach((button, choiceIndex) => {
+                if (choiceIndex === item.x) button.classList.add('correct');
+                if (selectedIndex !== null && choiceIndex === selectedIndex && choiceIndex !== item.x) {
+                    button.classList.add('wrong');
+                }
+            });
+            status.textContent = selectedIndex === null
+                ? `The answer is ${item.a[item.x]}`
+                : selectedIndex === item.x
+                    ? 'Correct! 🎉'
+                    : `Not quite — the answer is ${item.a[item.x]}`;
+        }
+
         function showQuestion() {
+            clearAdvanceTimer();
             const list = currentQuestions();
             if (!list.length) return;
             const item = list[deck[position]];
-            answered = false;
+            const savedAnswer = answers.get(item);
+            answered = answers.has(item);
             question.textContent = item.q;
             meta.textContent = `${item.c} · Level ${item.d} · ${position + 1}/${list.length}`;
             status.textContent = '';
@@ -556,21 +597,23 @@
                 button.addEventListener('click', () => chooseAnswer(index));
                 choices.appendChild(button);
             });
+            if (savedAnswer) paintAnswer(item, savedAnswer.selectedIndex);
         }
 
         function revealAnswer() {
             if (answered) return;
             answered = true;
             const item = currentQuestions()[deck[position]];
-            [...choices.children].forEach((button, index) => {
-                if (index === item.x) button.classList.add('correct');
-            });
+            answers.set(item, {selectedIndex: null});
+            paintAnswer(item, null);
+            startAdvanceTimer();
         }
 
         function chooseAnswer(index) {
             if (answered) return;
             answered = true;
             const item = currentQuestions()[deck[position]];
+            answers.set(item, {selectedIndex: index});
             if (index === item.x) {
                 rightAnswers++;
                 categoryStats[item.c].right++;
@@ -581,13 +624,37 @@
                 difficultyStats[item.d].wrong++;
             }
             updateScore();
-            [...choices.children].forEach((button, choiceIndex) => {
-                if (choiceIndex === item.x) button.classList.add('correct');
-                if (choiceIndex === index && choiceIndex !== item.x) button.classList.add('wrong');
+            paintAnswer(item, index);
+            playTone(index === item.x);
+            startAdvanceTimer();
+        }
+
+        function playTone(correct) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            if (!audioContext) audioContext = new AudioContext();
+            if (audioContext.state === 'suspended') audioContext.resume();
+
+            const now = audioContext.currentTime + 0.01;
+            const notes = correct
+                ? [{frequency: 523, start: 0, length: 0.13}, {frequency: 659, start: 0.14, length: 0.2}]
+                : [{frequency: 220, start: 0, length: 0.18}, {frequency: 165, start: 0.16, length: 0.28}];
+
+            notes.forEach(note => {
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                const start = now + note.start;
+                const end = start + note.length;
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(note.frequency, start);
+                gain.gain.setValueAtTime(0.0001, start);
+                gain.gain.exponentialRampToValueAtTime(0.12, start + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, end);
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.start(start);
+                oscillator.stop(end + 0.02);
             });
-            status.textContent = index === item.x
-                ? 'Correct! 🎉'
-                : `Not quite — the answer is ${item.a[item.x]}`;
         }
 
         function chartRows(items) {
@@ -609,6 +676,7 @@
         }
 
         function showResults() {
+            clearAdvanceTimer();
             const total = rightAnswers + wrongAnswers;
             document.getElementById('results-summary').innerHTML = `
                 <div class="result-number total"><strong>${total}</strong>Answered</div>
@@ -630,6 +698,7 @@
         }
 
         function move(step) {
+            clearAdvanceTimer();
             const list = currentQuestions();
             if (!list.length) return;
             position = (position + step + list.length) % list.length;
