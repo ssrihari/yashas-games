@@ -109,7 +109,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="game" tabindex="-1">
         <div class="status" id="status"></div>
         <div class="question" id="question"></div>
         <div class="choices" id="choices"></div>
@@ -240,6 +240,7 @@
             deck = shuffle(matchingQuestions().map((_, index) => index));
             position = 0;
             showQuestion();
+            if (isTv) document.getElementById('game').focus();
         }
 
         function currentQuestions() {
@@ -306,26 +307,35 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        document.addEventListener('keydown', event => {
+        window.addEventListener('keydown', event => {
+            // Some Android TV browsers expose D-pad keys as Android key codes
+            // instead of the usual ArrowLeft/ArrowRight values.
+            const left = event.key === 'ArrowLeft' || event.keyCode === 37 || event.keyCode === 21;
+            const right = event.key === 'ArrowRight' || event.keyCode === 39 || event.keyCode === 22;
+            const up = event.key === 'ArrowUp' || event.keyCode === 38 || event.keyCode === 19;
+            const down = event.key === 'ArrowDown' || event.keyCode === 40 || event.keyCode === 20;
+            const enter = event.key === 'Enter' || event.keyCode === 13 || event.keyCode === 66;
+            const space = event.code === 'Space' || event.keyCode === 32 || event.keyCode === 62;
+
             // Let the TV remote operate the category and difficulty menus normally.
             if (event.target.matches('select, input, textarea')) return;
 
             // Keep native button activation working when a TV remote has focused a button.
-            if (event.target.matches('button') && event.code === 'Enter') return;
+            if (event.target.matches('button') && enter) return;
 
             // OK/Enter and Space both reveal the answer on TV remotes.
-            if (event.code === 'Space' || event.code === 'Enter') {
+            if (space || enter) {
                 event.preventDefault();
                 revealAnswer();
             }
             if (event.code === 'KeyS') { event.preventDefault(); speakQuestion(); }
-            if (event.code === 'ArrowLeft') { event.preventDefault(); move(-1); }
-            if (event.code === 'ArrowRight') { event.preventDefault(); move(1); }
-            if (isTv && event.code === 'ArrowUp') {
+            if (left) { event.preventDefault(); move(-1); }
+            if (right) { event.preventDefault(); move(1); }
+            if (isTv && up) {
                 event.preventDefault();
                 category.focus();
             }
-            if (isTv && event.code === 'ArrowDown') {
+            if (isTv && down) {
                 event.preventDefault();
                 document.getElementById('next').focus();
             }
