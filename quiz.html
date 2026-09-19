@@ -259,6 +259,7 @@
                 button.className = 'choice';
                 button.tabIndex = -1;
                 button.textContent = `${String.fromCharCode(65 + index)}) ${choice}`;
+                button.addEventListener('click', () => chooseAnswer(index));
                 choices.appendChild(button);
             });
         }
@@ -270,6 +271,19 @@
             [...choices.children].forEach((button, index) => {
                 if (index === item.x) button.classList.add('correct');
             });
+        }
+
+        function chooseAnswer(index) {
+            if (answered) return;
+            answered = true;
+            const item = currentQuestions()[deck[position]];
+            [...choices.children].forEach((button, choiceIndex) => {
+                if (choiceIndex === item.x) button.classList.add('correct');
+                if (choiceIndex === index && choiceIndex !== item.x) button.classList.add('wrong');
+            });
+            status.textContent = index === item.x
+                ? 'Correct! 🎉'
+                : `Not quite — the answer is ${item.a[item.x]}`;
         }
 
         function move(step) {
