@@ -2978,7 +2978,7 @@
             if (!item) return;
             stopQuestionAudio();
             stopFeedbackAudio();
-            questionAudio = new Audio(`audio/${item.id}.mp3`);
+            questionAudio = new Audio(`audio/${item.id}.mp3?v=2`);
             questionAudio.preload = 'auto';
             questionAudio.play().catch(() => {
                 // Some browsers block the first autoplay. The Hear button retries
