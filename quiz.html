@@ -2874,6 +2874,15 @@
             });
         }
 
+        window.quizRemote = {
+            back() {
+                if (!picker.hidden) { closePicker(); return true; }
+                if (!results.hidden) { hideResults(); return true; }
+                if (!childResults.hidden) { continuePlaying(); return true; }
+                return false;
+            }
+        };
+
         window.addEventListener('keydown', event => {
             // Some Android TV browsers expose D-pad keys as Android key codes
             // instead of the usual ArrowLeft/ArrowRight values.
@@ -2920,10 +2929,12 @@
             }
 
             // Let the TV remote operate the category and difficulty menus normally.
-            if (event.target.matches('select, input, textarea')) return;
+            const targetMatches = selector => event.target && typeof event.target.matches === 'function'
+                && event.target.matches(selector);
+            if (targetMatches('select, input, textarea')) return;
 
             // Keep native button activation working when a TV remote has focused a button.
-            if (event.target.matches('button') && enter) return;
+            if (targetMatches('button') && enter) return;
 
             // OK/Enter and Space both reveal the answer on TV remotes.
             if (space || enter) {
