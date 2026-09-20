@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QUIZ</title>
+    <link rel="preload" href="audio/correct.mp3" as="audio" type="audio/mpeg">
+    <link rel="preload" href="audio/wrong.mp3" as="audio" type="audio/mpeg">
     <style>
         :root {
             --ink: #17233d;
@@ -2388,7 +2390,7 @@
         let advanceInterval = null;
         let speakTimeout = null;
         let questionAudio = null;
-        let audioContext = null;
+        let feedbackAudio = null;
         let questionShownAt = performance.now();
         let pendingBatchReport = false;
         let childContinueShouldAdvance = false;
@@ -2584,6 +2586,7 @@
             clearAdvanceTimer();
             if (speakTimeout) clearTimeout(speakTimeout);
             stopQuestionAudio();
+            stopFeedbackAudio();
             const item = currentItem();
             if (!item) return;
             const savedAnswer = answers.get(item.id);
@@ -2668,31 +2671,12 @@
         }
 
         function playTone(correct) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) return;
-            if (!audioContext) audioContext = new AudioContext();
-            if (audioContext.state === 'suspended') audioContext.resume();
-
-            const now = audioContext.currentTime + 0.01;
-            const notes = correct
-                ? [{frequency: 523, start: 0, length: 0.13}, {frequency: 659, start: 0.14, length: 0.2}]
-                : [{frequency: 220, start: 0, length: 0.18}, {frequency: 165, start: 0.16, length: 0.28}];
-
-            notes.forEach(note => {
-                const oscillator = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                const start = now + note.start;
-                const end = start + note.length;
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(note.frequency, start);
-                gain.gain.setValueAtTime(0.0001, start);
-                gain.gain.exponentialRampToValueAtTime(0.12, start + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.0001, end);
-                oscillator.connect(gain);
-                gain.connect(audioContext.destination);
-                oscillator.start(start);
-                oscillator.stop(end + 0.02);
-            });
+            stopQuestionAudio();
+            stopFeedbackAudio();
+            feedbackAudio = new Audio(correct ? 'audio/correct.mp3' : 'audio/wrong.mp3');
+            feedbackAudio.preload = 'auto';
+            feedbackAudio.volume = 1;
+            feedbackAudio.play().catch(() => {});
         }
 
         function chartRows(items) {
@@ -2729,6 +2713,7 @@
             clearAdvanceTimer();
             if (speakTimeout) clearTimeout(speakTimeout);
             stopQuestionAudio();
+            stopFeedbackAudio();
 
             const total = sessionLog.length;
             const batchNumber = Math.max(1, Math.ceil(total / BATCH_SIZE));
@@ -2869,10 +2854,18 @@
             questionAudio = null;
         }
 
+        function stopFeedbackAudio() {
+            if (!feedbackAudio) return;
+            feedbackAudio.pause();
+            feedbackAudio.currentTime = 0;
+            feedbackAudio = null;
+        }
+
         function speakQuestion() {
             const item = currentItem();
             if (!item) return;
             stopQuestionAudio();
+            stopFeedbackAudio();
             questionAudio = new Audio(`audio/${item.id}.mp3`);
             questionAudio.preload = 'auto';
             questionAudio.play().catch(() => {
