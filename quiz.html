@@ -458,6 +458,12 @@
             font-weight: bold;
         }
         .tv-mode select:focus, .tv-mode button:focus { outline: 4px solid var(--blue); outline-offset: 3px; }
+        .tv-mode .choice:focus { outline: none; }
+        .tv-mode .nav-buttons button:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 4px var(--blue), 0 5px 0 #081228;
+        }
         .tv-mode .child-actions button:focus {
             outline: none;
             transform: translateY(-2px);
@@ -2551,23 +2557,48 @@
             buttons[(current < 0 ? 0 : current + step + buttons.length) % buttons.length].focus();
         }
 
+        const headerControls = () => [doneButton, categoryButton, difficultyButton];
+        const navControls = () => [
+            document.getElementById('previous'),
+            document.getElementById('hear'),
+            nextButton
+        ];
+
         function moveHeader(step) {
-            const controls = [categoryButton, difficultyButton, doneButton];
+            const controls = headerControls();
             remoteHeaderPosition = (remoteHeaderPosition + step + controls.length) % controls.length;
             remoteArea = 'header';
             controls[remoteHeaderPosition].focus();
         }
 
         function focusHeader() {
+            const controls = headerControls();
             remoteArea = 'header';
-            remoteHeaderPosition = 0;
-            categoryButton.focus();
+            remoteHeaderPosition = 1;
+            controls[remoteHeaderPosition].focus();
         }
 
-        function focusChoices() {
+        function focusChoice(index = remoteChoicePosition) {
+            if (!choices.children.length) return;
             remoteArea = 'choices';
-            document.getElementById('game').focus();
+            remoteChoicePosition = Math.max(0, Math.min(index, choices.children.length - 1));
             updateRemoteChoiceFocus();
+            choices.children[remoteChoicePosition].focus();
+        }
+
+        function moveNav(step) {
+            const controls = navControls();
+            const current = Math.max(0, controls.indexOf(document.activeElement));
+            const next = (current + step + controls.length) % controls.length;
+            remoteArea = 'nav';
+            controls[next].focus();
+        }
+
+        function focusNav(index = remoteChoicePosition) {
+            const controls = navControls();
+            const next = Math.max(0, Math.min(index, controls.length - 1));
+            remoteArea = 'nav';
+            controls[next].focus();
         }
 
         function movePicker(step) {
@@ -2709,7 +2740,7 @@
         function remoteChoiceStep(step) {
             if (answered || !choices.children.length) return;
             remoteChoicePosition = (remoteChoicePosition + step + choices.children.length) % choices.children.length;
-            updateRemoteChoiceFocus();
+            focusChoice(remoteChoicePosition);
         }
 
         function remoteSelect() {
@@ -2742,7 +2773,7 @@
             choiceOrders.get(item.id).forEach((choiceIndex, displayIndex) => {
                 const button = document.createElement('button');
                 button.className = 'choice';
-                button.tabIndex = -1;
+                button.tabIndex = 0;
                 button.dataset.letter = String.fromCharCode(65 + displayIndex);
                 button.dataset.choiceIndex = choiceIndex;
                 button.textContent = item.choices[choiceIndex];
@@ -2751,6 +2782,7 @@
             });
             updateRemoteChoiceFocus();
             if (savedAnswer) paintAnswer(item, savedAnswer.selectedIndex);
+            if (started && remoteArea !== 'header') focusChoice(0);
             questionShownAt = performance.now();
             if (started) speakTimeout = setTimeout(speakQuestion, 350);
         }
@@ -2758,7 +2790,7 @@
         function startGame() {
             started = true;
             startScreen.hidden = true;
-            document.getElementById('game').focus();
+            focusChoice(0);
             speakQuestion();
         }
 
@@ -2943,7 +2975,7 @@
                 childContinueShouldAdvance = false;
                 move(1);
             } else {
-                document.getElementById('game').focus();
+                focusChoice(0);
                 speakTimeout = setTimeout(speakQuestion, 250);
             }
         }
@@ -3080,6 +3112,7 @@
                 if (!childResults.hidden) { moveModal(-1); return true; }
                 if (!results.hidden) { scrollResults(-1); return true; }
                 if (remoteArea === 'header') { moveHeader(-1); return true; }
+                if (remoteArea === 'nav') { moveNav(-1); return true; }
                 remoteChoiceStep(-1);
                 return true;
             },
@@ -3088,6 +3121,7 @@
                 if (!childResults.hidden) { moveModal(1); return true; }
                 if (!results.hidden) { scrollResults(1); return true; }
                 if (remoteArea === 'header') { moveHeader(1); return true; }
+                if (remoteArea === 'nav') { moveNav(1); return true; }
                 remoteChoiceStep(1);
                 return true;
             },
@@ -3095,15 +3129,16 @@
                 if (!picker.hidden) { movePicker(-1); return true; }
                 if (!childResults.hidden) { moveModal(-1); return true; }
                 if (!results.hidden) { scrollResults(-1); return true; }
-                focusHeader();
+                if (remoteArea === 'nav') { focusChoice(navControls().indexOf(document.activeElement)); return true; }
+                if (remoteArea === 'choices') { focusHeader(); return true; }
                 return true;
             },
             down() {
                 if (!picker.hidden) { movePicker(1); return true; }
                 if (!childResults.hidden) { moveModal(1); return true; }
                 if (!results.hidden) { scrollResults(1); return true; }
-                if (remoteArea === 'header') { focusChoices(); return true; }
-                move(1);
+                if (remoteArea === 'header') { focusChoice(remoteHeaderPosition); return true; }
+                if (remoteArea === 'choices') { focusNav(remoteChoicePosition); return true; }
                 return true;
             },
             select() {
@@ -3113,10 +3148,6 @@
                     if (focused) focused.click();
                     return true;
                 }
-                if (remoteArea === 'header') {
-                    [categoryButton, difficultyButton, doneButton][remoteHeaderPosition].click();
-                    return true;
-                }
                 if (!results.hidden || !childResults.hidden) {
                     const buttons = !childResults.hidden
                         ? [...childResults.querySelectorAll('button')]
@@ -3124,6 +3155,15 @@
                     const focused = buttons.includes(document.activeElement)
                         ? document.activeElement
                         : buttons[0];
+                    if (focused) focused.click();
+                    return true;
+                }
+                if (remoteArea === 'header') {
+                    headerControls()[remoteHeaderPosition].click();
+                    return true;
+                }
+                if (remoteArea === 'nav') {
+                    const focused = navControls().find(button => button === document.activeElement);
                     if (focused) focused.click();
                     return true;
                 }
@@ -3206,16 +3246,10 @@
                 revealAnswer();
             }
             if (event.code === 'KeyS') { event.preventDefault(); speakQuestion(); }
-            if (left) { event.preventDefault(); move(-1); }
-            if (right) { event.preventDefault(); move(1); }
-            if (isTv && up) {
-                event.preventDefault();
-                categoryButton.focus();
-            }
-            if (isTv && down) {
-                event.preventDefault();
-                document.getElementById('next').focus();
-            }
+            if (left) { event.preventDefault(); window.quizRemote.left(); }
+            if (right) { event.preventDefault(); window.quizRemote.right(); }
+            if (up) { event.preventDefault(); window.quizRemote.up(); }
+            if (down) { event.preventDefault(); window.quizRemote.down(); }
         });
 
         rebuildDeck();
