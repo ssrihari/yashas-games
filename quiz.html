@@ -190,6 +190,7 @@
         .choice.correct::before { content: "✓"; background: var(--green); color: white; }
         .choice.wrong::before { content: "✕"; background: var(--red); color: white; }
         .choice:hover { background: #fff7ce; transform: translateY(-3px); box-shadow: 0 10px 0 var(--ink); }
+        .choice.remote-focus { outline: 7px solid #00e5ff; outline-offset: 6px; transform: translateY(-3px); }
         .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink); }
         .choice.correct {
             background: #bcebc7;
@@ -217,6 +218,10 @@
         .tv-mode .tv-hint { display: inline; }
         .nav-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 14px; }
         .nav-buttons button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
             min-width: 150px;
             padding: 12px 22px;
             background: var(--navy);
@@ -418,7 +423,7 @@
         .tv-mode h1 { flex: 0 0 auto; font-size: 30px; }
         .tv-mode .controls { flex-wrap: nowrap; gap: 7px; }
         .tv-mode .filter-button { min-width: 104px; font-size: 15px; padding: 8px 10px; }
-        .tv-mode .controls label { margin-left: 1px; font-size: 11px; }
+        .tv-mode .controls label { display: none; }
         .tv-mode .score { margin-right: 1px; font-size: 15px; }
         .tv-mode .score .right, .tv-mode .score .wrong { padding: 6px 9px; }
         .tv-mode .done-button { padding: 7px 12px; }
@@ -2394,6 +2399,7 @@
         let questionShownAt = performance.now();
         let pendingBatchReport = false;
         let childContinueShouldAdvance = false;
+        let remoteChoicePosition = 0;
         const sessionStartedAt = Date.now();
         const sessionLog = [];
         const answers = new Map();
@@ -2422,6 +2428,7 @@
         const picker = document.getElementById('picker');
         const pickerTitle = document.getElementById('picker-title');
         const pickerOptions = document.getElementById('picker-options');
+        const hint = document.querySelector('.hint');
         let activePicker = null;
 
         const pickerData = {
@@ -2438,9 +2445,15 @@
                 options: [['random', 'Random'], ['1', 'Level 1 · Easy'], ['2', 'Level 2'], ['3', 'Level 3'], ['4', 'Level 4'], ['5', 'Level 5 · Tricky']]
             }
         };
+        if (isTv) {
+            categoryButton.textContent = 'Category: Random';
+            difficultyButton.textContent = 'Level: Random';
+        }
 
         function updateScore() {
-            score.innerHTML = `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
+            score.innerHTML = isTv
+                ? `<span class="right">✓ ${rightAnswers}</span><span class="wrong">✕ ${wrongAnswers}</span>`
+                : `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
         }
 
         function openPicker(type) {
@@ -2463,10 +2476,18 @@
             selected.focus();
         }
 
+        function movePicker(step) {
+            const pickerButtons = [...picker.querySelectorAll('.picker-option, .picker-cancel')];
+            const current = pickerButtons.indexOf(document.activeElement);
+            if (!pickerButtons.length) return;
+            pickerButtons[(current + step + pickerButtons.length) % pickerButtons.length].focus();
+        }
+
         function choosePickerValue(value, label) {
             const data = pickerData[activePicker];
             data.select.value = value;
-            data.trigger.textContent = label;
+            const prefix = activePicker === 'category' ? 'Category' : 'Level';
+            data.trigger.textContent = isTv ? `${prefix}: ${label}` : label;
             closePicker(false);
             data.select.dispatchEvent(new Event('change'));
             data.trigger.focus();
@@ -2556,6 +2577,7 @@
             let seconds = 5;
             const label = pendingBatchReport ? 'Results' : 'Next';
             nextButton.textContent = `${label} → ${seconds}`;
+            hint.textContent = `Hear replays the question · ${label} question in ${seconds} seconds`;
             advanceInterval = setInterval(() => {
                 seconds--;
                 if (seconds <= 0) {
@@ -2563,6 +2585,7 @@
                     move(1);
                 } else {
                     nextButton.textContent = `${label} → ${seconds}`;
+                    hint.textContent = `Hear replays the question · ${label} question in ${seconds} seconds`;
                 }
             }, 1000);
         }
@@ -2580,6 +2603,25 @@
                 : selectedIndex === item.answer
                     ? 'Correct! 🎉'
                     : `Not quite — the answer is ${item.choices[item.answer]}`;
+            hint.textContent = 'Hear replays the question · Next question in 5 seconds';
+        }
+
+        function updateRemoteChoiceFocus() {
+            [...choices.children].forEach((button, index) => {
+                button.classList.toggle('remote-focus', index === remoteChoicePosition && !answered);
+            });
+        }
+
+        function remoteChoiceStep(step) {
+            if (answered || !choices.children.length) return;
+            remoteChoicePosition = (remoteChoicePosition + step + choices.children.length) % choices.children.length;
+            updateRemoteChoiceFocus();
+        }
+
+        function remoteSelect() {
+            if (!childResults.hidden || !results.hidden || !picker.hidden) return;
+            const button = choices.children[remoteChoicePosition];
+            if (button) chooseAnswer(Number(button.dataset.choiceIndex));
         }
 
         function showQuestion() {
@@ -2591,13 +2633,15 @@
             if (!item) return;
             const savedAnswer = answers.get(item.id);
             answered = answers.has(item.id);
-            const batch = savedAnswer ? savedAnswer.batch : Math.floor(sessionLog.length / BATCH_SIZE) + 1;
-            const batchQuestion = savedAnswer ? savedAnswer.batchQuestion : (sessionLog.length % BATCH_SIZE) + 1;
+            const batch = savedAnswer ? savedAnswer.batch : Math.floor(position / BATCH_SIZE) + 1;
+            const batchQuestion = savedAnswer ? savedAnswer.batchQuestion : (position % BATCH_SIZE) + 1;
             question.textContent = item.question;
-            meta.textContent = `${item.category} · Level ${item.difficulty} · Batch ${batch} · ${batchQuestion}/${BATCH_SIZE}`;
+            meta.textContent = `${batchQuestion} / ${BATCH_SIZE}`;
             status.textContent = '';
+            hint.textContent = 'Choose an answer';
             choices.innerHTML = '';
             choices.classList.toggle('two-options', item.choices.length === 2);
+            remoteChoicePosition = 0;
             if (!choiceOrders.has(item.id)) {
                 choiceOrders.set(item.id, shuffle(item.choices.map((_, index) => index)));
             }
@@ -2611,6 +2655,7 @@
                 button.addEventListener('click', () => chooseAnswer(choiceIndex));
                 choices.appendChild(button);
             });
+            updateRemoteChoiceFocus();
             if (savedAnswer) paintAnswer(item, savedAnswer.selectedIndex);
             questionShownAt = performance.now();
             speakTimeout = setTimeout(speakQuestion, 350);
@@ -2875,6 +2920,44 @@
         }
 
         window.quizRemote = {
+            left() {
+                if (!picker.hidden) { movePicker(-1); return true; }
+                if (!results.hidden || !childResults.hidden) return true;
+                remoteChoiceStep(-1);
+                return true;
+            },
+            right() {
+                if (!picker.hidden) { movePicker(1); return true; }
+                if (!results.hidden || !childResults.hidden) return true;
+                remoteChoiceStep(1);
+                return true;
+            },
+            up() {
+                if (!picker.hidden) { movePicker(-1); return true; }
+                if (!results.hidden || !childResults.hidden) return true;
+                move(-1);
+                return true;
+            },
+            down() {
+                if (!picker.hidden) { movePicker(1); return true; }
+                if (!results.hidden || !childResults.hidden) return true;
+                move(1);
+                return true;
+            },
+            select() {
+                if (!picker.hidden) {
+                    const focused = pickerOptions.querySelector(':focus');
+                    if (focused) focused.click();
+                    return true;
+                }
+                if (!results.hidden || !childResults.hidden) {
+                    const focused = document.activeElement;
+                    if (focused && typeof focused.click === 'function') focused.click();
+                    return true;
+                }
+                remoteSelect();
+                return true;
+            },
             back() {
                 if (!picker.hidden) { closePicker(); return true; }
                 if (!results.hidden) { hideResults(); return true; }

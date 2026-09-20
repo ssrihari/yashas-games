@@ -3,6 +3,7 @@ package com.yashas.quiztv;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -11,6 +12,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
+    private static final String TAG = "QuizTV";
     private static final String QUIZ_URL =
             "https://ssrihari.github.io/yashas-games/quiz.html";
 
@@ -82,30 +84,28 @@ public class MainActivity extends Activity {
     private String keyFor(int keyCode) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                return "ArrowLeft";
+                return "left";
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                return "ArrowRight";
+                return "right";
             case KeyEvent.KEYCODE_DPAD_UP:
-                return "ArrowUp";
+                return "up";
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                return "ArrowDown";
+                return "down";
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
             case KeyEvent.KEYCODE_BUTTON_A:
-                return "Enter";
             case KeyEvent.KEYCODE_SPACE:
-                return " ";
+                return "select";
             default:
                 return null;
         }
     }
 
-    private void sendBrowserKey(String key) {
-        String escapedKey = key.equals(" ") ? " " : key;
-        String code = key.equals(" ") ? "Space" : key;
-        String javascript = "window.dispatchEvent(new KeyboardEvent('keydown', "
-                + "{key:'" + escapedKey + "', code:'" + code + "', bubbles:true}));";
-        webView.evaluateJavascript(javascript, null);
+    private void sendBrowserKey(String action) {
+        Log.d(TAG, "Forwarding remote action: " + action);
+        webView.evaluateJavascript(
+                "window.quizRemote && window.quizRemote." + action + "();",
+                null);
     }
 
     @Override
