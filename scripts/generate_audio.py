@@ -42,8 +42,11 @@ async def generate_one(question, output_dir, voice, rate, semaphore, force):
     async with semaphore:
         for attempt in range(3):
             try:
+                # Underscores are visible blanks in the quiz, but Edge TTS
+                # reads them as "underscore". Say "dash" instead.
+                speech_text = re.sub(r"_+", " dash ", question["question"])
                 communicate = edge_tts.Communicate(
-                    question["question"], voice, rate=rate
+                    speech_text, voice, rate=rate
                 )
                 await communicate.save(str(output))
                 return "generated"
