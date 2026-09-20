@@ -190,7 +190,12 @@
         .choice.correct::before { content: "✓"; background: var(--green); color: white; }
         .choice.wrong::before { content: "✕"; background: var(--red); color: white; }
         .choice:hover { background: #fff7ce; transform: translateY(-3px); box-shadow: 0 10px 0 var(--ink); }
-        .choice.remote-focus { outline: 7px solid #00e5ff; outline-offset: 6px; transform: translateY(-3px); }
+        .choice.remote-focus {
+            outline: none;
+            border-color: #087f9c;
+            box-shadow: 0 0 0 4px var(--blue), 0 7px 0 #087f9c;
+            transform: translateY(-2px);
+        }
         .choice:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink); }
         .choice.correct {
             background: #bcebc7;
