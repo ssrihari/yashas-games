@@ -246,6 +246,40 @@
             background: rgba(8, 18, 40, .82);
         }
         .results[hidden], .child-results[hidden] { display: none; }
+        .start-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            background: var(--navy);
+        }
+        .start-screen[hidden] { display: none; }
+        .start-card {
+            width: min(620px, 100%);
+            padding: clamp(36px, 6vw, 70px);
+            color: white;
+            text-align: center;
+        }
+        .start-logo { color: var(--yellow); font-size: clamp(70px, 10vw, 120px); line-height: .8; }
+        .start-card h2 {
+            margin: 28px 0 12px;
+            font-size: clamp(48px, 7vw, 82px);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .start-card p { margin: 0 0 34px; color: #cbd5ef; font-size: clamp(18px, 2.5vw, 26px); }
+        .start-button {
+            min-width: 220px;
+            padding: 16px 34px;
+            background: var(--yellow);
+            color: var(--ink);
+            font-size: 26px;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #b78600;
+        }
+        .start-button:active { transform: translateY(4px); box-shadow: 0 2px 0 #b78600; }
         .child-results { z-index: 90; }
         .child-results-card {
             width: min(720px, 100%);
@@ -509,6 +543,15 @@
             <button class="filter-button" id="difficulty-button" type="button" aria-haspopup="dialog">Random</button>
         </div>
     </header>
+
+    <div class="start-screen" id="start-screen" role="dialog" aria-modal="true" aria-labelledby="start-title">
+        <section class="start-card">
+            <div class="start-logo" aria-hidden="true">★</div>
+            <h2 id="start-title">Quiz</h2>
+            <p>Ready to play?</p>
+            <button class="start-button" id="start-button" type="button">Start</button>
+        </section>
+    </div>
 
     <main id="game" tabindex="-1">
         <div class="meta" id="meta"></div>
@@ -2394,6 +2437,7 @@
         let deck = [];
         let position = -1;
         let answered = false;
+        let started = false;
         let rightAnswers = 0;
         let wrongAnswers = 0;
         let revealedAnswers = 0;
@@ -2429,6 +2473,8 @@
         const score = document.getElementById('score');
         const results = document.getElementById('results');
         const childResults = document.getElementById('child-results');
+        const startScreen = document.getElementById('start-screen');
+        const startButton = document.getElementById('start-button');
         const nextButton = document.getElementById('next');
         const picker = document.getElementById('picker');
         const pickerTitle = document.getElementById('picker-title');
@@ -2672,7 +2718,14 @@
             updateRemoteChoiceFocus();
             if (savedAnswer) paintAnswer(item, savedAnswer.selectedIndex);
             questionShownAt = performance.now();
-            speakTimeout = setTimeout(speakQuestion, 350);
+            if (started) speakTimeout = setTimeout(speakQuestion, 350);
+        }
+
+        function startGame() {
+            started = true;
+            startScreen.hidden = true;
+            document.getElementById('game').focus();
+            speakQuestion();
         }
 
         function recordResponse(item, selectedIndex) {
@@ -2892,6 +2945,7 @@
             showQuestion();
         }
 
+        startButton.addEventListener('click', startGame);
         category.addEventListener('change', rebuildDeck);
         difficulty.addEventListener('change', rebuildDeck);
         categoryButton.addEventListener('click', () => openPicker('category'));
@@ -2958,6 +3012,7 @@
                 return true;
             },
             select() {
+                if (!startScreen.hidden) { startGame(); return true; }
                 if (!picker.hidden) {
                     const focused = pickerOptions.querySelector(':focus');
                     if (focused) focused.click();
@@ -2977,6 +3032,7 @@
                 return true;
             },
             back() {
+                if (!startScreen.hidden) return false;
                 if (!picker.hidden) { closePicker(); return true; }
                 if (!results.hidden) { hideResults(); return true; }
                 if (!childResults.hidden) { continuePlaying(); return true; }
@@ -2993,6 +3049,14 @@
             const down = event.key === 'ArrowDown' || event.keyCode === 40 || event.keyCode === 20;
             const enter = event.key === 'Enter' || event.keyCode === 13 || event.keyCode === 66;
             const space = event.code === 'Space' || event.keyCode === 32 || event.keyCode === 62;
+
+            if (!startScreen.hidden) {
+                if (space || enter) {
+                    event.preventDefault();
+                    startGame();
+                }
+                return;
+            }
 
             if (!picker.hidden) {
                 const pickerButtons = [...picker.querySelectorAll('button')];
@@ -3056,6 +3120,7 @@
         });
 
         rebuildDeck();
+        if (isTv) startButton.focus();
     </script>
 </body>
 </html>
