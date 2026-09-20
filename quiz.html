@@ -457,7 +457,7 @@
             font-size: 18px;
             font-weight: bold;
         }
-        .tv-mode select:focus, .tv-mode button:focus { outline: 7px solid #00e5ff; outline-offset: 6px; }
+        .tv-mode select:focus, .tv-mode button:focus { outline: 4px solid var(--blue); outline-offset: 3px; }
         .tv-mode header { padding: 9px 18px; gap: 10px; }
         .tv-mode h1 { flex: 0 0 auto; font-size: 30px; }
         .tv-mode .controls { flex-wrap: nowrap; gap: 7px; }
@@ -2449,6 +2449,8 @@
         let pendingBatchReport = false;
         let childContinueShouldAdvance = false;
         let remoteChoicePosition = 0;
+        let remoteArea = 'choices';
+        let remoteHeaderPosition = 0;
         const sessionStartedAt = Date.now();
         const sessionLog = [];
         const answers = new Map();
@@ -2476,6 +2478,7 @@
         const startScreen = document.getElementById('start-screen');
         const startButton = document.getElementById('start-button');
         const nextButton = document.getElementById('next');
+        const doneButton = document.getElementById('done');
         const picker = document.getElementById('picker');
         const pickerTitle = document.getElementById('picker-title');
         const pickerOptions = document.getElementById('picker-options');
@@ -2534,6 +2537,25 @@
             if (!buttons.length) return;
             const current = buttons.indexOf(document.activeElement);
             buttons[(current < 0 ? 0 : current + step + buttons.length) % buttons.length].focus();
+        }
+
+        function moveHeader(step) {
+            const controls = [categoryButton, difficultyButton, doneButton];
+            remoteHeaderPosition = (remoteHeaderPosition + step + controls.length) % controls.length;
+            remoteArea = 'header';
+            controls[remoteHeaderPosition].focus();
+        }
+
+        function focusHeader() {
+            remoteArea = 'header';
+            remoteHeaderPosition = 0;
+            categoryButton.focus();
+        }
+
+        function focusChoices() {
+            remoteArea = 'choices';
+            document.getElementById('game').focus();
+            updateRemoteChoiceFocus();
         }
 
         function movePicker(step) {
@@ -2990,24 +3012,27 @@
             left() {
                 if (!picker.hidden) { movePicker(-1); return true; }
                 if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
+                if (remoteArea === 'header') { moveHeader(-1); return true; }
                 remoteChoiceStep(-1);
                 return true;
             },
             right() {
                 if (!picker.hidden) { movePicker(1); return true; }
                 if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
+                if (remoteArea === 'header') { moveHeader(1); return true; }
                 remoteChoiceStep(1);
                 return true;
             },
             up() {
                 if (!picker.hidden) { movePicker(-1); return true; }
                 if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
-                move(-1);
+                focusHeader();
                 return true;
             },
             down() {
                 if (!picker.hidden) { movePicker(1); return true; }
                 if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
+                if (remoteArea === 'header') { focusChoices(); return true; }
                 move(1);
                 return true;
             },
@@ -3016,6 +3041,10 @@
                 if (!picker.hidden) {
                     const focused = pickerOptions.querySelector(':focus');
                     if (focused) focused.click();
+                    return true;
+                }
+                if (remoteArea === 'header') {
+                    [categoryButton, difficultyButton, doneButton][remoteHeaderPosition].click();
                     return true;
                 }
                 if (!results.hidden || !childResults.hidden) {
