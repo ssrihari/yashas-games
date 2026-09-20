@@ -2443,6 +2443,7 @@
 
         const QUESTIONS = JSON.parse(document.getElementById('question-bank').textContent);
         const BATCH_SIZE = 25;
+        const PROGRESS_STORAGE_KEY = 'quiz-progress-v1';
 
         let deck = [];
         let position = -1;
@@ -2461,6 +2462,7 @@
         let remoteChoicePosition = 0;
         let remoteArea = 'choices';
         let remoteHeaderPosition = 0;
+        let storedRecords = loadStoredRecords();
         const sessionStartedAt = Date.now();
         const sessionLog = [];
         const answers = new Map();
@@ -2770,6 +2772,7 @@
                 category: item.category,
                 difficulty: item.difficulty,
                 question: item.question,
+                playedAt: Date.now(),
                 selectedIndex,
                 selectedAnswer: selectedIndex === null ? null : item.choices[selectedIndex],
                 correctAnswer: item.choices[item.answer],
@@ -2777,6 +2780,7 @@
                 responseSeconds: Math.max(0.1, (performance.now() - questionShownAt) / 1000)
             };
             sessionLog.push(record);
+            persistRecord(record);
             answers.set(item.id, record);
 
             if (record.correct === true) {
@@ -2823,6 +2827,49 @@
             feedbackAudio.play().catch(() => {});
         }
 
+        function loadStoredRecords() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function persistRecord(record) {
+            storedRecords.push(record);
+            localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(storedRecords));
+        }
+
+        function recordsForToday() {
+            const today = new Date().toDateString();
+            return storedRecords.filter(record => new Date(record.playedAt).toDateString() === today);
+        }
+
+        function aggregateStats(records) {
+            const category = {
+                Math: {right: 0, wrong: 0},
+                Spelling: {right: 0, wrong: 0},
+                Space: {right: 0, wrong: 0}
+            };
+            const difficulty = Object.fromEntries(
+                [1, 2, 3, 4, 5].map(level => [level, {right: 0, wrong: 0}])
+            );
+            records.forEach(record => {
+                const target = record.correct ? 'right' : record.correct === false ? 'wrong' : null;
+                if (target) {
+                    category[record.category][target]++;
+                    difficulty[record.difficulty][target]++;
+                }
+            });
+            return {category, difficulty};
+        }
+
+        function scrollResults(step) {
+            const card = document.getElementById('results-card');
+            card.scrollBy({top: step * Math.max(220, card.clientHeight * 0.7), behavior: 'auto'});
+        }
+
         function chartRows(items) {
             return items.map(([label, values]) => {
                 const total = values.right + values.wrong;
@@ -2859,14 +2906,16 @@
             stopQuestionAudio();
             stopFeedbackAudio();
 
-            const total = sessionLog.length;
-            const batchNumber = Math.max(1, Math.ceil(total / BATCH_SIZE));
-            const isCompleteBatch = batchComplete && total > 0 && total % BATCH_SIZE === 0;
+            const todayRecords = recordsForToday();
+            const total = todayRecords.length;
+            const batchNumber = Math.max(1, Math.ceil(sessionLog.length / BATCH_SIZE));
+            const isCompleteBatch = batchComplete && sessionLog.length > 0 && sessionLog.length % BATCH_SIZE === 0;
             const records = isCompleteBatch
                 ? sessionLog.filter(record => record.batch === batchNumber)
-                : sessionLog;
+                : todayRecords;
             const right = records.filter(record => record.correct === true).length;
-            const practice = records.length - right;
+            const practice = records.filter(record => record.correct !== true).length;
+            const todayRight = todayRecords.filter(record => record.correct === true).length;
 
             document.getElementById('child-kicker').textContent = isCompleteBatch
                 ? `Batch ${batchNumber} · ${BATCH_SIZE} questions`
@@ -2878,7 +2927,7 @@
                 ? `<strong>${right}</strong> of ${records.length} right`
                 : 'Ready when you are';
             document.getElementById('child-progress').textContent = records.length
-                ? `${practice} to practice · ${rightAnswers} right overall`
+                ? `${practice} to practice · ${todayRight} right today`
                 : 'Answer a question to start your progress.';
             document.getElementById('continue-playing').textContent = isCompleteBatch ? 'Next 25' : 'Keep playing';
 
@@ -2902,21 +2951,26 @@
         function showResults() {
             clearAdvanceTimer();
             childResults.hidden = true;
-            const total = sessionLog.length;
+            const reportRecords = storedRecords;
+            const total = reportRecords.length;
+            const reportRight = reportRecords.filter(record => record.correct === true).length;
+            const reportWrong = reportRecords.filter(record => record.correct === false).length;
+            const reportRevealed = reportRecords.filter(record => record.correct === null).length;
+            const reportStats = aggregateStats(reportRecords);
             document.getElementById('results-summary').innerHTML = `
                 <div class="result-number total"><strong>${total}</strong>Completed</div>
-                <div class="result-number right"><strong>${rightAnswers}</strong>Right</div>
-                <div class="result-number wrong"><strong>${wrongAnswers}</strong>Wrong</div>
-                ${revealedAnswers ? `<div class="result-number total"><strong>${revealedAnswers}</strong>Revealed</div>` : ''}`;
-            document.getElementById('category-chart').innerHTML = chartRows(Object.entries(categoryStats));
+                <div class="result-number right"><strong>${reportRight}</strong>Right</div>
+                <div class="result-number wrong"><strong>${reportWrong}</strong>Wrong</div>
+                ${reportRevealed ? `<div class="result-number total"><strong>${reportRevealed}</strong>Revealed</div>` : ''}`;
+            document.getElementById('category-chart').innerHTML = chartRows(Object.entries(reportStats.category));
             document.getElementById('difficulty-chart').innerHTML = chartRows(
-                Object.entries(difficultyStats).map(([level, values]) => [`Level ${level}`, values])
+                Object.entries(reportStats.difficulty).map(([level, values]) => [`Level ${level}`, values])
             );
 
-            const batches = [...new Set(sessionLog.map(record => record.batch))];
+            const batches = [...new Set(reportRecords.map(record => record.batch))];
             document.getElementById('batch-chart').innerHTML = batches.length
                 ? batches.map(batch => {
-                    const records = sessionLog.filter(record => record.batch === batch);
+                    const records = reportRecords.filter(record => record.batch === batch);
                     const right = records.filter(record => record.correct === true).length;
                     const wrong = records.filter(record => record.correct === false).length;
                     const revealed = records.filter(record => record.correct === null).length;
@@ -2926,11 +2980,11 @@
                 : '<div class="batch-row"><span>No completed questions</span></div>';
 
             const averageSeconds = total
-                ? sessionLog.reduce((sum, record) => sum + record.responseSeconds, 0) / total
+                ? reportRecords.reduce((sum, record) => sum + record.responseSeconds, 0) / total
                 : 0;
             const elapsedSeconds = (Date.now() - sessionStartedAt) / 1000;
-            const accuracy = rightAnswers + wrongAnswers
-                ? Math.round((rightAnswers / (rightAnswers + wrongAnswers)) * 100)
+            const accuracy = reportRight + reportWrong
+                ? Math.round((reportRight / (reportRight + reportWrong)) * 100)
                 : 0;
             document.getElementById('session-data').innerHTML = `
                 <div class="session-stat"><strong>${accuracy}%</strong>Accuracy</div>
@@ -2938,7 +2992,7 @@
                 <div class="session-stat"><strong>${formatDuration(elapsedSeconds)}</strong>Session time</div>
                 <div class="session-stat"><strong>${QUESTIONS.length}</strong>Questions in bank</div>`;
 
-            const missed = sessionLog.filter(record => record.correct !== true);
+            const missed = reportRecords.filter(record => record.correct !== true);
             document.getElementById('review-list').innerHTML = missed.length
                 ? missed.map(record => `
                     <div class="review-item">
@@ -3018,30 +3072,36 @@
             });
         }
 
+        window.quizReport = () => JSON.parse(JSON.stringify(storedRecords));
+
         window.quizRemote = {
             left() {
                 if (!picker.hidden) { movePicker(-1); return true; }
-                if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
+                if (!childResults.hidden) { moveModal(-1); return true; }
+                if (!results.hidden) { scrollResults(-1); return true; }
                 if (remoteArea === 'header') { moveHeader(-1); return true; }
                 remoteChoiceStep(-1);
                 return true;
             },
             right() {
                 if (!picker.hidden) { movePicker(1); return true; }
-                if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
+                if (!childResults.hidden) { moveModal(1); return true; }
+                if (!results.hidden) { scrollResults(1); return true; }
                 if (remoteArea === 'header') { moveHeader(1); return true; }
                 remoteChoiceStep(1);
                 return true;
             },
             up() {
                 if (!picker.hidden) { movePicker(-1); return true; }
-                if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
+                if (!childResults.hidden) { moveModal(-1); return true; }
+                if (!results.hidden) { scrollResults(-1); return true; }
                 focusHeader();
                 return true;
             },
             down() {
                 if (!picker.hidden) { movePicker(1); return true; }
-                if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
+                if (!childResults.hidden) { moveModal(1); return true; }
+                if (!results.hidden) { scrollResults(1); return true; }
                 if (remoteArea === 'header') { focusChoices(); return true; }
                 move(1);
                 return true;
