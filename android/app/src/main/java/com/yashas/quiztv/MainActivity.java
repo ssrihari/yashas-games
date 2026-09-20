@@ -3,6 +3,7 @@ package com.yashas.quiztv;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -17,11 +18,15 @@ public class MainActivity extends Activity {
             "https://ssrihari.github.io/yashas-games/quiz.html";
 
     private WebView webView;
+    // The OK press used to launch the TV app can be delivered to the new
+    // Activity as well. Ignore it briefly so it cannot skip the start screen.
+    private long ignoreSelectUntil;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ignoreSelectUntil = SystemClock.uptimeMillis() + 1500;
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -57,6 +62,11 @@ public class MainActivity extends Activity {
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             String key = keyFor(event.getKeyCode());
             if (key != null) {
+                boolean isSelect = "select".equals(key);
+                if (isSelect && SystemClock.uptimeMillis() < ignoreSelectUntil) {
+                    Log.d(TAG, "Ignoring launch OK press");
+                    return true;
+                }
                 sendBrowserKey(key);
                 return true;
             }
