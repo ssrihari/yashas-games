@@ -13,7 +13,7 @@
 <main>
 <div id="loadStatus" class="load ready">Voice tracks are ready — no special browser features or model download needed.</div>
 <div class="toolbar"><select id="category"><option value="all">All categories</option></select><select id="difficulty"><option value="all">All levels</option></select><input id="search" type="search" placeholder="Search questions…"><button id="random">Random question</button></div>
-<section class="card"><div class="meta" id="meta"></div><div class="question" id="question"></div><div class="choices" id="choices"></div><div class="status" id="status" aria-live="polite"></div><div class="actions"><button id="speak" class="primary">🔊 Speak question</button><button id="next">Next question →</button></div><div class="help">Choose an answer, or speak the question. Audio runs locally after the model loads.</div></section>
+<section class="card"><div class="meta" id="meta"></div><div class="question" id="question"></div><div class="choices" id="choices"></div><div class="status" id="status" aria-live="polite"></div><div class="actions"><button id="speak" class="primary">🔊 Speak question</button><button id="next">Next question →</button></div><div class="help">The question starts speaking automatically. Use Speak question to hear it again.</div></section>
 <section class="list"><h2>All questions (<span id="count"></span>)</h2><div id="questionList" class="question-list"></div></section>
 </main>
 <script type="module">
@@ -29,7 +29,7 @@ function answer(i){if(answered)return;answered=true;const q=filtered[current];do
 function speak(question){if(audioPlayer){audioPlayer.pause();audioPlayer.currentTime=0}audioPlayer=new Audio(`audio/${question.id}.mp3`);$('loadStatus').textContent='Playing voice track…';audioPlayer.onended=()=>$('loadStatus').textContent='Voice tracks are ready — no special browser features or model download needed.';audioPlayer.onerror=()=>{$('loadStatus').textContent='Audio could not be loaded. Make sure the audio folder was uploaded too.'};audioPlayer.play().catch(()=>{$('loadStatus').textContent='Press Speak again to start audio.'})}
 
 $('speak').onclick=()=>filtered[current]&&speak(filtered[current]);$('next').onclick=()=>{if(filtered.length){current=(current+1)%filtered.length;show()}};$('random').onclick=()=>{if(filtered.length){current=Math.floor(Math.random()*filtered.length);show()}};[category,difficulty,$('search')].forEach(el=>el.oninput=()=>{renderList();current=0;show()});
-renderList();show();
+renderList();show();speak(filtered[0]);
 </script>
 </body>
 </html>
