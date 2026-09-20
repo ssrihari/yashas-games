@@ -2481,6 +2481,15 @@
             selected.focus();
         }
 
+        function moveModal(step) {
+            const buttons = !childResults.hidden
+                ? [...childResults.querySelectorAll('button')]
+                : [...results.querySelectorAll('button')];
+            if (!buttons.length) return;
+            const current = buttons.indexOf(document.activeElement);
+            buttons[(current < 0 ? 0 : current + step + buttons.length) % buttons.length].focus();
+        }
+
         function movePicker(step) {
             const pickerButtons = [...picker.querySelectorAll('.picker-option, .picker-cancel')];
             const current = pickerButtons.indexOf(document.activeElement);
@@ -2791,8 +2800,7 @@
             childContinueShouldAdvance = isCompleteBatch;
             if (isCompleteBatch) pendingBatchReport = false;
             childResults.hidden = false;
-            const card = document.getElementById('child-results-card');
-            card.focus();
+            document.getElementById('continue-playing').focus();
         }
 
         function continuePlaying() {
@@ -2927,25 +2935,25 @@
         window.quizRemote = {
             left() {
                 if (!picker.hidden) { movePicker(-1); return true; }
-                if (!results.hidden || !childResults.hidden) return true;
+                if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
                 remoteChoiceStep(-1);
                 return true;
             },
             right() {
                 if (!picker.hidden) { movePicker(1); return true; }
-                if (!results.hidden || !childResults.hidden) return true;
+                if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
                 remoteChoiceStep(1);
                 return true;
             },
             up() {
                 if (!picker.hidden) { movePicker(-1); return true; }
-                if (!results.hidden || !childResults.hidden) return true;
+                if (!results.hidden || !childResults.hidden) { moveModal(-1); return true; }
                 move(-1);
                 return true;
             },
             down() {
                 if (!picker.hidden) { movePicker(1); return true; }
-                if (!results.hidden || !childResults.hidden) return true;
+                if (!results.hidden || !childResults.hidden) { moveModal(1); return true; }
                 move(1);
                 return true;
             },
@@ -2956,8 +2964,13 @@
                     return true;
                 }
                 if (!results.hidden || !childResults.hidden) {
-                    const focused = document.activeElement;
-                    if (focused && typeof focused.click === 'function') focused.click();
+                    const buttons = !childResults.hidden
+                        ? [...childResults.querySelectorAll('button')]
+                        : [...results.querySelectorAll('button')];
+                    const focused = buttons.includes(document.activeElement)
+                        ? document.activeElement
+                        : buttons[0];
+                    if (focused) focused.click();
                     return true;
                 }
                 remoteSelect();
