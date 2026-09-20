@@ -91,6 +91,16 @@
             cursor: pointer;
         }
         select { font-weight: bold; box-shadow: inset 0 0 0 2px #ccd4e5; }
+        .filter-button {
+            min-width: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            font-weight: bold;
+            box-shadow: inset 0 0 0 2px #ccd4e5;
+        }
+        .filter-button::after { content: "▾"; color: #69748c; }
         select:focus, button:focus {
             outline: 5px solid var(--blue);
             outline-offset: 4px;
@@ -296,10 +306,55 @@
             font-weight: bold;
             box-shadow: 0 5px 0 #081228;
         }
+        .picker {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            background: rgba(8, 18, 40, .86);
+        }
+        .picker[hidden] { display: none; }
+        .picker-card {
+            width: min(720px, 100%);
+            padding: clamp(28px, 4vw, 48px);
+            background: var(--paper);
+            border: 4px solid var(--ink);
+            border-radius: 28px;
+            box-shadow: 12px 12px 0 var(--yellow);
+            text-align: center;
+        }
+        .picker-card h2 {
+            margin: 0 0 28px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(34px, 4vw, 52px);
+        }
+        .picker-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .picker-option {
+            min-height: 72px;
+            border: 3px solid var(--ink);
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 6px 0 var(--ink);
+        }
+        .picker-option.selected { background: var(--yellow); }
+        .picker-cancel {
+            margin-top: 26px;
+            background: var(--navy);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        body.tv-mode { zoom: .88; min-height: 113.64vh; }
         .tv-mode select:focus, .tv-mode button:focus { outline: 7px solid #00e5ff; outline-offset: 6px; }
         .tv-mode header { padding: 22px 38px; }
         .tv-mode .controls { gap: 16px; }
-        .tv-mode select { min-width: 180px; font-size: 22px; padding: 14px 16px; }
+        .tv-mode .filter-button { min-width: 180px; font-size: 22px; padding: 14px 16px; }
         .tv-mode .controls label { font-size: 18px; }
         .tv-mode .score { font-size: 22px; }
         .tv-mode .hint { font-size: 22px; }
@@ -321,7 +376,7 @@
             .controls .score { grid-column: 1 / -1; }
             .controls .done-button { grid-column: 1 / -1; width: 100%; }
             .controls label { margin-left: 0; }
-            .controls select { width: 100%; }
+            .controls .filter-button { width: 100%; }
             main { width: calc(100% - 28px); padding: 80px 18px 28px; box-shadow: 7px 7px 0 var(--ink); }
             .meta { top: 18px; left: 20px; max-width: calc(100% - 40px); font-size: 12px; }
             .status { top: 42px; right: 18px; padding: 6px 11px; font-size: 14px; }
@@ -330,6 +385,7 @@
             .charts { grid-template-columns: 1fr; }
             .results { padding: 14px; }
             .results-card { max-height: calc(100vh - 28px); padding: 28px 18px; }
+            .picker-options { grid-template-columns: 1fr; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -342,15 +398,16 @@
         <div class="controls">
             <div class="score" id="score"><span class="right">✓ Right: 0</span><span class="wrong">✕ Wrong: 0</span></div>
             <button class="done-button" id="done">Done</button>
-            <label for="category">Category</label>
-            <select id="category">
+            <label for="category-button">Category</label>
+            <select id="category" hidden>
                 <option value="random">Random</option>
                 <option value="Math">Math</option>
                 <option value="Spelling">Spelling</option>
                 <option value="Space">Space</option>
             </select>
-            <label for="difficulty">Difficulty</label>
-            <select id="difficulty">
+            <button class="filter-button" id="category-button" type="button" aria-haspopup="dialog">Random</button>
+            <label for="difficulty-button">Difficulty</label>
+            <select id="difficulty" hidden>
                 <option value="random">Random</option>
                 <option value="1">1 - Easy</option>
                 <option value="2">2</option>
@@ -358,6 +415,7 @@
                 <option value="4">4</option>
                 <option value="5">5 - Tricky</option>
             </select>
+            <button class="filter-button" id="difficulty-button" type="button" aria-haspopup="dialog">Random</button>
         </div>
     </header>
 
@@ -393,8 +451,18 @@
         </section>
     </div>
 
+    <div class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" hidden>
+        <section class="picker-card">
+            <h2 id="picker-title"></h2>
+            <div class="picker-options" id="picker-options"></div>
+            <button class="picker-cancel" id="picker-cancel" type="button">Cancel</button>
+        </section>
+    </div>
+
     <script>
-        const isTv = /Android TV|GoogleTV|SmartTV|HbbTV|BRAVIA|Tizen|webOS|NetCast/i.test(navigator.userAgent);
+        const userAgent = navigator.userAgent;
+        const isTv = /Android TV|GoogleTV|SmartTV|HbbTV|BRAVIA|Tizen|webOS|NetCast|BrowseHere|TCL/i.test(userAgent)
+            || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent));
         if (isTv) document.body.classList.add('tv-mode');
 
         const QUESTIONS = [
@@ -503,6 +571,8 @@
 
         const category = document.getElementById('category');
         const difficulty = document.getElementById('difficulty');
+        const categoryButton = document.getElementById('category-button');
+        const difficultyButton = document.getElementById('difficulty-button');
         const question = document.getElementById('question');
         const choices = document.getElementById('choices');
         const meta = document.getElementById('meta');
@@ -510,9 +580,66 @@
         const score = document.getElementById('score');
         const results = document.getElementById('results');
         const nextButton = document.getElementById('next');
+        const picker = document.getElementById('picker');
+        const pickerTitle = document.getElementById('picker-title');
+        const pickerOptions = document.getElementById('picker-options');
+        let activePicker = null;
+
+        const pickerData = {
+            category: {
+                title: 'Choose a category',
+                select: category,
+                trigger: categoryButton,
+                options: [['random', 'Random'], ['Math', 'Math'], ['Spelling', 'Spelling'], ['Space', 'Space']]
+            },
+            difficulty: {
+                title: 'Choose a level',
+                select: difficulty,
+                trigger: difficultyButton,
+                options: [['random', 'Random'], ['1', 'Level 1 · Easy'], ['2', 'Level 2'], ['3', 'Level 3'], ['4', 'Level 4'], ['5', 'Level 5 · Tricky']]
+            }
+        };
 
         function updateScore() {
             score.innerHTML = `<span class="right">✓ Right: ${rightAnswers}</span><span class="wrong">✕ Wrong: ${wrongAnswers}</span>`;
+        }
+
+        function openPicker(type) {
+            const data = pickerData[type];
+            activePicker = type;
+            pickerTitle.textContent = data.title;
+            pickerOptions.innerHTML = '';
+            data.options.forEach(([value, label]) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'picker-option';
+                button.textContent = label;
+                if (data.select.value === value) button.classList.add('selected');
+                button.addEventListener('click', () => choosePickerValue(value, label));
+                pickerOptions.appendChild(button);
+            });
+            data.trigger.setAttribute('aria-expanded', 'true');
+            picker.hidden = false;
+            const selected = pickerOptions.querySelector('.selected') || pickerOptions.firstElementChild;
+            selected.focus();
+        }
+
+        function choosePickerValue(value, label) {
+            const data = pickerData[activePicker];
+            data.select.value = value;
+            data.trigger.textContent = label;
+            closePicker(false);
+            data.select.dispatchEvent(new Event('change'));
+            data.trigger.focus();
+        }
+
+        function closePicker(restoreFocus = true) {
+            if (!activePicker) return;
+            const trigger = pickerData[activePicker].trigger;
+            trigger.setAttribute('aria-expanded', 'false');
+            picker.hidden = true;
+            activePicker = null;
+            if (restoreFocus) trigger.focus();
         }
 
         function shuffle(items) {
@@ -707,6 +834,9 @@
 
         category.addEventListener('change', rebuildDeck);
         difficulty.addEventListener('change', rebuildDeck);
+        categoryButton.addEventListener('click', () => openPicker('category'));
+        difficultyButton.addEventListener('click', () => openPicker('difficulty'));
+        document.getElementById('picker-cancel').addEventListener('click', () => closePicker());
         document.getElementById('done').addEventListener('click', showResults);
         document.getElementById('keep-playing').addEventListener('click', hideResults);
         document.getElementById('previous').addEventListener('click', () => move(-1));
@@ -729,6 +859,22 @@
             const down = event.key === 'ArrowDown' || event.keyCode === 40 || event.keyCode === 20;
             const enter = event.key === 'Enter' || event.keyCode === 13 || event.keyCode === 66;
             const space = event.code === 'Space' || event.keyCode === 32 || event.keyCode === 62;
+
+            if (!picker.hidden) {
+                const pickerButtons = [...picker.querySelectorAll('button')];
+                const current = pickerButtons.indexOf(document.activeElement);
+                if (event.key === 'Escape' || event.keyCode === 27 || event.keyCode === 4) {
+                    event.preventDefault();
+                    closePicker();
+                } else if (up || left) {
+                    event.preventDefault();
+                    pickerButtons[(current - 1 + pickerButtons.length) % pickerButtons.length].focus();
+                } else if (down || right) {
+                    event.preventDefault();
+                    pickerButtons[(current + 1) % pickerButtons.length].focus();
+                }
+                return;
+            }
 
             if (!results.hidden) {
                 if (event.key === 'Escape' || event.keyCode === 27 || event.keyCode === 4 || space || enter) {
@@ -754,7 +900,7 @@
             if (right) { event.preventDefault(); move(1); }
             if (isTv && up) {
                 event.preventDefault();
-                category.focus();
+                categoryButton.focus();
             }
             if (isTv && down) {
                 event.preventDefault();
