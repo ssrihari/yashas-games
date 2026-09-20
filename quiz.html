@@ -2568,6 +2568,7 @@
             const controls = headerControls();
             remoteHeaderPosition = (remoteHeaderPosition + step + controls.length) % controls.length;
             remoteArea = 'header';
+            updateRemoteChoiceFocus();
             controls[remoteHeaderPosition].focus();
         }
 
@@ -2575,6 +2576,7 @@
             const controls = headerControls();
             remoteArea = 'header';
             remoteHeaderPosition = 1;
+            updateRemoteChoiceFocus();
             controls[remoteHeaderPosition].focus();
         }
 
@@ -2591,6 +2593,7 @@
             const current = Math.max(0, controls.indexOf(document.activeElement));
             const next = (current + step + controls.length) % controls.length;
             remoteArea = 'nav';
+            updateRemoteChoiceFocus();
             controls[next].focus();
         }
 
@@ -2598,6 +2601,7 @@
             const controls = navControls();
             const next = Math.max(0, Math.min(index, controls.length - 1));
             remoteArea = 'nav';
+            updateRemoteChoiceFocus();
             controls[next].focus();
         }
 
@@ -2733,7 +2737,7 @@
 
         function updateRemoteChoiceFocus() {
             [...choices.children].forEach((button, index) => {
-                button.classList.toggle('remote-focus', index === remoteChoicePosition && !answered);
+                button.classList.toggle('remote-focus', remoteArea === 'choices' && index === remoteChoicePosition && !answered);
             });
         }
 

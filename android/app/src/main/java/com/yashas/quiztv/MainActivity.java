@@ -52,6 +52,8 @@ public class MainActivity extends Activity {
         settings.setSupportZoom(false);
         settings.setLoadWithOverviewMode(false);
         settings.setUseWideViewPort(false);
+        // The quiz is hosted live; do not let WebView keep an old navigation script.
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setUserAgentString(settings.getUserAgentString() + " Android TV QuizApp");
 
         setContentView(webView);
