@@ -221,7 +221,7 @@
             box-shadow: 0 5px 0 #081228;
         }
         .nav-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #081228; }
-        .results {
+        .results, .child-results {
             position: fixed;
             inset: 0;
             z-index: 100;
@@ -230,7 +230,41 @@
             padding: 28px;
             background: rgba(8, 18, 40, .82);
         }
-        .results[hidden] { display: none; }
+        .results[hidden], .child-results[hidden] { display: none; }
+        .child-results { z-index: 90; }
+        .child-results-card {
+            width: min(720px, 100%);
+            padding: clamp(34px, 5vw, 64px);
+            background: var(--paper);
+            border: 4px solid var(--ink);
+            border-radius: 28px;
+            box-shadow: 12px 12px 0 var(--yellow);
+            text-align: center;
+        }
+        .child-kicker {
+            color: #6c7690;
+            font-weight: bold;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+        .child-results-card h2 {
+            margin: 12px 0 20px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(42px, 6vw, 68px);
+        }
+        .child-score { font-size: clamp(28px, 4vw, 44px); font-weight: bold; }
+        .child-score strong { font-size: 1.5em; }
+        .child-progress { margin: 14px 0 30px; color: #667087; font-size: 20px; font-weight: bold; }
+        .child-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .child-actions button {
+            padding: 14px 24px;
+            background: var(--navy);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #081228;
+        }
+        .child-actions .secondary { background: white; color: var(--ink); box-shadow: inset 0 0 0 3px var(--ink); }
         .results-card {
             width: min(1000px, 100%);
             max-height: calc(100vh - 56px);
@@ -306,6 +340,30 @@
             font-weight: bold;
             box-shadow: 0 5px 0 #081228;
         }
+        .parent-observability {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 34px;
+            margin-top: 34px;
+            text-align: left;
+        }
+        .parent-section { text-align: left; }
+        .parent-section h3 { margin: 0 0 14px; font-size: 24px; }
+        .session-data { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .session-stat { padding: 12px; border-radius: 12px; background: #edf1f7; }
+        .session-stat strong { display: block; font-size: 23px; }
+        .batch-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid #d5dae5; }
+        .review-section { margin-top: 34px; }
+        .review-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 6px 18px;
+            padding: 12px 0;
+            border-bottom: 1px solid #d5dae5;
+        }
+        .review-item strong { font-size: 17px; }
+        .review-answer { color: #6a7388; }
+        .review-time { grid-row: 1 / 3; grid-column: 2; align-self: center; color: #6a7388; white-space: nowrap; }
         .picker {
             position: fixed;
             inset: 0;
@@ -350,19 +408,31 @@
             font-size: 18px;
             font-weight: bold;
         }
-        body.tv-mode { zoom: .88; min-height: 113.64vh; }
         .tv-mode select:focus, .tv-mode button:focus { outline: 7px solid #00e5ff; outline-offset: 6px; }
-        .tv-mode header { padding: 22px 38px; }
-        .tv-mode .controls { gap: 16px; }
-        .tv-mode .filter-button { min-width: 180px; font-size: 22px; padding: 14px 16px; }
-        .tv-mode .controls label { font-size: 18px; }
-        .tv-mode .score { font-size: 22px; }
-        .tv-mode .hint { font-size: 22px; }
-        .tv-mode .meta { font-size: 18px; }
-        .tv-mode .status { font-size: 22px; }
-        .tv-mode .results-card { width: min(1100px, 100%); }
-        .tv-mode .chart-label, .tv-mode .bar-count { font-size: 18px; }
-        .tv-mode .bar { height: 36px; }
+        .tv-mode header { padding: 12px 22px; gap: 12px; }
+        .tv-mode h1 { flex: 0 0 auto; font-size: 34px; }
+        .tv-mode .controls { flex-wrap: nowrap; gap: 8px; }
+        .tv-mode .filter-button { min-width: 112px; font-size: 16px; padding: 9px 11px; }
+        .tv-mode .controls label { margin-left: 2px; font-size: 12px; }
+        .tv-mode .score { margin-right: 2px; font-size: 16px; }
+        .tv-mode .score .right, .tv-mode .score .wrong { padding: 7px 10px; }
+        .tv-mode .done-button { padding: 8px 13px; }
+        .tv-mode main { width: min(1100px, 92vw); padding: 40px; }
+        .tv-mode .question { max-width: 880px; font-size: clamp(38px, 4.6vw, 62px); }
+        .tv-mode .choice { min-height: 86px; font-size: clamp(21px, 2.3vw, 30px); }
+        .tv-mode .hint { font-size: 16px; }
+        .tv-mode .meta { font-size: 13px; }
+        .tv-mode .status { font-size: 17px; }
+        .tv-mode .results-card { width: min(960px, 90vw); max-height: 88vh; padding: 28px; }
+        .tv-mode .results-card h2 { font-size: 48px; }
+        .tv-mode .results-summary { margin: 16px 0 24px; }
+        .tv-mode .result-number { min-width: 125px; padding: 10px 16px; font-size: 18px; }
+        .tv-mode .result-number strong { font-size: 30px; }
+        .tv-mode .chart-row { margin: 8px 0; }
+        .tv-mode .chart-label, .tv-mode .bar-count { font-size: 14px; }
+        .tv-mode .bar { height: 28px; }
+        .tv-mode .child-results-card { width: min(680px, 86vw); padding: 40px; }
+        .tv-mode .picker-card { width: min(640px, 86vw); padding: 36px; }
         @keyframes pop { 50% { transform: scale(1.08) rotate(-1deg); } }
         @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @media (max-width: 800px) {
@@ -383,8 +453,11 @@
             .choices, .choices.two-options { grid-template-columns: 1fr; max-width: 930px; }
             .choice { min-height: 70px; }
             .charts { grid-template-columns: 1fr; }
-            .results { padding: 14px; }
+            .parent-observability { grid-template-columns: 1fr; }
+            .results, .child-results { padding: 14px; }
             .results-card { max-height: calc(100vh - 28px); padding: 28px 18px; }
+            .child-results-card { padding: 34px 20px; }
+            .session-data { grid-template-columns: 1fr; }
             .picker-options { grid-template-columns: 1fr; }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -431,9 +504,22 @@
         </div>
     </main>
 
+    <div class="child-results" id="child-results" role="dialog" aria-modal="true" aria-labelledby="child-results-title" hidden>
+        <section class="child-results-card" id="child-results-card" tabindex="-1">
+            <div class="child-kicker" id="child-kicker"></div>
+            <h2 id="child-results-title"></h2>
+            <div class="child-score" id="child-score"></div>
+            <p class="child-progress" id="child-progress"></p>
+            <div class="child-actions">
+                <button id="continue-playing">Continue</button>
+                <button class="secondary" id="parent-details">Parent details</button>
+            </div>
+        </section>
+    </div>
+
     <div class="results" id="results" role="dialog" aria-modal="true" aria-labelledby="results-title" hidden>
         <section class="results-card" id="results-card" tabindex="-1">
-            <h2 id="results-title">Great playing!</h2>
+            <h2 id="results-title">Parent details</h2>
             <div class="results-summary" id="results-summary"></div>
             <div class="charts">
                 <div class="chart">
@@ -445,8 +531,22 @@
                     <div id="difficulty-chart"></div>
                 </div>
             </div>
+            <div class="parent-observability">
+                <div class="parent-section">
+                    <h3>By batch</h3>
+                    <div id="batch-chart"></div>
+                </div>
+                <div class="parent-section">
+                    <h3>Session</h3>
+                    <div class="session-data" id="session-data"></div>
+                </div>
+            </div>
+            <div class="parent-section review-section">
+                <h3>Questions to review</h3>
+                <div class="review-list" id="review-list"></div>
+            </div>
             <div class="results-actions">
-                <button id="keep-playing">Keep playing</button>
+                <button id="back-to-summary">Back</button>
             </div>
         </section>
     </div>
@@ -459,107 +559,1830 @@
         </section>
     </div>
 
+    <script type="application/json" id="question-bank">
+[
+  {
+    "id": "math-1-01",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What is 1 + 2?",
+    "choices": [
+      "2",
+      "3",
+      "4"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-02",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "Which number is bigger: 3 or 5?",
+    "choices": [
+      "3",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-03",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What comes after 6?",
+    "choices": [
+      "5",
+      "7",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-04",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "How many sides does a triangle have?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "math-1-05",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What is 5 − 1?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-06",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What is 2 + 2?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-07",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "How many sides does a rectangle have?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-08",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What number comes before 5?",
+    "choices": [
+      "3",
+      "4",
+      "6"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-09",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "What is 3 − 1?",
+    "choices": [
+      "1",
+      "2",
+      "3"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-1-10",
+    "category": "Math",
+    "difficulty": 1,
+    "question": "Which number is the smallest?",
+    "choices": [
+      "2",
+      "6",
+      "9"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-01",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Dog",
+      "Dawg",
+      "Dok"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-02",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "What letter does “ball” start with?",
+    "choices": [
+      "B",
+      "D",
+      "P"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-03",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Fill in the missing letter: c_t",
+    "choices": [
+      "a",
+      "e",
+      "i"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-04",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Which word rhymes with “cat”?",
+    "choices": [
+      "Hat",
+      "Dog",
+      "Sun"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-05",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "How do you spell something you wear on your foot?",
+    "choices": [
+      "Shoe",
+      "Shoo",
+      "Shu"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-06",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "What letter does “apple” start with?",
+    "choices": [
+      "A",
+      "E",
+      "P"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-07",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Fill in the missing letter: s_n",
+    "choices": [
+      "a",
+      "i",
+      "u"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "spelling-1-08",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Which word rhymes with “dog”?",
+    "choices": [
+      "Log",
+      "Dig",
+      "Sun"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-09",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Sun",
+      "Sunn",
+      "Snu"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-1-10",
+    "category": "Spelling",
+    "difficulty": 1,
+    "question": "Which word ends with the letter T?",
+    "choices": [
+      "Cat",
+      "Dog",
+      "Sun"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-01",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What do we live on?",
+    "choices": [
+      "Earth",
+      "Mars",
+      "The Moon"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-02",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What gives Earth most of its light during the day?",
+    "choices": [
+      "The Sun",
+      "The Moon",
+      "Mars"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-03",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "Is the Moon a planet?",
+    "choices": [
+      "Yes",
+      "No"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-1-04",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What color is the sky on a clear day?",
+    "choices": [
+      "Blue",
+      "Green",
+      "Purple"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-05",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What do astronauts wear in space?",
+    "choices": [
+      "Spacesuits",
+      "Pajamas",
+      "Raincoats"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-06",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "Where do astronauts travel?",
+    "choices": [
+      "Under the sea",
+      "Into space",
+      "Inside Earth"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-1-07",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What can you often see at night?",
+    "choices": [
+      "The Moon",
+      "A rainbow",
+      "The Sun only"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-08",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "Which vehicle can fly into space?",
+    "choices": [
+      "A rocket",
+      "A bicycle",
+      "A train"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-09",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "What shape is Earth?",
+    "choices": [
+      "Round",
+      "Square",
+      "Flat like paper"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-1-10",
+    "category": "Space",
+    "difficulty": 1,
+    "question": "Is the Sun hot or cold?",
+    "choices": [
+      "Hot",
+      "Cold"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "math-2-01",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What is 4 + 5?",
+    "choices": [
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-02",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What is 10 − 3?",
+    "choices": [
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-03",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What comes next: 2, 4, 6, __?",
+    "choices": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-04",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "How many sides does a square have?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-05",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "Which is smaller?",
+    "choices": [
+      "8",
+      "6"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-06",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What is 6 + 3?",
+    "choices": [
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-07",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What is 9 − 4?",
+    "choices": [
+      "4",
+      "5",
+      "6"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-08",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "What comes next: 1, 3, 5, __?",
+    "choices": [
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-09",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "There are 2 groups of 2 stars. How many stars?",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-2-10",
+    "category": "Math",
+    "difficulty": 2,
+    "question": "Which shape has no corners?",
+    "choices": [
+      "Square",
+      "Triangle",
+      "Circle"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "spelling-2-01",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Fish",
+      "Fissh",
+      "Fich"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-02",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Fill in the missing letter: d_g",
+    "choices": [
+      "a",
+      "o",
+      "u"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-2-03",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Which word rhymes with “sun”?",
+    "choices": [
+      "Run",
+      "Sit",
+      "Red"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-04",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "What is the opposite of “big”?",
+    "choices": [
+      "Tall",
+      "Small",
+      "Wide"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-2-05",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "How do you spell the color?",
+    "choices": [
+      "Blu",
+      "Blue",
+      "Bloo"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-2-06",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Bird",
+      "Burd",
+      "Brid"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-07",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Fill in the missing letter: h_t",
+    "choices": [
+      "a",
+      "e",
+      "i"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-08",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "Which word rhymes with “tree”?",
+    "choices": [
+      "Bee",
+      "Toy",
+      "Car"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-09",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "What is the opposite of “tall”?",
+    "choices": [
+      "Short",
+      "Wide",
+      "Loud"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-2-10",
+    "category": "Spelling",
+    "difficulty": 2,
+    "question": "What is the plural of “cat”?",
+    "choices": [
+      "Cats",
+      "Cates",
+      "Catses"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-01",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "What is the name of our star?",
+    "choices": [
+      "The Sun",
+      "Mars",
+      "Saturn"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-02",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "Which one is a planet?",
+    "choices": [
+      "Earth",
+      "Moon",
+      "Sun"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-03",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "What shape does the Moon look like when it is full?",
+    "choices": [
+      "A circle",
+      "A square",
+      "A triangle"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-04",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "What can you see in the night sky?",
+    "choices": [
+      "Stars",
+      "Rainbows only",
+      "Clouds only"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-05",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "Do astronauts float in space?",
+    "choices": [
+      "Yes",
+      "No"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-06",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "Which planet do we live on?",
+    "choices": [
+      "Venus",
+      "Earth",
+      "Mars"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-2-07",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "What does the Moon travel around?",
+    "choices": [
+      "Earth",
+      "Mars",
+      "Jupiter"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-08",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "What kind of object is the Sun?",
+    "choices": [
+      "A planet",
+      "A star",
+      "A moon"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-2-09",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "Which planet looks red?",
+    "choices": [
+      "Mars",
+      "Earth",
+      "Neptune"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-2-10",
+    "category": "Space",
+    "difficulty": 2,
+    "question": "How many planets are in our solar system?",
+    "choices": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-01",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What is 7 + 6?",
+    "choices": [
+      "12",
+      "13",
+      "14"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-02",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What is 14 − 5?",
+    "choices": [
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-03",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What comes next: 5, 10, 15, __?",
+    "choices": [
+      "18",
+      "20",
+      "25"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-04",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "You have 2 groups of 3 blocks. How many blocks?",
+    "choices": [
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-05",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "Which number is even?",
+    "choices": [
+      "7",
+      "9",
+      "12"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "math-3-06",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What is 8 + 7?",
+    "choices": [
+      "14",
+      "15",
+      "16"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-07",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What is 16 − 8?",
+    "choices": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-08",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What comes next: 3, 6, 9, __?",
+    "choices": [
+      "10",
+      "11",
+      "12"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "math-3-09",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "There are 3 groups of 2 blocks. How many blocks?",
+    "choices": [
+      "5",
+      "6",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-3-10",
+    "category": "Math",
+    "difficulty": 3,
+    "question": "What is half of 10?",
+    "choices": [
+      "4",
+      "5",
+      "6"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-01",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Because",
+      "Becaus",
+      "Becose"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-3-02",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word means the opposite of “hot”?",
+    "choices": [
+      "Warm",
+      "Cold",
+      "Fast"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-03",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word has two syllables?",
+    "choices": [
+      "Cat",
+      "Apple",
+      "Dog"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-04",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word rhymes with “cake”?",
+    "choices": [
+      "Bike",
+      "Make",
+      "Book"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-05",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word means the opposite of “up”?",
+    "choices": [
+      "Over",
+      "Down",
+      "Around"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-06",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "People",
+      "Peepul",
+      "Peple"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-3-07",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Fill in the missing letter: tr_e",
+    "choices": [
+      "a",
+      "e",
+      "i"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-3-08",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word means the same as “happy”?",
+    "choices": [
+      "Glad",
+      "Angry",
+      "Tired"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-3-09",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "Which word has two syllables?",
+    "choices": [
+      "Rocket",
+      "Star",
+      "Moon"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-3-10",
+    "category": "Spelling",
+    "difficulty": 3,
+    "question": "What is the plural of “baby”?",
+    "choices": [
+      "Babys",
+      "Babies",
+      "Babyes"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-3-01",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "Which planet is known for its rings?",
+    "choices": [
+      "Mars",
+      "Saturn",
+      "Earth"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-3-02",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "Which planet is closest to the Sun?",
+    "choices": [
+      "Mercury",
+      "Earth",
+      "Neptune"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-03",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "What is the Moon’s light really?",
+    "choices": [
+      "Reflected sunlight",
+      "Fire",
+      "A flashlight"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-04",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "What is a rocket used for?",
+    "choices": [
+      "Going into space",
+      "Sailing on water",
+      "Digging holes"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-05",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "Which is bigger?",
+    "choices": [
+      "Earth",
+      "The Sun"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-3-06",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "About how long does Earth take to travel around the Sun?",
+    "choices": [
+      "One day",
+      "One month",
+      "One year"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "space-3-07",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "What is Earth’s closest neighbor in space?",
+    "choices": [
+      "The Moon",
+      "Saturn",
+      "Neptune"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-08",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "What are stars made of?",
+    "choices": [
+      "Hot gas",
+      "Wood",
+      "Ice"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-09",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "What is our galaxy called?",
+    "choices": [
+      "The Milky Way",
+      "The Rainbow Road",
+      "The Moon Way"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-3-10",
+    "category": "Space",
+    "difficulty": 3,
+    "question": "Where can astronauts live and work while orbiting Earth?",
+    "choices": [
+      "A space station",
+      "A submarine",
+      "A lighthouse"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "math-4-01",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What is 18 + 7?",
+    "choices": [
+      "24",
+      "25",
+      "26"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-02",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What is 20 − 9?",
+    "choices": [
+      "10",
+      "11",
+      "12"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-03",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What comes next: 3, 6, 9, 12, __?",
+    "choices": [
+      "14",
+      "15",
+      "16"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-04",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What is 2 + 2 + 2 + 2?",
+    "choices": [
+      "6",
+      "8",
+      "10"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-05",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "Sam has 12 cookies and gives away 4. How many are left?",
+    "choices": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-06",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What is 27 + 8?",
+    "choices": [
+      "34",
+      "35",
+      "36"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-07",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What is 30 − 13?",
+    "choices": [
+      "16",
+      "17",
+      "18"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-08",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "There are 4 groups of 3. How many altogether?",
+    "choices": [
+      "7",
+      "12",
+      "14"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-4-09",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "What comes next: 2, 4, 8, 16, __?",
+    "choices": [
+      "18",
+      "24",
+      "32"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "math-4-10",
+    "category": "Math",
+    "difficulty": 4,
+    "question": "24 cookies are shared equally among 4 children. How many does each child get?",
+    "choices": [
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-4-01",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Little",
+      "Littel",
+      "Litil"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-02",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word means the same as “quick”?",
+    "choices": [
+      "Fast",
+      "Slow",
+      "Quiet"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-03",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "What is the plural of “box”?",
+    "choices": [
+      "Boxs",
+      "Boxes",
+      "Boxies"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-4-04",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word starts with the same sound as “chair”?",
+    "choices": [
+      "Cheese",
+      "Cat",
+      "Ship"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-05",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Fill in the missing letter: pl_y",
+    "choices": [
+      "a",
+      "e",
+      "i"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-06",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "School",
+      "Scool",
+      "Schule"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-07",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "What is the past tense of “jump”?",
+    "choices": [
+      "Jumped",
+      "Jumpt",
+      "Jumping"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-08",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which is the short form of “cannot”?",
+    "choices": [
+      "Can't",
+      "Canot",
+      "Cantt"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-09",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word has three syllables?",
+    "choices": [
+      "Banana",
+      "Apple",
+      "Cat"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-4-10",
+    "category": "Spelling",
+    "difficulty": 4,
+    "question": "Which word comes first in alphabetical order?",
+    "choices": [
+      "Apple",
+      "Ball",
+      "Cat"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-01",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "Which planet is called the Red Planet?",
+    "choices": [
+      "Mars",
+      "Venus",
+      "Jupiter"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-02",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What causes daytime and nighttime on Earth?",
+    "choices": [
+      "Earth spinning",
+      "The Moon moving",
+      "Clouds moving"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-03",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What is the largest planet in our solar system?",
+    "choices": [
+      "Earth",
+      "Jupiter",
+      "Mars"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-4-04",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What do we call a person who travels into space?",
+    "choices": [
+      "Astronaut",
+      "Sailor",
+      "Explorer"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-05",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "Which object orbits Earth?",
+    "choices": [
+      "The Moon",
+      "The Sun",
+      "Mars"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-06",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What pulls us toward the ground?",
+    "choices": [
+      "Gravity",
+      "Sunlight",
+      "Wind"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-07",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "One trip by Earth around the Sun makes what?",
+    "choices": [
+      "A day",
+      "A month",
+      "A year"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "space-4-08",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What do we call the Moon when its bright side cannot be seen from Earth?",
+    "choices": [
+      "Full Moon",
+      "New Moon",
+      "Half Moon"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-4-09",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "Which planet has the shortest year?",
+    "choices": [
+      "Mercury",
+      "Earth",
+      "Neptune"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-4-10",
+    "category": "Space",
+    "difficulty": 4,
+    "question": "What is an asteroid?",
+    "choices": [
+      "A rocky object orbiting the Sun",
+      "A kind of cloud",
+      "A baby star"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "math-5-01",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What is 15 − 7?",
+    "choices": [
+      "6",
+      "8",
+      "9"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-02",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What is 9 + 8?",
+    "choices": [
+      "16",
+      "17",
+      "18"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-03",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "Mia has 3 bags with 2 apples in each. How many apples?",
+    "choices": [
+      "5",
+      "6",
+      "8"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-04",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What comes next: 20, 18, 16, 14, __?",
+    "choices": [
+      "12",
+      "13",
+      "10"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "math-5-05",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "Which number is odd?",
+    "choices": [
+      "12",
+      "16",
+      "19"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "math-5-06",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What is 36 + 17?",
+    "choices": [
+      "52",
+      "53",
+      "54"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-07",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What is 50 − 28?",
+    "choices": [
+      "21",
+      "22",
+      "23"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-08",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "Four bags hold 3 marbles each. How many marbles altogether?",
+    "choices": [
+      "7",
+      "12",
+      "14"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "math-5-09",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What comes next: 1, 2, 4, 8, __?",
+    "choices": [
+      "10",
+      "12",
+      "16"
+    ],
+    "answer": 2
+  },
+  {
+    "id": "math-5-10",
+    "category": "Math",
+    "difficulty": 5,
+    "question": "What is half of 18?",
+    "choices": [
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-5-01",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Friend",
+      "Frend",
+      "Freind"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-02",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "What is the opposite of “early”?",
+    "choices": [
+      "Late",
+      "Light",
+      "Long"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-03",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which word has three syllables?",
+    "choices": [
+      "Elephant",
+      "Cat",
+      "Playground"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-04",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which word means the same as “tiny”?",
+    "choices": [
+      "Huge",
+      "Small",
+      "Heavy"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-5-05",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Beautiful",
+      "Beautifull",
+      "Beauteful"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-06",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which word is spelled correctly?",
+    "choices": [
+      "Different",
+      "Diffrent",
+      "Diferent"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-07",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "What does “un-” mean in the word “unhappy”?",
+    "choices": [
+      "Very",
+      "Not",
+      "Again"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-5-08",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "What is the plural of “mouse”?",
+    "choices": [
+      "Mouses",
+      "Mice",
+      "Mouse"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "spelling-5-09",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which letter is silent in “knee”?",
+    "choices": [
+      "K",
+      "N",
+      "E"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "spelling-5-10",
+    "category": "Spelling",
+    "difficulty": 5,
+    "question": "Which sentence has the correct punctuation?",
+    "choices": [
+      "Where are you?",
+      "Where are you.",
+      "Where are you!"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-01",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Why does the Moon appear to shine?",
+    "choices": [
+      "It reflects sunlight",
+      "It is on fire",
+      "It has light bulbs"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-02",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Which planet is famous for its big red spot?",
+    "choices": [
+      "Jupiter",
+      "Venus",
+      "Mercury"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-03",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "What is the path a planet travels around the Sun called?",
+    "choices": [
+      "An orbit",
+      "A tunnel",
+      "A ladder"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-04",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Why do astronauts need spacesuits?",
+    "choices": [
+      "To help them breathe and stay safe",
+      "To make them fly",
+      "To keep rain off"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-05",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Which planet is farthest from the Sun?",
+    "choices": [
+      "Neptune",
+      "Earth",
+      "Mars"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-06",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "What causes Earth’s seasons?",
+    "choices": [
+      "Earth’s tilt as it orbits the Sun",
+      "The Moon changing shape",
+      "Clouds moving"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-07",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "What does the Moon’s gravity help cause on Earth?",
+    "choices": [
+      "Ocean tides",
+      "Thunder",
+      "Earthquakes"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-08",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Which object is a dwarf planet?",
+    "choices": [
+      "Pluto",
+      "The Moon",
+      "The Sun"
+    ],
+    "answer": 0
+  },
+  {
+    "id": "space-5-09",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "About how long does sunlight take to reach Earth?",
+    "choices": [
+      "8 seconds",
+      "8 minutes",
+      "8 hours"
+    ],
+    "answer": 1
+  },
+  {
+    "id": "space-5-10",
+    "category": "Space",
+    "difficulty": 5,
+    "question": "Our solar system is inside which galaxy?",
+    "choices": [
+      "The Milky Way",
+      "Andromeda",
+      "The Whirlpool"
+    ],
+    "answer": 0
+  }
+]
+    </script>
+
     <script>
         const userAgent = navigator.userAgent;
         const isTv = /Android TV|GoogleTV|SmartTV|HbbTV|BRAVIA|Tizen|webOS|NetCast|BrowseHere|TCL/i.test(userAgent)
             || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent));
         if (isTv) document.body.classList.add('tv-mode');
 
-        const QUESTIONS = [
-            // Difficulty 1
-            {c:'Math',d:1,q:'What is 1 + 2?',a:['2','3','4'],x:1},
-            {c:'Math',d:1,q:'Which number is bigger: 3 or 5?',a:['3','5'],x:1},
-            {c:'Math',d:1,q:'What comes after 6?',a:['5','7','8'],x:1},
-            {c:'Math',d:1,q:'How many sides does a triangle have?',a:['3','4','5'],x:0},
-            {c:'Math',d:1,q:'What is 5 − 1?',a:['3','4','5'],x:1},
-            {c:'Spelling',d:1,q:'Which word is spelled correctly?',a:['Dog','Dawg','Dok'],x:0},
-            {c:'Spelling',d:1,q:'What letter does “ball” start with?',a:['B','D','P'],x:0},
-            {c:'Spelling',d:1,q:'Fill in the missing letter: c_t',a:['a','e','i'],x:0},
-            {c:'Spelling',d:1,q:'Which word rhymes with “cat”?',a:['Hat','Dog','Sun'],x:0},
-            {c:'Spelling',d:1,q:'How do you spell something you wear on your foot?',a:['Shoe','Shoo','Shu'],x:0},
-            {c:'Space',d:1,q:'What do we live on?',a:['Earth','Mars','The Moon'],x:0},
-            {c:'Space',d:1,q:'What shines during the day?',a:['The Sun','The Moon','A star'],x:0},
-            {c:'Space',d:1,q:'Is the Moon a planet?',a:['Yes','No'],x:1},
-            {c:'Space',d:1,q:'What color is the sky on a clear day?',a:['Blue','Green','Purple'],x:0},
-            {c:'Space',d:1,q:'What do astronauts wear in space?',a:['Spacesuits','Pajamas','Raincoats'],x:0},
-
-            // Difficulty 2
-            {c:'Math',d:2,q:'What is 4 + 5?',a:['8','9','10'],x:1},
-            {c:'Math',d:2,q:'What is 10 − 3?',a:['6','7','8'],x:1},
-            {c:'Math',d:2,q:'What comes next: 2, 4, 6, __?',a:['7','8','9'],x:1},
-            {c:'Math',d:2,q:'How many sides does a square have?',a:['3','4','5'],x:1},
-            {c:'Math',d:2,q:'Which is smaller?',a:['8','6'],x:1},
-            {c:'Spelling',d:2,q:'Which word is spelled correctly?',a:['Fish','Fissh','Fich'],x:0},
-            {c:'Spelling',d:2,q:'Fill in the missing letter: d_g',a:['a','o','u'],x:1},
-            {c:'Spelling',d:2,q:'Which word rhymes with “sun”?',a:['Run','Sit','Red'],x:0},
-            {c:'Spelling',d:2,q:'What is the opposite of “big”?',a:['Tall','Small','Wide'],x:1},
-            {c:'Spelling',d:2,q:'How do you spell the color?',a:['Blu','Blue','Bloo'],x:1},
-            {c:'Space',d:2,q:'What is the name of our star?',a:['The Sun','Mars','Saturn'],x:0},
-            {c:'Space',d:2,q:'Which one is a planet?',a:['Earth','Moon','Sun'],x:0},
-            {c:'Space',d:2,q:'What shape does the Moon look like when it is full?',a:['A circle','A square','A triangle'],x:0},
-            {c:'Space',d:2,q:'What can you see in the night sky?',a:['Stars','Rainbows only','Clouds only'],x:0},
-            {c:'Space',d:2,q:'Do astronauts float in space?',a:['Yes','No'],x:0},
-
-            // Difficulty 3
-            {c:'Math',d:3,q:'What is 7 + 6?',a:['12','13','14'],x:1},
-            {c:'Math',d:3,q:'What is 14 − 5?',a:['8','9','10'],x:1},
-            {c:'Math',d:3,q:'What comes next: 5, 10, 15, __?',a:['18','20','25'],x:1},
-            {c:'Math',d:3,q:'You have 2 groups of 3 blocks. How many blocks?',a:['5','6','7'],x:1},
-            {c:'Math',d:3,q:'Which number is even?',a:['7','9','12'],x:2},
-            {c:'Spelling',d:3,q:'Which word is spelled correctly?',a:['Because','Becaus','Becose'],x:0},
-            {c:'Spelling',d:3,q:'Which word means the opposite of “hot”?',a:['Warm','Cold','Fast'],x:1},
-            {c:'Spelling',d:3,q:'Which word has two syllables?',a:['Cat','Apple','Dog'],x:1},
-            {c:'Spelling',d:3,q:'Which word rhymes with “cake”?',a:['Bike','Make','Book'],x:1},
-            {c:'Spelling',d:3,q:'Which word means the opposite of “up”?',a:['Over','Down','Around'],x:1},
-            {c:'Space',d:3,q:'Which planet is known for its rings?',a:['Mars','Saturn','Earth'],x:1},
-            {c:'Space',d:3,q:'Which planet is closest to the Sun?',a:['Mercury','Earth','Neptune'],x:0},
-            {c:'Space',d:3,q:'What is the Moon’s light really?',a:['Reflected sunlight','Fire','A flashlight'],x:0},
-            {c:'Space',d:3,q:'What is a rocket used for?',a:['Going into space','Sailing on water','Digging holes'],x:0},
-            {c:'Space',d:3,q:'Which is bigger?',a:['Earth','The Sun'],x:1},
-
-            // Difficulty 4
-            {c:'Math',d:4,q:'What is 18 + 7?',a:['24','25','26'],x:1},
-            {c:'Math',d:4,q:'What is 20 − 9?',a:['10','11','12'],x:1},
-            {c:'Math',d:4,q:'What comes next: 3, 6, 9, 12, __?',a:['14','15','16'],x:1},
-            {c:'Math',d:4,q:'What is 2 + 2 + 2 + 2?',a:['6','8','10'],x:1},
-            {c:'Math',d:4,q:'Sam has 12 cookies and gives away 4. How many are left?',a:['7','8','9'],x:1},
-            {c:'Spelling',d:4,q:'Which word is spelled correctly?',a:['Little','Littel','Litil'],x:0},
-            {c:'Spelling',d:4,q:'Which word means the same as “quick”?',a:['Fast','Slow','Quiet'],x:0},
-            {c:'Spelling',d:4,q:'What is the plural of “box”?',a:['Boxs','Boxes','Boxies'],x:1},
-            {c:'Spelling',d:4,q:'Which word starts with the same sound as “chair”?',a:['Cheese','Cat','Ship'],x:0},
-            {c:'Spelling',d:4,q:'Fill in the missing letter: pl_y',a:['a','e','i'],x:0},
-            {c:'Space',d:4,q:'Which planet is called the Red Planet?',a:['Mars','Venus','Jupiter'],x:0},
-            {c:'Space',d:4,q:'What causes daytime and nighttime on Earth?',a:['Earth spinning','The Moon moving','Clouds moving'],x:0},
-            {c:'Space',d:4,q:'What is the largest planet in our solar system?',a:['Earth','Jupiter','Mars'],x:1},
-            {c:'Space',d:4,q:'What do we call a person who travels into space?',a:['Astronaut','Sailor','Explorer'],x:0},
-            {c:'Space',d:4,q:'Which object orbits Earth?',a:['The Moon','The Sun','Mars'],x:0},
-
-            // Difficulty 5
-            {c:'Math',d:5,q:'What is 15 − 7?',a:['6','8','9'],x:1},
-            {c:'Math',d:5,q:'What is 9 + 8?',a:['16','17','18'],x:1},
-            {c:'Math',d:5,q:'Mia has 3 bags with 2 apples in each. How many apples?',a:['5','6','8'],x:1},
-            {c:'Math',d:5,q:'What comes next: 20, 18, 16, 14, __?',a:['12','13','10'],x:0},
-            {c:'Math',d:5,q:'Which number is odd?',a:['12','16','19'],x:2},
-            {c:'Spelling',d:5,q:'Which word is spelled correctly?',a:['Friend','Frend','Freind'],x:0},
-            {c:'Spelling',d:5,q:'What is the opposite of “early”?',a:['Late','Light','Long'],x:0},
-            {c:'Spelling',d:5,q:'Which word has three syllables?',a:['Elephant','Cat','Playground'],x:0},
-            {c:'Spelling',d:5,q:'Which word means the same as “tiny”?',a:['Huge','Small','Heavy'],x:1},
-            {c:'Spelling',d:5,q:'Which word is spelled correctly?',a:['Beautiful','Beautifull','Beauteful'],x:0},
-            {c:'Space',d:5,q:'Why does the Moon appear to shine?',a:['It reflects sunlight','It is on fire','It has light bulbs'],x:0},
-            {c:'Space',d:5,q:'Which planet is famous for its big red spot?',a:['Jupiter','Venus','Mercury'],x:0},
-            {c:'Space',d:5,q:'What is the path a planet travels around the Sun called?',a:['An orbit','A tunnel','A ladder'],x:0},
-            {c:'Space',d:5,q:'Why do astronauts need spacesuits?',a:['To help them breathe and stay safe','To make them fly','To keep rain off'],x:0},
-            {c:'Space',d:5,q:'Which planet is farthest from the Sun?',a:['Neptune','Earth','Mars'],x:0}
-        ];
+        const QUESTIONS = JSON.parse(document.getElementById('question-bank').textContent);
+        const BATCH_SIZE = 25;
 
         let deck = [];
         let position = -1;
         let answered = false;
         let rightAnswers = 0;
         let wrongAnswers = 0;
+        let revealedAnswers = 0;
         let advanceInterval = null;
+        let speakTimeout = null;
         let audioContext = null;
+        let questionShownAt = performance.now();
+        let pendingBatchReport = false;
+        let childContinueShouldAdvance = false;
+        const sessionStartedAt = Date.now();
+        const sessionLog = [];
         const answers = new Map();
+        const choiceOrders = new Map();
         const categoryStats = {
             Math: {right: 0, wrong: 0},
             Spelling: {right: 0, wrong: 0},
@@ -579,6 +2402,7 @@
         const status = document.getElementById('status');
         const score = document.getElementById('score');
         const results = document.getElementById('results');
+        const childResults = document.getElementById('child-results');
         const nextButton = document.getElementById('next');
         const picker = document.getElementById('picker');
         const pickerTitle = document.getElementById('picker-title');
@@ -652,20 +2476,58 @@
 
         function matchingQuestions() {
             return QUESTIONS.filter(item =>
-                (category.value === 'random' || item.c === category.value) &&
-                (difficulty.value === 'random' || item.d === Number(difficulty.value))
+                (category.value === 'random' || item.category === category.value) &&
+                (difficulty.value === 'random' || item.difficulty === Number(difficulty.value))
             );
         }
 
+        function buildDeck(items) {
+            if (difficulty.value !== 'random') return shuffle([...items]);
+
+            const categories = ['Math', 'Spelling', 'Space'];
+            const byLevel = Object.fromEntries([1, 2, 3, 4, 5].map(level => {
+                const pools = Object.fromEntries(categories.map(name => [
+                    name,
+                    shuffle(items.filter(item => item.difficulty === level && item.category === name))
+                ]));
+                const levelQuestions = [];
+                let turn = 0;
+                while (Object.values(pools).some(pool => pool.length)) {
+                    const preferred = categories[(turn + level - 1) % categories.length];
+                    const pool = pools[preferred].length
+                        ? pools[preferred]
+                        : Object.values(pools).find(candidate => candidate.length);
+                    levelQuestions.push(pool.pop());
+                    turn++;
+                }
+                return [level, levelQuestions];
+            }));
+            const orders = [[1, 3, 2, 4, 5], [2, 4, 1, 5, 3], [1, 2, 4, 3, 5]];
+            const ordered = [];
+            let round = 0;
+            while (Object.values(byLevel).some(group => group.length)) {
+                orders[round % orders.length].forEach(level => {
+                    if (byLevel[level].length) ordered.push(byLevel[level].pop());
+                });
+                round++;
+            }
+            return ordered;
+        }
+
         function rebuildDeck() {
-            deck = shuffle(matchingQuestions().map((_, index) => index));
+            const available = matchingQuestions().filter(item => !answers.has(item.id));
+            deck = buildDeck(available);
             position = 0;
+            if (!deck.length) {
+                showChildResults(false);
+                return;
+            }
             showQuestion();
             if (isTv) document.getElementById('game').focus();
         }
 
-        function currentQuestions() {
-            return matchingQuestions();
+        function currentItem() {
+            return deck[position];
         }
 
         function clearAdvanceTimer() {
@@ -677,61 +2539,106 @@
         function startAdvanceTimer() {
             clearAdvanceTimer();
             let seconds = 5;
-            nextButton.textContent = `Next → ${seconds}`;
+            const label = pendingBatchReport ? 'Results' : 'Next';
+            nextButton.textContent = `${label} → ${seconds}`;
             advanceInterval = setInterval(() => {
                 seconds--;
                 if (seconds <= 0) {
                     clearAdvanceTimer();
                     move(1);
                 } else {
-                    nextButton.textContent = `Next → ${seconds}`;
+                    nextButton.textContent = `${label} → ${seconds}`;
                 }
             }, 1000);
         }
 
         function paintAnswer(item, selectedIndex) {
-            [...choices.children].forEach((button, choiceIndex) => {
-                if (choiceIndex === item.x) button.classList.add('correct');
-                if (selectedIndex !== null && choiceIndex === selectedIndex && choiceIndex !== item.x) {
+            [...choices.children].forEach(button => {
+                const choiceIndex = Number(button.dataset.choiceIndex);
+                if (choiceIndex === item.answer) button.classList.add('correct');
+                if (selectedIndex !== null && choiceIndex === selectedIndex && choiceIndex !== item.answer) {
                     button.classList.add('wrong');
                 }
             });
             status.textContent = selectedIndex === null
-                ? `The answer is ${item.a[item.x]}`
-                : selectedIndex === item.x
+                ? `The answer is ${item.choices[item.answer]}`
+                : selectedIndex === item.answer
                     ? 'Correct! 🎉'
-                    : `Not quite — the answer is ${item.a[item.x]}`;
+                    : `Not quite — the answer is ${item.choices[item.answer]}`;
         }
 
         function showQuestion() {
             clearAdvanceTimer();
-            const list = currentQuestions();
-            if (!list.length) return;
-            const item = list[deck[position]];
-            const savedAnswer = answers.get(item);
-            answered = answers.has(item);
-            question.textContent = item.q;
-            meta.textContent = `${item.c} · Level ${item.d} · ${position + 1}/${list.length}`;
+            if (speakTimeout) clearTimeout(speakTimeout);
+            const item = currentItem();
+            if (!item) return;
+            const savedAnswer = answers.get(item.id);
+            answered = answers.has(item.id);
+            const batch = savedAnswer ? savedAnswer.batch : Math.floor(sessionLog.length / BATCH_SIZE) + 1;
+            const batchQuestion = savedAnswer ? savedAnswer.batchQuestion : (sessionLog.length % BATCH_SIZE) + 1;
+            question.textContent = item.question;
+            meta.textContent = `${item.category} · Level ${item.difficulty} · Batch ${batch} · ${batchQuestion}/${BATCH_SIZE}`;
             status.textContent = '';
             choices.innerHTML = '';
-            choices.classList.toggle('two-options', item.a.length === 2);
-            item.a.forEach((choice, index) => {
+            choices.classList.toggle('two-options', item.choices.length === 2);
+            if (!choiceOrders.has(item.id)) {
+                choiceOrders.set(item.id, shuffle(item.choices.map((_, index) => index)));
+            }
+            choiceOrders.get(item.id).forEach((choiceIndex, displayIndex) => {
                 const button = document.createElement('button');
                 button.className = 'choice';
                 button.tabIndex = -1;
-                button.dataset.letter = String.fromCharCode(65 + index);
-                button.textContent = choice;
-                button.addEventListener('click', () => chooseAnswer(index));
+                button.dataset.letter = String.fromCharCode(65 + displayIndex);
+                button.dataset.choiceIndex = choiceIndex;
+                button.textContent = item.choices[choiceIndex];
+                button.addEventListener('click', () => chooseAnswer(choiceIndex));
                 choices.appendChild(button);
             });
             if (savedAnswer) paintAnswer(item, savedAnswer.selectedIndex);
+            questionShownAt = performance.now();
+            speakTimeout = setTimeout(speakQuestion, 350);
+        }
+
+        function recordResponse(item, selectedIndex) {
+            const sequence = sessionLog.length + 1;
+            const record = {
+                sequence,
+                batch: Math.ceil(sequence / BATCH_SIZE),
+                batchQuestion: ((sequence - 1) % BATCH_SIZE) + 1,
+                id: item.id,
+                category: item.category,
+                difficulty: item.difficulty,
+                question: item.question,
+                selectedIndex,
+                selectedAnswer: selectedIndex === null ? null : item.choices[selectedIndex],
+                correctAnswer: item.choices[item.answer],
+                correct: selectedIndex === null ? null : selectedIndex === item.answer,
+                responseSeconds: Math.max(0.1, (performance.now() - questionShownAt) / 1000)
+            };
+            sessionLog.push(record);
+            answers.set(item.id, record);
+
+            if (record.correct === true) {
+                rightAnswers++;
+                categoryStats[item.category].right++;
+                difficultyStats[item.difficulty].right++;
+            } else if (record.correct === false) {
+                wrongAnswers++;
+                categoryStats[item.category].wrong++;
+                difficultyStats[item.difficulty].wrong++;
+            } else {
+                revealedAnswers++;
+            }
+            updateScore();
+            pendingBatchReport = sequence % BATCH_SIZE === 0;
+            return record;
         }
 
         function revealAnswer() {
             if (answered) return;
             answered = true;
-            const item = currentQuestions()[deck[position]];
-            answers.set(item, {selectedIndex: null});
+            const item = currentItem();
+            recordResponse(item, null);
             paintAnswer(item, null);
             startAdvanceTimer();
         }
@@ -739,20 +2646,10 @@
         function chooseAnswer(index) {
             if (answered) return;
             answered = true;
-            const item = currentQuestions()[deck[position]];
-            answers.set(item, {selectedIndex: index});
-            if (index === item.x) {
-                rightAnswers++;
-                categoryStats[item.c].right++;
-                difficultyStats[item.d].right++;
-            } else {
-                wrongAnswers++;
-                categoryStats[item.c].wrong++;
-                difficultyStats[item.d].wrong++;
-            }
-            updateScore();
+            const item = currentItem();
+            const record = recordResponse(item, index);
             paintAnswer(item, index);
-            playTone(index === item.x);
+            playTone(record.correct);
             startAdvanceTimer();
         }
 
@@ -802,17 +2699,113 @@
             }).join('');
         }
 
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            })[character]);
+        }
+
+        function formatDuration(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.round(totalSeconds % 60);
+            return minutes ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        }
+
+        function showChildResults(batchComplete = false) {
+            clearAdvanceTimer();
+            if (speakTimeout) clearTimeout(speakTimeout);
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+            const total = sessionLog.length;
+            const batchNumber = Math.max(1, Math.ceil(total / BATCH_SIZE));
+            const isCompleteBatch = batchComplete && total > 0 && total % BATCH_SIZE === 0;
+            const records = isCompleteBatch
+                ? sessionLog.filter(record => record.batch === batchNumber)
+                : sessionLog;
+            const right = records.filter(record => record.correct === true).length;
+            const practice = records.length - right;
+
+            document.getElementById('child-kicker').textContent = isCompleteBatch
+                ? `Batch ${batchNumber} · ${BATCH_SIZE} questions`
+                : `${total} question${total === 1 ? '' : 's'} completed`;
+            document.getElementById('child-results-title').textContent = isCompleteBatch
+                ? 'Batch complete'
+                : 'Today’s progress';
+            document.getElementById('child-score').innerHTML = records.length
+                ? `<strong>${right}</strong> of ${records.length} right`
+                : 'Ready when you are';
+            document.getElementById('child-progress').textContent = records.length
+                ? `${practice} to practice · ${rightAnswers} right overall`
+                : 'Answer a question to start your progress.';
+            document.getElementById('continue-playing').textContent = isCompleteBatch ? 'Next 25' : 'Keep playing';
+
+            childContinueShouldAdvance = isCompleteBatch;
+            if (isCompleteBatch) pendingBatchReport = false;
+            childResults.hidden = false;
+            const card = document.getElementById('child-results-card');
+            card.focus();
+        }
+
+        function continuePlaying() {
+            childResults.hidden = true;
+            if (childContinueShouldAdvance) {
+                childContinueShouldAdvance = false;
+                move(1);
+            } else {
+                document.getElementById('game').focus();
+                speakTimeout = setTimeout(speakQuestion, 250);
+            }
+        }
+
         function showResults() {
             clearAdvanceTimer();
-            const total = rightAnswers + wrongAnswers;
+            childResults.hidden = true;
+            const total = sessionLog.length;
             document.getElementById('results-summary').innerHTML = `
-                <div class="result-number total"><strong>${total}</strong>Answered</div>
+                <div class="result-number total"><strong>${total}</strong>Completed</div>
                 <div class="result-number right"><strong>${rightAnswers}</strong>Right</div>
-                <div class="result-number wrong"><strong>${wrongAnswers}</strong>Wrong</div>`;
+                <div class="result-number wrong"><strong>${wrongAnswers}</strong>Wrong</div>
+                ${revealedAnswers ? `<div class="result-number total"><strong>${revealedAnswers}</strong>Revealed</div>` : ''}`;
             document.getElementById('category-chart').innerHTML = chartRows(Object.entries(categoryStats));
             document.getElementById('difficulty-chart').innerHTML = chartRows(
                 Object.entries(difficultyStats).map(([level, values]) => [`Level ${level}`, values])
             );
+
+            const batches = [...new Set(sessionLog.map(record => record.batch))];
+            document.getElementById('batch-chart').innerHTML = batches.length
+                ? batches.map(batch => {
+                    const records = sessionLog.filter(record => record.batch === batch);
+                    const right = records.filter(record => record.correct === true).length;
+                    const wrong = records.filter(record => record.correct === false).length;
+                    const revealed = records.filter(record => record.correct === null).length;
+                    const average = records.reduce((sum, record) => sum + record.responseSeconds, 0) / records.length;
+                    return `<div class="batch-row"><strong>Batch ${batch}</strong><span>${right} right · ${wrong} wrong${revealed ? ` · ${revealed} revealed` : ''} · ${average.toFixed(1)}s avg</span></div>`;
+                }).join('')
+                : '<div class="batch-row"><span>No completed questions</span></div>';
+
+            const averageSeconds = total
+                ? sessionLog.reduce((sum, record) => sum + record.responseSeconds, 0) / total
+                : 0;
+            const elapsedSeconds = (Date.now() - sessionStartedAt) / 1000;
+            const accuracy = rightAnswers + wrongAnswers
+                ? Math.round((rightAnswers / (rightAnswers + wrongAnswers)) * 100)
+                : 0;
+            document.getElementById('session-data').innerHTML = `
+                <div class="session-stat"><strong>${accuracy}%</strong>Accuracy</div>
+                <div class="session-stat"><strong>${averageSeconds.toFixed(1)}s</strong>Average response</div>
+                <div class="session-stat"><strong>${formatDuration(elapsedSeconds)}</strong>Session time</div>
+                <div class="session-stat"><strong>${QUESTIONS.length}</strong>Questions in bank</div>`;
+
+            const missed = sessionLog.filter(record => record.correct !== true);
+            document.getElementById('review-list').innerHTML = missed.length
+                ? missed.map(record => `
+                    <div class="review-item">
+                        <strong>${escapeHtml(record.question)}</strong>
+                        <span class="review-answer">${record.selectedAnswer === null ? 'Answer revealed' : `Chose: ${escapeHtml(record.selectedAnswer)}`} · Answer: ${escapeHtml(record.correctAnswer)} · ${record.category} L${record.difficulty}</span>
+                        <span class="review-time">${record.responseSeconds.toFixed(1)}s</span>
+                    </div>`).join('')
+                : '<div class="review-item"><strong>No questions to review.</strong></div>';
+
             results.hidden = false;
             const resultsCard = document.getElementById('results-card');
             resultsCard.focus();
@@ -821,14 +2814,24 @@
 
         function hideResults() {
             results.hidden = true;
-            document.getElementById('done').focus();
+            childResults.hidden = false;
+            document.getElementById('child-results-card').focus();
         }
 
         function move(step) {
             clearAdvanceTimer();
-            const list = currentQuestions();
-            if (!list.length) return;
-            position = (position + step + list.length) % list.length;
+            const item = currentItem();
+            const record = item ? answers.get(item.id) : null;
+            if (step > 0 && pendingBatchReport && record && record.sequence === sessionLog.length) {
+                showChildResults(true);
+                return;
+            }
+            if (!deck.length) return;
+            if (step > 0 && position === deck.length - 1) {
+                showChildResults(false);
+                return;
+            }
+            position = (position + step + deck.length) % deck.length;
             showQuestion();
         }
 
@@ -837,8 +2840,10 @@
         categoryButton.addEventListener('click', () => openPicker('category'));
         difficultyButton.addEventListener('click', () => openPicker('difficulty'));
         document.getElementById('picker-cancel').addEventListener('click', () => closePicker());
-        document.getElementById('done').addEventListener('click', showResults);
-        document.getElementById('keep-playing').addEventListener('click', hideResults);
+        document.getElementById('done').addEventListener('click', () => showChildResults(pendingBatchReport));
+        document.getElementById('continue-playing').addEventListener('click', continuePlaying);
+        document.getElementById('parent-details').addEventListener('click', showResults);
+        document.getElementById('back-to-summary').addEventListener('click', hideResults);
         document.getElementById('previous').addEventListener('click', () => move(-1));
         document.getElementById('next').addEventListener('click', () => move(1));
         function speakQuestion() {
@@ -880,6 +2885,17 @@
                 if (event.key === 'Escape' || event.keyCode === 27 || event.keyCode === 4 || space || enter) {
                     event.preventDefault();
                     hideResults();
+                }
+                return;
+            }
+
+            if (!childResults.hidden) {
+                if (event.key === 'Escape' || event.keyCode === 27 || event.keyCode === 4) {
+                    event.preventDefault();
+                    continuePlaying();
+                } else if ((space || enter) && !event.target.matches('button')) {
+                    event.preventDefault();
+                    continuePlaying();
                 }
                 return;
             }
