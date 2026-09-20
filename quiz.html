@@ -452,6 +452,8 @@
             .status { top: 42px; right: 18px; padding: 6px 11px; font-size: 14px; }
             .choices, .choices.two-options { grid-template-columns: 1fr; max-width: 930px; }
             .choice { min-height: 70px; }
+            .nav-buttons { gap: 8px; }
+            .nav-buttons button { flex: 1; min-width: 0; padding-inline: 8px; font-size: 16px; }
             .charts { grid-template-columns: 1fr; }
             .parent-observability { grid-template-columns: 1fr; }
             .results, .child-results { padding: 14px; }
@@ -500,6 +502,7 @@
         <div class="hint">SPACE / OK = SHOW ANSWER · AUTO-NEXT IN 5S · S = HEAR · ← → = MOVE</div>
         <div class="nav-buttons">
             <button id="previous">← Previous</button>
+            <button id="hear">Hear</button>
             <button id="next">Next →</button>
         </div>
     </main>
@@ -2375,6 +2378,7 @@
         let revealedAnswers = 0;
         let advanceInterval = null;
         let speakTimeout = null;
+        let questionAudio = null;
         let audioContext = null;
         let questionShownAt = performance.now();
         let pendingBatchReport = false;
@@ -2570,6 +2574,7 @@
         function showQuestion() {
             clearAdvanceTimer();
             if (speakTimeout) clearTimeout(speakTimeout);
+            stopQuestionAudio();
             const item = currentItem();
             if (!item) return;
             const savedAnswer = answers.get(item.id);
@@ -2714,7 +2719,7 @@
         function showChildResults(batchComplete = false) {
             clearAdvanceTimer();
             if (speakTimeout) clearTimeout(speakTimeout);
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            stopQuestionAudio();
 
             const total = sessionLog.length;
             const batchNumber = Math.max(1, Math.ceil(total / BATCH_SIZE));
@@ -2845,14 +2850,26 @@
         document.getElementById('parent-details').addEventListener('click', showResults);
         document.getElementById('back-to-summary').addEventListener('click', hideResults);
         document.getElementById('previous').addEventListener('click', () => move(-1));
+        document.getElementById('hear').addEventListener('click', speakQuestion);
         document.getElementById('next').addEventListener('click', () => move(1));
+
+        function stopQuestionAudio() {
+            if (!questionAudio) return;
+            questionAudio.pause();
+            questionAudio.currentTime = 0;
+            questionAudio = null;
+        }
+
         function speakQuestion() {
-            if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(question.textContent);
-            utterance.rate = 0.8;
-            utterance.pitch = 1.1;
-            window.speechSynthesis.speak(utterance);
+            const item = currentItem();
+            if (!item) return;
+            stopQuestionAudio();
+            questionAudio = new Audio(`audio/${item.id}.mp3`);
+            questionAudio.preload = 'auto';
+            questionAudio.play().catch(() => {
+                // Some browsers block the first autoplay. The Hear button retries
+                // from a user gesture, after which following questions autoplay.
+            });
         }
 
         window.addEventListener('keydown', event => {
