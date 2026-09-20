@@ -6,6 +6,8 @@
 
     <application
         android:banner="@drawable/banner"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
         android:label="Quiz"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
