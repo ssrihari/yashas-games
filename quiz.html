@@ -458,6 +458,16 @@
             font-weight: bold;
         }
         .tv-mode select:focus, .tv-mode button:focus { outline: 4px solid var(--blue); outline-offset: 3px; }
+        .tv-mode .child-actions button:focus {
+            outline: none;
+            transform: translateY(-2px);
+        }
+        .tv-mode .child-actions button:not(.secondary):focus {
+            box-shadow: 0 0 0 4px var(--blue), 0 5px 0 #081228;
+        }
+        .tv-mode .child-actions .secondary:focus {
+            box-shadow: inset 0 0 0 3px var(--ink), 0 0 0 4px var(--blue);
+        }
         .tv-mode header { padding: 9px 18px; gap: 10px; }
         .tv-mode h1 { flex: 0 0 auto; font-size: 30px; }
         .tv-mode .controls { flex-wrap: nowrap; gap: 7px; }
