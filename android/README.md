@@ -1,4 +1,15 @@
-# Quiz TV app
+# Quiz and Garden TV apps
+
+This Gradle project builds two separate Android TV apps:
+
+| Module | App | Package | Hosted page |
+| --- | --- | --- | --- |
+| `app` | **Quiz** | `com.yashas.quiztv` | `quiz.html` |
+| `garden` | **Garden** | `com.yashas.gardentv` | `garden.html` |
+
+They are installed, launched, and updated independently; each has its own launcher tile and its own saved data. Prerequisites, building, and Wi-Fi pairing below apply to both. The install, launch, and test sections are for Quiz; the Garden app has its own section [at the end](#garden-app).
+
+## Quiz
 
 A native Android TV WebView app for the quiz. The Android wrapper handles the TV remote and loads the live quiz page:
 
@@ -31,11 +42,14 @@ export ANDROID_SDK_ROOT=/usr/local/share/android-commandlinetools
 gradle -p android assembleDebug
 ```
 
-APK output:
+This builds both apps. APK output:
 
 ```text
-android/app/build/outputs/apk/debug/app-debug.apk
+android/app/build/outputs/apk/debug/app-debug.apk         # Quiz
+android/garden/build/outputs/apk/debug/garden-debug.apk   # Garden
 ```
+
+To build only one: `gradle -p android :app:assembleDebug` or `gradle -p android :garden:assembleDebug`.
 
 ## First-time Wi-Fi pairing
 
@@ -138,3 +152,77 @@ Changes to `quiz.html`, question data, CSS, JavaScript, or `audio/*.mp3` only ne
 The wrapper disables WebView HTTP caching so the TV fetches the current hosted quiz when it launches. If a page update is not visible, force-stop and reopen Quiz.
 
 Saved answer records are stored locally in the app's WebView storage. They survive normal app restarts and APK updates, but are erased by clearing app data or uninstalling the app.
+
+## Garden app
+
+GARDEN GUARD (game 9 of `keys.html`) as its own TV app. Like Quiz, the wrapper loads a hosted page and forwards remote buttons to it:
+
+```text
+https://ssrihari.github.io/yashas-games/garden.html
+```
+
+`garden.html` is a standalone copy of the game with a remote control scheme; `keys.html` is unchanged. **Push `garden.html` and `audio/keys/gg-tv-*.mp3` to GitHub Pages before installing** — until then the app has nothing to load.
+
+### Install and launch
+
+```bash
+$ADB -s "$SERIAL" install -r android/garden/build/outputs/apk/debug/garden-debug.apk
+$ADB -s "$SERIAL" shell am start -n com.yashas.gardentv/.MainActivity
+```
+
+The app appears on the TV under **Apps → Garden**.
+
+Debug builds can load a page served from the computer instead of GitHub Pages, to try changes before pushing:
+
+```bash
+python3 -m http.server 8000            # from the repository root
+$ADB -s "$SERIAL" reverse tcp:8000 tcp:8000
+$ADB -s "$SERIAL" shell am start -n com.yashas.gardentv/.MainActivity \
+    --es url http://localhost:8000/garden.html
+```
+
+(On the Android emulator, `http://10.0.2.2:8000/garden.html` reaches the computer without `adb reverse`.)
+
+### Remote controls
+
+| Where | Button | Does |
+| --- | --- | --- |
+| Level pick | Left / Right, OK | choose Easy / Medium / Hard, start |
+| Level pick | Back | exit the app |
+| Board | Arrows | move the yellow cursor |
+| Board | OK on an empty tile | open the helper picker: Left / Right to choose, OK to plant, Back to cancel |
+| Board | OK on a helper | open Dig up / Keep: Left / Right, OK; Back keeps it |
+| Board | Down from the bottom row | focus the **START** button (Up returns to the board) |
+| Anywhere in a game | Play/Pause, or OK on START | start the wave; during a wave, pause / go on |
+| Game | Back | first press pauses and asks; second press goes to the level pick |
+| Game over | Left / Right, OK | **Play again** or **Levels** (Play/Pause also plays again) |
+
+The game holds still while the picker or dig-up pop-up is open, and pauses if the app goes to the background. Holding a direction repeats.
+
+Keyboard, for testing in a desktop browser: arrows, Enter = OK, Escape or Backspace = Back, Space = Play/Pause, plus the original shortcuts `1`–`5` (plant), `X` (dig up), and `E` / `M` / `H` (level).
+
+### Smoke test
+
+1. Open Garden; the level pick shows with Easy focused and the intro plays.
+2. Right/Left move between levels; OK on Easy starts the board.
+3. OK on a tile, Right to a helper, OK plants it; water drops by its cost.
+4. OK on that helper, OK on **Dig up**; the water comes back.
+5. Down past the bottom row to **START**, OK; bugs walk in. Play/Pause pauses and resumes.
+6. Back once (prompt), Back again (level pick), Back again (app exits).
+
+Logs and force-stop:
+
+```bash
+$ADB -s "$SERIAL" logcat -s GardenTV:D '*:S'
+$ADB -s "$SERIAL" shell am force-stop com.yashas.gardentv
+```
+
+### Updating the garden
+
+Changes to `garden.html` or its audio only need to be pushed to GitHub Pages. Voice clips for new lines in its `voice-lines` block are generated with:
+
+```bash
+python3 scripts/generate_keys_audio.py --html garden.html
+```
+
+Rebuild the APK only when changing `android/garden` (wrapper, icon, banner, or manifest).

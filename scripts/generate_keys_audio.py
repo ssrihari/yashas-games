@@ -2,10 +2,12 @@
 """Generate one MP3 per spoken line in keys.html with Microsoft Edge TTS.
 
 The lines live in the <script id="voice-lines"> JSON block in keys.html
-(id -> text). Each becomes audio/keys/<id>.mp3.
+(id -> text). Each becomes audio/keys/<id>.mp3. garden.html (the TV version
+of GARDEN) has its own block; generate its extra lines with --html garden.html.
 
 Usage:
     python3 scripts/generate_keys_audio.py
+    python3 scripts/generate_keys_audio.py --html garden.html
     python3 scripts/generate_keys_audio.py --voice en-US-AnaNeural --force
 
 Install the dependency with:
@@ -46,15 +48,15 @@ def trim_silence(path):
     tmp.replace(path)
 
 
-def load_lines():
-    html = (ROOT / "keys.html").read_text(encoding="utf-8")
+def load_lines(page="keys.html"):
+    html = (ROOT / page).read_text(encoding="utf-8")
     match = re.search(
         r'<script type="application/json" id="voice-lines">\s*(.*?)\s*</script>',
         html,
         re.DOTALL,
     )
     if not match:
-        raise RuntimeError("Could not find the voice-lines block in keys.html")
+        raise RuntimeError(f"Could not find the voice-lines block in {page}")
     return json.loads(match.group(1))
 
 
@@ -76,7 +78,7 @@ async def generate_one(line_id, text, output_dir, voice, rate, semaphore, force)
 
 
 async def generate(args):
-    lines = load_lines()
+    lines = load_lines(args.html)
     output_dir = ROOT / args.output
     output_dir.mkdir(parents=True, exist_ok=True)
     semaphore = asyncio.Semaphore(args.concurrency)
@@ -95,6 +97,7 @@ async def generate(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--html", default="keys.html", help="Page whose voice-lines block to read")
     parser.add_argument("--voice", default=DEFAULT_VOICE)
     parser.add_argument("--rate", default="-10%")
     parser.add_argument("--output", default="audio/keys")

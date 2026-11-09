@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDEN</title>
+    <!--
+        GARDEN GUARD for the TV remote. The game is game 9 of keys.html,
+        pulled out into a standalone page with a D-pad / OK / Back / Play-Pause
+        control scheme. The Android TV wrapper (android/garden) loads this page
+        and forwards remote keys to window.gardenRemote. Keyboard still works
+        for testing in a desktop browser.
+    -->
+    <style>
+        :root {
+            --ink: #17233d;
+            --navy: #18274b;
+            --paper: #fffdf7;
+            --cream: #f7ebc9;
+            --yellow: #ffd84d;
+            --blue: #54c7ec;
+            --green: #45b969;
+            --red: #e95c55;
+            --pink: #f39bc0;
+            --muted: #9aa3b5;
+            --focus: 0 0 0 7px var(--yellow), 0 0 0 11px var(--ink);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            background:
+                radial-gradient(circle at 8% 14%, rgba(255,216,77,.45) 0 7%, transparent 7.2%),
+                radial-gradient(circle at 93% 86%, rgba(84,199,236,.35) 0 9%, transparent 9.2%),
+                var(--cream);
+            color: var(--ink);
+            font-family: "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+            user-select: none;
+            cursor: none;
+        }
+        /* Android has no Arial Rounded; its plain sans is too thin from the sofa */
+        body.android { font-weight: bold; }
+        /* TV safe area: keep everything ~3% in from the edges */
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.4vh;
+            padding: 3vh 3vw;
+        }
+        .screen.on { display: flex; }
+
+        /* ---------- shared bits (from keys.html) ---------- */
+        .card {
+            position: relative;
+            width: min(1500px, 100%);
+            height: min(80vh, 860px);
+            background: var(--paper);
+            border: 5px solid var(--ink);
+            border-radius: 36px;
+            box-shadow: 10px 10px 0 var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: min(3vh, 28px);
+            padding: min(3vh, 28px) min(3vw, 36px) min(4vh, 36px);
+            overflow: hidden;
+        }
+        .card > * { flex: none; }
+        .card > .fill { flex: 1 1 0; min-height: 0; width: 100%; }
+        .pop { animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+        @keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .wobble { animation: wobble .4s ease; }
+        @keyframes wobble {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-16px) rotate(-3deg); }
+            40% { transform: translateX(14px) rotate(3deg); }
+            60% { transform: translateX(-9px); }
+            80% { transform: translateX(6px); }
+        }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+
+        /* remote button glyphs used in every hint */
+        .rk {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 1.7em; height: 1.55em; padding: 0 .4em; margin: 0 .12em;
+            vertical-align: middle;
+            border-radius: 999px;
+            background: var(--navy); color: white;
+            font-size: .9em; letter-spacing: .04em; white-space: nowrap;
+            box-shadow: 0 3px 0 #0c1428;
+        }
+        .rk.ok { background: var(--green); box-shadow: 0 3px 0 #2a7a43; }
+        .hint {
+            font-size: min(3.6vh, 2.4vw, 34px);
+            color: #6f6650;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        /* ---------- level pick (sky-* / pick from keys.html, TV sized) ---------- */
+        .sky-q { font-size: min(5.4vh, 3.6vw, 52px); color: #8c8064; letter-spacing: .1em; text-transform: uppercase; text-align: center; }
+        .sky-picks { display: flex; justify-content: center; gap: min(3vw, 44px); width: 100%; }
+        .pick {
+            flex: 1 1 0; min-width: 0; max-width: 340px;
+            display: flex; flex-direction: column; align-items: center; gap: min(1.4vh, 14px);
+            padding: min(2.6vh, 28px) 8px min(2.8vh, 30px);
+            margin-bottom: 8px;
+            background: white;
+            border: 4px solid var(--ink); border-radius: 28px;
+            box-shadow: 0 8px 0 var(--ink);
+            transition: transform .2s, opacity .2s, box-shadow .2s;
+        }
+        .pick .pic { font-size: min(13vh, 8vw, 150px); line-height: 1; }
+        .pick .name { font-size: min(5vh, 3vw, 50px); letter-spacing: .06em; white-space: nowrap; }
+        .pick .sub { font-size: min(3vh, 1.9vw, 28px); color: #8c8064; white-space: nowrap; }
+        .pick.focus { transform: translateY(-12px) scale(1.06); box-shadow: 0 8px 0 var(--ink), var(--focus); }
+        .pick.picked { transform: translateY(-12px) scale(1.1); }
+        .sky-picks.chose .pick:not(.picked) { opacity: .3; }
+        .sky-chosen { font-size: min(16vh, 11vw, 170px); line-height: 1; animation: float 2.4s ease-in-out infinite; }
+        .sky-pill { padding: .15em .7em; border-radius: 999px; background: #efe6cc; color: #6f6650; }
+        .sky-stage {
+            position: relative;
+            border: 4px solid var(--ink); border-radius: 24px;
+            overflow: hidden;
+            background: #bfe8fb;
+        }
+        .sky-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+        .sky-over {
+            position: absolute; inset: 0;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(23,35,61,.22);
+        }
+        .sky-over.on { display: flex; }
+        .sky-res {
+            display: flex; flex-direction: column; align-items: center;
+            gap: min(2vh, 20px);
+            max-width: 92%;
+            padding: min(3.4vh, 36px) min(4vw, 60px) min(3.8vh, 40px);
+            background: var(--paper);
+            border: 5px solid var(--ink); border-radius: 30px;
+            box-shadow: 10px 10px 0 var(--ink);
+            text-align: center;
+            animation: pop .35s cubic-bezier(.2,1.6,.4,1);
+        }
+        .sky-res h3 { font-size: min(7vh, 4.6vw, 72px); color: var(--red); letter-spacing: .04em; white-space: nowrap; transform: rotate(-2deg); }
+        .sky-res .big { font-size: min(9vh, 6vw, 96px); line-height: 1; white-space: nowrap; }
+        .sky-res .best { font-size: min(4vh, 2.6vw, 38px); color: #8c8064; white-space: nowrap; }
+
+        /* ---------- garden guard ---------- */
+        #gg .card { width: min(1840px, 100%); height: 100%; gap: min(1.4vh, 14px); padding: min(2vh, 22px) min(2vw, 30px) min(2.6vh, 26px); }
+        .gg-hud { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2vw; width: 100%; }
+        .gg-hud > div { font-size: min(4.8vh, 3vw, 48px); line-height: 1.15; white-space: nowrap; }
+        .gg-water { color: #2f7fb0; }
+        .gg-carrots { text-align: right; letter-spacing: -.08em; }
+        .gg-carrots .gone { opacity: .16; filter: grayscale(1); }
+        .gg-msg { font-size: min(3.4vh, 2.3vw, 34px); line-height: 1.4; color: #6f6650; white-space: nowrap; text-align: center; }
+        .gg-msg.paused, .gg-msg.leave { color: var(--red); }
+        .gg-stage { background: #cfe9b0; }
+
+        /* bottom row: what each helper costs and does, and the START / PAUSE button */
+        .gg-tray { display: flex; align-items: stretch; justify-content: center; gap: min(1.2vw, 18px); width: 100%; padding-bottom: 6px; }
+        .gg-chip {
+            flex: 1 1 0; min-width: 0; max-width: 230px;
+            display: flex; align-items: center; justify-content: center; gap: .35em;
+            padding: .25em .4em;
+            background: white;
+            border: 3px solid var(--ink); border-radius: 18px;
+            box-shadow: 0 5px 0 var(--ink);
+            font-size: min(3vh, 1.9vw, 30px);
+            transition: opacity .2s, transform .15s, background .15s;
+        }
+        .gg-chip .p { font-size: 1.5em; line-height: 1; }
+        .gg-chip .s { display: flex; flex-direction: column; line-height: 1.1; color: #6f6650; white-space: nowrap; font-size: .82em; }
+        .gg-chip .s b { color: #2f7fb0; }
+        .gg-chip.poor { opacity: .35; }
+        .gg-chip.used { transform: translateY(-6px); background: #fff6cf; }
+        .gg-go {
+            flex: 0 0 auto;
+            display: flex; align-items: center; gap: .45em;
+            margin-left: min(1vw, 14px);
+            padding: .25em .8em;
+            background: var(--yellow);
+            border: 4px solid var(--ink); border-radius: 999px;
+            box-shadow: 0 6px 0 var(--ink);
+            font-size: min(3.6vh, 2.3vw, 38px);
+            white-space: nowrap;
+            transition: transform .15s, box-shadow .15s, background .15s;
+        }
+        .gg-go.wave { background: #efe6cc; }
+        .gg-go.focus { transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 0 var(--ink), var(--focus); }
+        .gg-go.off { display: none; }
+
+        /* the small pop-up next to the board cursor: pick a helper, or dig one up */
+        .gg-pop {
+            position: absolute; z-index: 2;
+            display: none; gap: .5em;
+            padding: .55em;
+            background: var(--paper);
+            border: 4px solid var(--ink); border-radius: 22px;
+            box-shadow: 7px 7px 0 var(--ink);
+        }
+        .gg-pop.on { display: flex; }
+        .gg-opt {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-width: 4.4em; padding: .35em .45em .4em;
+            background: white;
+            border: 3px solid var(--ink); border-radius: 16px;
+            transition: transform .12s, box-shadow .12s, background .12s;
+        }
+        .gg-opt .p { font-size: 2.4em; line-height: 1.1; }
+        .gg-opt .n { font-size: .82em; letter-spacing: .04em; white-space: nowrap; }
+        .gg-opt .c { font-size: .9em; color: #2f7fb0; white-space: nowrap; }
+        .gg-opt.poor { opacity: .4; }
+        .gg-opt.focus { background: #fff6cf; transform: translateY(-3px) scale(1.06); box-shadow: var(--focus); opacity: 1; }
+        .gg-opt.poor.focus .p { filter: grayscale(.8); }
+
+        /* end-of-game buttons */
+        .gg-btns { display: flex; gap: min(2vw, 30px); margin-top: min(1vh, 10px); }
+        .gg-btn {
+            padding: .3em .9em;
+            background: white;
+            border: 4px solid var(--ink); border-radius: 999px;
+            box-shadow: 0 6px 0 var(--ink);
+            font-size: min(4vh, 2.6vw, 40px);
+            white-space: nowrap;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .gg-btn.focus { background: var(--yellow); transform: translateY(-4px) scale(1.05); box-shadow: 0 6px 0 var(--ink), var(--focus); }
+    </style>
+</head>
+<body>
+
+<!-- pick how hard (this is also the first screen the TV app shows) -->
+<section class="screen on" id="gg-level">
+    <div class="card">
+        <div class="sky-chosen">🥕</div>
+        <div class="sky-q">Easy, medium, or hard?</div>
+        <div class="sky-picks" id="ggLevels"></div>
+    </div>
+    <div class="hint" id="ggLevelHint"></div>
+</section>
+
+<!-- play -->
+<section class="screen" id="gg">
+    <div class="card">
+        <div class="gg-hud">
+            <div class="gg-water" id="ggWater">💧 6</div>
+            <div class="sky-pill" id="ggWave">WAVE 1 / 4</div>
+            <div class="gg-carrots" id="ggCarrots"></div>
+        </div>
+        <div class="gg-msg" id="ggMsg"></div>
+        <div class="sky-stage gg-stage fill" id="ggStage">
+            <canvas id="ggCanvas"></canvas>
+            <div class="gg-pop" id="ggPop"></div>
+            <div class="sky-over" id="ggOver">
+                <div class="sky-res">
+                    <h3 id="ggResHead">GARDEN SAVED!</h3>
+                    <div class="big" id="ggResBig"></div>
+                    <div class="best" id="ggResSub"></div>
+                    <div class="gg-btns">
+                        <div class="gg-btn" id="ggAgainBtn">▶ PLAY AGAIN</div>
+                        <div class="gg-btn" id="ggLevelsBtn">🌱 LEVELS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gg-tray" id="ggTray"></div>
+    </div>
+</section>
+
+<!-- Clips live in audio/keys/<id>.mp3. The gg-tv-* lines are the remote
+     versions of keyboard instructions; generate missing clips with
+     python3 scripts/generate_keys_audio.py --html garden.html -->
+<script type="application/json" id="voice-lines">
+{
+ "gg-intro": "Bugs want to eat your carrots! Plant helpers to keep them safe.",
+ "gg-tv-level": "Easy, medium, or hard? Pick one and press OK.",
+ "gg-tv-plan": "Move with the arrows. Press OK to plant a helper. Press play when you are ready.",
+ "gg-tv-again-plan": "Plant your helpers. Press play when you are ready.",
+ "gg-tv-again": "Press OK to play again.",
+ "gg-coming": "Here they come!",
+ "gg-clear": "Well done! Get ready for the next bugs.",
+ "gg-need": "You need more water drops.",
+ "gg-win": "You saved the garden!",
+ "gg-lose": "The bugs got the carrots. Try a new plan!",
+ "gg-cactus": "Cactus. It throws spikes.",
+ "gg-rock": "Rock. Bugs have to chew through it.",
+ "gg-mushroom": "Mushroom. It puffs at bugs close by.",
+ "gg-frog": "Frog. It gobbles a big bug.",
+ "gg-daisy": "Daisy. It gives you more water after each wave.",
+ "sky-easy": "Easy!",
+ "sky-medium": "Medium!",
+ "sky-hard": "Hard!"
+}
+</script>
+
+<script>
+/* ================= sound (from keys.html) ================= */
+let ac = null, master = null;
+function audio() {
+    if (!ac) {
+        ac = new (window.AudioContext || window.webkitAudioContext)();
+        master = ac.createGain();
+        master.gain.value = 0.18;
+        master.connect(ac.destination);
+    }
+    if (ac.state === "suspended") ac.resume();
+    return ac;
+}
+function tone(freq, start = 0, dur = 0.35, type = "sine", vol = 1) {
+    const a = audio();
+    const t = a.currentTime + start;
+    const o = a.createOscillator();
+    const g = a.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g).connect(master);
+    o.start(t);
+    o.stop(t + dur + 0.05);
+}
+// C major pentatonic, gentle and never clashing
+const PENTA = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.5, 1174.66, 1318.5];
+const sfx = {
+    good() { tone(783.99, 0, 0.25); tone(1046.5, 0.1, 0.4); tone(1568, 0.1, 0.3, "sine", 0.2); },
+    oops() { tone(220, 0, 0.22, "triangle", 0.7); tone(196, 0.09, 0.25, "triangle", 0.6); },
+    step(i) { tone(PENTA[Math.min(i, PENTA.length - 1)], 0, 0.3, "triangle", 0.7); },
+    party() { [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.14, 0.5, "triangle", 0.8)); }
+};
+
+/* ================= voice (from keys.html) ================= */
+// Every line is pre-generated with Edge TTS into audio/keys/<id>.mp3
+// (scripts/generate_keys_audio.py). Browser speech is only a fallback.
+const LINES = JSON.parse(document.getElementById("voice-lines").textContent);
+let vQueue = [], vCurrent = null, vThen = null;
+function say(ids, { queue = false, then = null } = {}) {
+    if (!queue) hush();
+    if (then) vThen = then;
+    vQueue.push(...[].concat(ids));
+    if (!vCurrent) playNext();
+}
+function hush() {
+    vQueue = [];
+    vThen = null;
+    if (vCurrent) { vCurrent.onended = vCurrent.onerror = null; vCurrent.pause(); vCurrent = null; }
+    if (window.speechSynthesis) speechSynthesis.cancel();
+}
+function playNext() {
+    const id = vQueue.shift();
+    if (!id) { vCurrent = null; const f = vThen; vThen = null; if (f) f(); return; }
+    const a = new Audio(`audio/keys/${id}.mp3`);
+    vCurrent = a;
+    a.volume = 0.9;
+    let done = false;
+    const next = () => { if (!done && vCurrent === a) { done = true; playNext(); } };
+    const fallback = () => {
+        if (done || vCurrent !== a) return;
+        if (!window.speechSynthesis || !LINES[id]) return next();
+        const u = new SpeechSynthesisUtterance(LINES[id]);
+        u.rate = 0.85;
+        u.onend = u.onerror = next;
+        speechSynthesis.speak(u);
+    };
+    a.onended = next;
+    a.onerror = fallback;
+    a.play().catch(fallback);
+}
+
+/* ================= helpers (from keys.html) ================= */
+const $ = id => document.getElementById(id);
+function replay(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+let timers = [];
+const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+let screen = "gg-level";
+let busy = false;
+function show(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+    screen = id;
+}
+// what the remote buttons look like in the on-screen hints
+const RK = {
+    arrows: `<span class="rk">◀ ▶ ▲ ▼</span>`,
+    lr: `<span class="rk">◀ ▶</span>`,
+    ok: `<span class="rk ok">OK</span>`,
+    play: `<span class="rk">⏯</span>`,
+    back: `<span class="rk">↩ BACK</span>`
+};
+
+/* ================= garden guard (game 9 of keys.html) ================= */
+// Lane defense at your own pace. Bugs walk in from the right along the rows
+// and want the carrots on the left. You plant helpers on the tiles to stop
+// them. Between waves nothing moves: the next wave waits on the right where
+// you can see it, you plan, and press Play when ready.
+// Board units: one tile = 1. Columns 0..GG_COLS-1; bugs enter at x = GG_COLS.
+const GG_COLS = 9;
+const GG_SLOT = 1.8;   // seconds between bugs in one row ("." in a wave is a gap)
+const GG_UNITS = {
+    1: { id: "cactus", name: "CACTUS", pic: "🌵", sub: "spikes", cost: 2, hp: 4 },
+    2: { id: "rock", name: "ROCK", pic: "🪨", sub: "blocks", cost: 1, hp: 12 },
+    3: { id: "mushroom", name: "MUSHROOM", pic: "🍄", sub: "puffs", cost: 3, hp: 4 },
+    4: { id: "frog", name: "FROG", pic: "🐸", sub: "gobbles", cost: 4, hp: 6 },
+    5: { id: "daisy", name: "DAISY", pic: "🌼", sub: "+2 later", cost: 3, hp: 3 }
+};
+// hp, speed in tiles/s, chew = damage per second to a helper in the way.
+// No water for squashing bugs: water only comes between waves, so it's a
+// planning game, not a grinding one.
+const GG_BUGS = {
+    c: { pic: "🐛", hp: 4, speed: 0.42, chew: 1 },
+    l: { pic: "🐞", hp: 2, speed: 0.75, chew: 0.8 },
+    s: { pic: "🐌", hp: 12, speed: 0.24, chew: 1, shell: true, flip: true },   // spikes bounce off the shell; the emoji faces right, so flip it
+    b: { pic: "🪲", hp: 6, speed: 0.38, chew: 3.5 }
+};
+// Each wave lists one string per row: c caterpillar, l ladybug, s snail, b beetle.
+const GG_LEVELS = {
+    E: { id: "easy", name: "EASY", pic: "🌱", bg: "#dff5e3", rows: 3, water: 6, income: 4, waves: [
+        ["", "c", ""],
+        ["c", "..c", "c"],
+        ["l.l", "c.c", "l.l"],
+        ["c.c", "c.c.c", "c.c"]
+    ] },
+    M: { id: "medium", name: "MEDIUM", pic: "🌿", bg: "#fff3c4", rows: 5, water: 10, income: 6, waves: [
+        ["", "c", "", "c", ""],
+        ["c", "", "c.c", "", "c"],
+        ["lll", "", "c", "", "lll"],
+        ["c", "b.c", "", "b.c", "c"],
+        ["s", "c.c", "lll", "c.c", "s"],
+        ["c.b", "s.c", "s.ll", "s.c", "c.b"]
+    ] },
+    H: { id: "hard", name: "HARD", pic: "🌳", bg: "#fde0dc", rows: 5, water: 10, income: 6, waves: [
+        ["c", "", "c", "", "c"],
+        ["", "c.c", "l.l", "c.c", ""],
+        ["b", "llll", "c.c", "llll", "b"],
+        ["s", "c", "bb", "c", "s"],
+        ["c.c.c", "lll.lll", "s", "lll.lll", "c.c.c"],
+        ["b.s", "b.c", "ss", "c.b", "s.b"],
+        ["lllll", "s.b", "c.c.c", "b.s", "lllll"],
+        ["s.s", "b.b", "s.lll.s", "b.b", "s.s"]
+    ] }
+};
+const GG_KEYS = Object.keys(GG_LEVELS);
+
+let ggLevel = "E";
+let gg = null, ggRaf = 0, ggLast = 0;
+let ggW = 0, ggH = 0, ggDpr = 1, ggCtx = null;
+// Remote focus inside the game: "board" (the cursor), "go" (START button),
+// "plant" / "dig" (pop-up open; the game holds still), "over" (end buttons).
+let ggUi = "board", ggPick = 1, ggDigFocus = 0, ggOverFocus = 0, ggLeaveAt = 0;
+let lvFocus = 0;
+
+/* ---------- level pick ---------- */
+function startGarden(speak = true) {
+    ggStop();
+    timers.forEach(clearTimeout); timers = [];
+    busy = false;
+    show("gg-level");
+    const box = $("ggLevels");
+    box.classList.remove("chose");
+    box.innerHTML = Object.entries(GG_LEVELS).map(([key, L]) =>
+        `<div class="pick lv" data-k="${key}" style="background:${L.bg}"><div class="pic">${L.pic}</div><div class="name">${L.name}</div><div class="sub">${L.rows} rows · ${L.waves.length} waves</div></div>`).join("");
+    $("ggLevelHint").innerHTML = `${RK.lr} choose · ${RK.ok} play · ${RK.back} exit`;
+    lvFocusOn(GG_KEYS.indexOf(ggLevel));
+    if (speak) say(["gg-intro", "gg-tv-level"]);
+}
+function lvFocusOn(i) {
+    lvFocus = Math.max(0, Math.min(GG_KEYS.length - 1, i));
+    [...$("ggLevels").children].forEach((el, j) => el.classList.toggle("focus", j === lvFocus));
+}
+function lvMove(d) {
+    const was = lvFocus;
+    lvFocusOn(lvFocus + d);
+    if (lvFocus !== was) tone(PENTA[lvFocus + 1], 0, 0.1, "sine", 0.3);
+}
+function lvPick(k) {
+    ggLevel = k;
+    lvFocusOn(GG_KEYS.indexOf(k));
+    const box = $("ggLevels");
+    box.classList.add("chose");
+    [...box.children].forEach(el => el.classList.toggle("picked", el.dataset.k === k));
+    sfx.good();
+    say("sky-" + GG_LEVELS[k].id);
+    busy = true;
+    later(() => { busy = false; ggBegin(); }, 900);
+}
+
+/* ---------- game ---------- */
+function ggBegin(again = false) {
+    show("gg");
+    timers.forEach(clearTimeout); timers = [];
+    $("ggOver").classList.remove("on");
+    const L = GG_LEVELS[ggLevel];
+    gg = {
+        state: "build", paused: false, wave: 0, water: L.water, rows: L.rows,
+        carrots: Array(L.rows).fill(true),
+        grid: Array.from({ length: L.rows }, () => Array(GG_COLS).fill(null)),
+        bugs: [], spikes: [], fx: [], spawns: [], wt: 0, time: 0,
+        cur: { r: Math.floor(L.rows / 2), c: 1 }, kills: 0, ready: false, told: {}, needT: -9
+    };
+    ggUi = "board"; ggOverFocus = 0; ggLeaveAt = 0;
+    ggPopHide();
+    ggPrep();
+    $("ggTray").innerHTML = Object.entries(GG_UNITS).map(([n, U]) =>
+        `<div class="gg-chip" data-n="${n}"><span class="p">${U.pic}</span><div class="s"><b>💧${U.cost}</b>${U.sub}</div></div>`).join("") +
+        `<div class="gg-go" id="ggGo"></div>`;
+    ggHud();
+    ggResize();
+    say(again ? "gg-tv-again-plan" : "gg-tv-plan");
+    if (!ggRaf) { ggLast = 0; ggRaf = requestAnimationFrame(ggFrame); }
+}
+function ggStop() {
+    if (ggRaf) cancelAnimationFrame(ggRaf);
+    ggRaf = 0;
+    gg = null;
+}
+// the bugs of the current wave, in the order they walk in
+function ggPrep() {
+    const s = gg, wave = GG_LEVELS[ggLevel].waves[s.wave];
+    s.spawns = [];
+    wave.forEach((row, lane) => [...row].forEach((ch, j) => {
+        if (GG_BUGS[ch]) s.spawns.push({ t: 0.4 + lane * 0.45 + j * GG_SLOT, lane, type: ch });
+    }));
+    s.spawns.sort((a, b) => a.t - b.t);
+    s.wt = 0;
+}
+function ggHud() {
+    const s = gg;
+    if (!s) return;
+    const L = GG_LEVELS[ggLevel];
+    $("ggWater").textContent = "💧 " + s.water;
+    $("ggWave").textContent = `WAVE ${s.wave + 1} / ${L.waves.length}`;
+    $("ggCarrots").innerHTML = s.carrots.map(c => `<span class="${c ? "" : "gone"}">🥕</span>`).join("");
+    document.querySelectorAll("#ggTray .gg-chip[data-n]").forEach(el =>
+        el.classList.toggle("poor", GG_UNITS[el.dataset.n].cost > s.water));
+    const leaving = performance.now() < ggLeaveAt;
+    const msg = $("ggMsg");
+    msg.classList.toggle("paused", s.paused && !leaving);
+    msg.classList.toggle("leave", leaving);
+    if (leaving) msg.innerHTML = `Press ${RK.back} again to leave`;
+    else if (ggUi === "plant") msg.innerHTML = `${RK.lr} choose a helper · ${RK.ok} plant · ${RK.back} cancel`;
+    else if (ggUi === "dig") msg.innerHTML = `${RK.lr} dig up or keep · ${RK.ok} choose · ${RK.back} keep it`;
+    else if (s.state === "build")
+        msg.innerHTML = s.wave === 0
+            ? `${RK.arrows} move · ${RK.ok} plant · ${RK.play} or START when ready`
+            : `Next bugs wait on the right · ${RK.play} or START when ready`;
+    else if (s.state === "wave")
+        msg.innerHTML = s.paused ? `Paused · ${RK.play} to go on` : `Here they come · ${RK.play} pauses`;
+    else msg.innerHTML = "&nbsp;";
+
+    const go = $("ggGo");
+    if (go) {
+        go.innerHTML = s.state === "build" ? `▶ START <span class="rk">⏯</span>`
+            : s.paused ? `▶ GO ON <span class="rk">⏯</span>` : `⏸ PAUSE <span class="rk">⏯</span>`;
+        go.classList.toggle("wave", s.state === "wave" && !s.paused);
+        go.classList.toggle("off", s.state === "over");
+        go.classList.toggle("focus", ggUi === "go");
+    }
+    $("ggAgainBtn").classList.toggle("focus", ggOverFocus === 0);
+    $("ggLevelsBtn").classList.toggle("focus", ggOverFocus === 1);
+}
+
+// one place for every remote / keyboard action: left right up down select back play.
+// Returns false only when Back has nothing left to close (the TV app then exits).
+function act(a) {
+    audio();
+    if (screen === "gg-level") {
+        if (a === "back") return false;
+        if (busy) return true;
+        if (a === "left") lvMove(-1);
+        else if (a === "right") lvMove(1);
+        else if (a === "select" || a === "play") lvPick(GG_KEYS[lvFocus]);
+        return true;
+    }
+    const s = gg;
+    if (screen !== "gg" || !s) return true;
+    if (a === "back") return ggBack();
+
+    if (ggUi === "over") {
+        if (!s.ready) return true;
+        if (a === "left" || a === "right") { ggOverFocus = 1 - ggOverFocus; tone(PENTA[2 + ggOverFocus], 0, 0.1, "sine", 0.3); ggHud(); }
+        else if (a === "play" || (a === "select" && ggOverFocus === 0)) ggBegin(true);
+        else if (a === "select") startGarden();
+        return true;
+    }
+    if (ggUi === "plant") {
+        if (a === "left" || a === "right") ggPickMove(a === "left" ? -1 : 1);
+        else if (a === "select") ggPlantPicked();
+        return true;
+    }
+    if (ggUi === "dig") {
+        if (a === "left" || a === "right") { ggDigFocus = 1 - ggDigFocus; ggPopFocus(); tone(PENTA[2 + ggDigFocus], 0, 0.1, "sine", 0.3); }
+        else if (a === "select") { if (ggDigFocus === 0) ggDig(); ggPopHide(); }
+        return true;
+    }
+    if (a === "play") { ggPlayPause(); return true; }
+    if (ggUi === "go") {
+        if (a === "up" || a === "left") { ggUi = "board"; ggHud(); tone(PENTA[s.cur.r % PENTA.length] / 2, 0, 0.08, "sine", 0.25); }
+        else if (a === "select") ggPlayPause();
+        return true;
+    }
+    // the board
+    const mv = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] }[a];
+    if (mv) {
+        if (a === "down" && s.cur.r === s.rows - 1) { ggUi = "go"; tone(PENTA[4], 0, 0.1, "sine", 0.3); ggHud(); return true; }
+        ggMove(mv[0], mv[1]);
+    } else if (a === "select" && s.state !== "over") {
+        ggPopShow(s.grid[s.cur.r][s.cur.c] ? "dig" : "plant");
+    }
+    return true;
+}
+function ggMove(dr, dc) {
+    const s = gg;
+    const r = Math.max(0, Math.min(s.rows - 1, s.cur.r + dr));
+    const c = Math.max(0, Math.min(GG_COLS - 1, s.cur.c + dc));
+    if (r !== s.cur.r || c !== s.cur.c) { s.cur = { r, c }; tone(PENTA[r % PENTA.length] / 2, 0, 0.08, "sine", 0.25); }
+}
+function ggPlayPause() {
+    const s = gg;
+    if (!s || s.state === "over") return;
+    if (s.state === "build") return ggGo();
+    s.paused = !s.paused;
+    sfx.step(s.paused ? 0 : 3);
+    ggHud();
+}
+// Back closes a pop-up, otherwise leaves for the level pick. Mid-game it asks
+// for a second Back (and pauses), so a stray press doesn't throw a game away.
+function ggBack() {
+    const s = gg;
+    if (ggUi === "plant" || ggUi === "dig") { ggPopHide(); sfx.step(0); return true; }
+    const started = s.state === "wave" || s.wave > 0 || s.grid.some(row => row.some(Boolean));
+    if (s.state === "over" || !started || performance.now() < ggLeaveAt) { sfx.step(0); startGarden(false); say("gg-tv-level"); return true; }
+    if (s.state === "wave" && !s.paused) { s.paused = true; sfx.step(0); }
+    ggLeaveAt = performance.now() + 3000;
+    ggHud();
+    later(ggHud, 3050);
+    return true;
+}
+
+/* ---------- the pop-up beside the cursor ---------- */
+function ggPopShow(kind) {
+    const s = gg, pop = $("ggPop");
+    ggUi = kind;
+    if (kind === "plant") {
+        // start on the last helper planted, or the first one we can pay for
+        if (GG_UNITS[ggPick].cost > s.water) {
+            const n = Object.keys(GG_UNITS).find(k => GG_UNITS[k].cost <= s.water);
+            if (n) ggPick = +n;
+        }
+        pop.innerHTML = Object.entries(GG_UNITS).map(([n, U]) =>
+            `<div class="gg-opt${U.cost > s.water ? " poor" : ""}" data-n="${n}"><span class="p">${U.pic}</span><span class="n">${U.name}</span><span class="c">💧${U.cost} · ${U.sub}</span></div>`).join("");
+    } else {
+        const u = s.grid[s.cur.r][s.cur.c], cost = GG_UNITS[u.n].cost;
+        const back = s.state === "build" ? cost : Math.floor(cost / 2);
+        ggDigFocus = 0;
+        pop.innerHTML =
+            `<div class="gg-opt" data-n="dig"><span class="p">⛏️</span><span class="n">DIG UP</span><span class="c">${back ? "+" + back + "💧" : "no water back"}</span></div>` +
+            `<div class="gg-opt" data-n="keep"><span class="p">${GG_UNITS[u.n].pic}</span><span class="n">KEEP</span><span class="c">&nbsp;</span></div>`;
+    }
+    pop.classList.add("on");
+    replay(pop, "pop");
+    ggPopFocus();
+    ggPopPlace();
+    tone(659.25, 0, 0.12, "sine", 0.3);
+    ggHud();
+}
+function ggPopHide() {
+    $("ggPop").classList.remove("on");
+    if (ggUi === "plant" || ggUi === "dig") ggUi = "board";
+    ggHud();
+}
+function ggPopFocus() {
+    [...$("ggPop").children].forEach((el, i) =>
+        el.classList.toggle("focus", ggUi === "plant" ? +el.dataset.n === ggPick : i === ggDigFocus));
+}
+function ggPickMove(d) {
+    const n = Math.max(1, Math.min(5, ggPick + d));
+    if (n === ggPick) return;
+    ggPick = n;
+    ggPopFocus();
+    tone(PENTA[n - 1], 0, 0.1, "sine", 0.3);
+}
+function ggPlantPicked() {
+    const s = gg;
+    if (GG_UNITS[ggPick].cost > s.water) {
+        const el = $("ggPop").querySelector(`[data-n="${ggPick}"]`);
+        if (el) replay(el, "wobble");
+    }
+    if (ggPlant(ggPick)) ggPopHide();
+}
+// sit next to the cursor tile: below it in the top half, above it in the bottom half
+function ggPopPlace() {
+    const s = gg, pop = $("ggPop");
+    if (!s || !pop.classList.contains("on") || !ggW) return;
+    const { T, ox, oy } = ggBoard();
+    pop.style.fontSize = Math.max(15, Math.round(T * 0.2)) + "px";
+    const w = pop.offsetWidth, h = pop.offsetHeight;
+    const cx = ox + (s.cur.c + 0.5) * T, top = oy + s.cur.r * T;
+    let y = s.cur.r < s.rows / 2 ? top + T + 6 : top - h - 6;
+    y = Math.max(6, Math.min(ggH - h - 6, y));
+    const x = Math.max(6, Math.min(ggW - w - 6, cx - w / 2));
+    pop.style.left = Math.round(x) + "px";
+    pop.style.top = Math.round(y) + "px";
+}
+
+function ggPlant(n) {
+    const s = gg, U = GG_UNITS[n], { r, c } = s.cur;
+    const chip = document.querySelector(`#ggTray .gg-chip[data-n="${n}"]`);
+    if (s.grid[r][c]) { sfx.oops(); s.fx.push({ kind: "no", r, c, t: 0, life: 0.35 }); return false; }
+    if (U.cost > s.water) {
+        sfx.oops();
+        if (chip) replay(chip, "wobble");
+        if (s.time - s.needT > 6) { s.needT = s.time; say("gg-need"); }
+        return false;
+    }
+    s.water -= U.cost;
+    s.grid[r][c] = { n, r, c, hp: U.hp, max: U.hp, cd: 0.3, act: 0, hurt: 0, grow: 0 };
+    tone(392, 0, 0.18, "triangle", 0.5); tone(587.33, 0.07, 0.25, "sine", 0.4);
+    if (chip) { chip.classList.add("used"); setTimeout(() => chip.classList.remove("used"), 220); }
+    if (!s.told[n]) { s.told[n] = true; say("gg-" + U.id); }
+    ggHud();
+    return true;
+}
+function ggDig() {
+    const s = gg, { r, c } = s.cur, u = s.grid[r][c];
+    if (!u) return;
+    const cost = GG_UNITS[u.n].cost;
+    // between waves you get it all back; mid-wave, half
+    const back = s.state === "build" ? cost : Math.floor(cost / 2);
+    s.grid[r][c] = null;
+    s.water += back;
+    if (back) s.fx.push({ kind: "text", text: "+" + back + "💧", r, x: c + 0.5, t: 0, life: 0.9 });
+    sfx.step(1);
+    ggHud();
+}
+function ggGo() {
+    const s = gg;
+    s.state = "wave";
+    s.paused = false;
+    s.wt = 0;
+    tone(261.63, 0, 0.3, "triangle", 0.5); tone(329.63, 0.12, 0.3, "triangle", 0.5); tone(392, 0.24, 0.4, "triangle", 0.5);
+    say("gg-coming");
+    ggHud();
+}
+
+function ggUpdate(dt) {
+    const s = gg;
+    // the game holds still while a pop-up is open, so choosing never costs time
+    if (!s || s.paused || ggUi === "plant" || ggUi === "dig") return;
+    s.time += dt;
+    s.fx.forEach(f => f.t += dt);
+    s.fx = s.fx.filter(f => f.t < f.life);
+    for (const row of s.grid) for (const u of row) if (u) { u.grow = Math.min(1, u.grow + dt * 4); u.hurt = Math.max(0, u.hurt - dt); u.act = Math.max(0, u.act - dt); }
+    if (s.state !== "wave") return;
+
+    s.wt += dt;
+    while (s.spawns.length && s.spawns[0].t <= s.wt) {
+        const sp = s.spawns.shift(), B = GG_BUGS[sp.type];
+        s.bugs.push({ type: sp.type, lane: sp.lane, x: GG_COLS + 0.5, hp: B.hp, max: B.hp, eat: false, hit: 0, ph: Math.random() * 6 });
+    }
+
+    // bugs walk, or chew whatever is in the way
+    for (const b of s.bugs) {
+        const B = GG_BUGS[b.type], row = s.grid[b.lane];
+        b.hit = Math.max(0, b.hit - dt);
+        let block = null;
+        for (let c = GG_COLS - 1; c >= 0; c--) {
+            const u = row[c];
+            if (u && b.x > c + 0.5 && b.x - 0.42 <= c + 0.92) { block = u; break; }
+        }
+        b.eat = !!block;
+        // a faster bug queues behind a slower one instead of walking over it
+        let ahead = -Infinity;
+        for (const o of s.bugs) if (o !== b && !o.gone && o.lane === b.lane && o.x < b.x && o.x > ahead) ahead = o.x;
+        if (block) {
+            block.hp -= B.chew * dt;
+            block.hurt = 0.12;
+            if (block.hp <= 0) {
+                row[block.c] = null;
+                s.fx.push({ kind: "poof", r: block.r, x: block.c + 0.5, t: 0, life: 0.5 });
+                tone(160, 0, 0.25, "triangle", 0.5);
+            }
+        } else b.x = Math.max(b.x - B.speed * dt, Math.min(b.x, ahead + 0.62));
+        if (b.x < -0.15) { b.gone = true; ggCarrot(b.lane); if (s.state !== "wave") return; }
+    }
+
+    // helpers act
+    const inRow = (r, lo, hi) => s.bugs.filter(b => !b.gone && b.hp > 0 && b.lane === r && b.x > lo && b.x <= hi);
+    for (const row of s.grid) for (const u of row) {
+        if (!u) continue;
+        u.cd -= dt;
+        if (u.cd > 0) continue;
+        const id = GG_UNITS[u.n].id, c = u.c, r = u.r;
+        if (id === "cactus") {
+            if (inRow(r, c + 0.3, GG_COLS + 0.3).length) { s.spikes.push({ lane: r, x: c + 0.75 }); u.cd = 1.3; u.act = 0.15; }
+        } else if (id === "mushroom") {
+            const hit = inRow(r, c + 0.2, c + 2.6);
+            if (hit.length) {
+                hit.forEach(b => { b.hp -= 1; b.hit = 0.15; });
+                s.fx.push({ kind: "puff", r, x: c + 0.5, t: 0, life: 0.5 });
+                tone(330, 0, 0.12, "sine", 0.18);
+                u.cd = 2.2; u.act = 0.3;
+            }
+        } else if (id === "frog") {
+            const t = inRow(r, c + 0.2, c + 2.5).sort((a, b) => a.x - b.x)[0];   // long tongue: reaches over a rock
+            if (t) {
+                t.hp -= 6; t.hit = 0.25;
+                s.fx.push({ kind: "tongue", r, x0: c + 0.62, x1: t.x, t: 0, life: 0.22 });
+                tone(520, 0, 0.1, "sine", 0.3); tone(260, 0.06, 0.12, "sine", 0.25);
+                u.cd = 5; u.act = 0.3;
+            }
+        }
+    }
+
+    // spikes fly right and hit the first bug they reach
+    for (const sp of s.spikes) {
+        const from = sp.x;
+        sp.x += 7 * dt;
+        let hit = null;
+        for (const b of s.bugs)
+            if (!b.gone && b.hp > 0 && b.lane === sp.lane && b.x + 0.3 >= from && b.x - 0.3 <= sp.x && (!hit || b.x < hit.x)) hit = b;
+        if (hit) { if (!GG_BUGS[hit.type].shell) { hit.hp -= 1; hit.hit = 0.12; } else s.fx.push({ kind: "text", text: "🛡", r: hit.lane, x: hit.x, t: 0, life: 0.4 }); sp.done = true; }
+        else if (sp.x > GG_COLS + 0.6) sp.done = true;
+    }
+    s.spikes = s.spikes.filter(sp => !sp.done);
+
+    // bugs that ran out of hp
+    for (const b of s.bugs) if (!b.gone && b.hp <= 0) {
+        b.gone = true;
+        s.kills++;
+        s.fx.push({ kind: "poof", r: b.lane, x: b.x, t: 0, life: 0.45 });
+        tone(PENTA[(s.kills + 2) % PENTA.length], 0, 0.2, "sine", 0.35);
+        ggHud();
+    }
+    s.bugs = s.bugs.filter(b => !b.gone);
+
+    if (!s.spawns.length && !s.bugs.length) ggWaveDone();
+}
+// a bug got through: it takes this row's carrot, or the nearest one left
+function ggCarrot(lane) {
+    const s = gg;
+    let i = -1;
+    for (let d = 0; d < s.rows && i < 0; d++)
+        for (const j of [lane - d, lane + d]) if (j >= 0 && j < s.rows && s.carrots[j]) { i = j; break; }
+    if (i >= 0) {
+        s.carrots[i] = false;
+        s.fx.push({ kind: "carrot", r: i, t: 0, life: 0.8 });
+    }
+    sfx.oops();
+    ggHud();
+    replay($("ggCarrots"), "wobble");
+    if (!s.carrots.some(Boolean)) ggOver(false);
+}
+function ggWaveDone() {
+    const s = gg, L = GG_LEVELS[ggLevel];
+    s.spikes = [];
+    if (s.wave + 1 >= L.waves.length) return ggOver(true);
+    let gain = GG_LEVELS[ggLevel].income;
+    for (const row of s.grid) for (const u of row) if (u && GG_UNITS[u.n].id === "daisy") {
+        gain += 2;
+        s.fx.push({ kind: "text", text: "+2💧", r: u.r, x: u.c + 0.5, t: 0, life: 1.4 });
+    }
+    s.water += gain;
+    s.wave++;
+    s.state = "build";
+    ggPrep();
+    sfx.good();
+    say("gg-clear");
+    ggHud();
+    replay($("ggWater"), "pop");
+}
+function ggOver(won) {
+    const s = gg;
+    if (!s || s.state === "over") return;
+    s.state = "over";
+    s.paused = false;
+    $("ggPop").classList.remove("on");
+    ggUi = "over"; ggOverFocus = 0;
+    ggHud();
+    const L = GG_LEVELS[ggLevel], left = s.carrots.filter(Boolean).length;
+    later(() => {
+        if (!gg) return;
+        $("ggResHead").textContent = won ? "GARDEN SAVED!" : "THE BUGS GOT IN";
+        $("ggResHead").style.color = won ? "" : "#e0a800";
+        $("ggResBig").textContent = won ? `🥕 ${left} / ${s.rows}` : `🐛 wave ${s.wave + 1} / ${L.waves.length}`;
+        $("ggResSub").textContent = won ? `${s.kills} bugs stopped` : "Try a new plan";
+        $("ggOver").classList.add("on");
+        if (won) sfx.party();
+        say([won ? "gg-win" : "gg-lose", "gg-tv-again"]);
+    }, 900);
+    later(() => { if (gg) gg.ready = true; }, 1800);
+}
+
+function ggFrame(ts) {
+    ggRaf = requestAnimationFrame(ggFrame);
+    if (screen !== "gg" || !gg) { ggLast = 0; return; }
+    const dt = ggLast ? Math.min(0.05, (ts - ggLast) / 1000) : 0;
+    ggLast = ts;
+    ggResize();
+    ggUpdate(dt);
+    ggDraw();
+}
+function ggResize() {
+    const st = $("ggStage"), c = $("ggCanvas");
+    const w = st.clientWidth, h = st.clientHeight, d = window.devicePixelRatio || 1;
+    if (!w || !h || (w === ggW && h === ggH && d === ggDpr)) return;
+    ggW = w; ggH = h; ggDpr = d;
+    c.width = Math.round(w * d);
+    c.height = Math.round(h * d);
+    ggCtx = c.getContext("2d");
+    ggPopPlace();
+}
+// tile size and where the board sits: [carrot patch 1][9 tiles][waiting bugs 1.5]
+function ggBoard() {
+    const R = gg.rows, span = GG_COLS + 2.5;
+    const T = Math.floor(Math.min((ggW - 16) / span, (ggH - 16) / R));
+    return { T, ox: Math.round((ggW - T * span) / 2 + T), oy: Math.round((ggH - T * R) / 2) };
+}
+function ggEmoji(ctx, ch, x, y, size, flip = false) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (flip) ctx.scale(-1, 1);
+    ctx.font = `${Math.round(size)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+}
+function ggBar(ctx, x, y, w, frac, color) {
+    const h = Math.max(4, w * 0.1);
+    ctx.fillStyle = "rgba(23,35,61,.55)";
+    ctx.fillRect(x - w / 2, y, w, h);
+    ctx.fillStyle = color;
+    ctx.fillRect(x - w / 2 + 1, y + 1, Math.max(0, (w - 2) * frac), h - 2);
+}
+function ggDraw() {
+    const s = gg, ctx = ggCtx;
+    if (!s || !ctx) return;
+    ctx.setTransform(ggDpr, 0, 0, ggDpr, 0, 0);
+    ctx.fillStyle = "#cfe9b0";
+    ctx.fillRect(0, 0, ggW, ggH);
+    const { T, ox, oy } = ggBoard(), R = s.rows;
+    const X = x => ox + x * T, Y = r => oy + (r + 0.5) * T;
+
+    // carrot patch, tiles, and the hedge where bugs wait
+    ctx.fillStyle = "#b98c5f";
+    ctx.fillRect(ox - T, oy, T, T * R);
+    for (let r = 0; r < R; r++) for (let c = 0; c < GG_COLS; c++) {
+        ctx.fillStyle = (r + c) % 2 ? "#8fcf7a" : "#a3dc8d";
+        ctx.fillRect(X(c), oy + r * T, T, T);
+    }
+    ctx.fillStyle = "#e7f2d8";
+    ctx.fillRect(X(GG_COLS), oy, T * 1.5, T * R);
+    ctx.strokeStyle = "#17233d"; ctx.lineWidth = 3;
+    ctx.strokeRect(ox - T, oy, T * (GG_COLS + 2.5), T * R);
+    ctx.beginPath(); ctx.moveTo(X(0), oy); ctx.lineTo(X(0), oy + T * R);
+    ctx.moveTo(X(GG_COLS), oy); ctx.lineTo(X(GG_COLS), oy + T * R); ctx.stroke();
+
+    // carrots
+    for (let r = 0; r < R; r++) {
+        ctx.globalAlpha = s.carrots[r] ? 1 : 0.15;
+        ggEmoji(ctx, "🥕", ox - T / 2, Y(r), T * 0.55);
+    }
+    ctx.globalAlpha = 1;
+
+    // who is still to come, per row (in the hedge on the right)
+    const waiting = Array.from({ length: R }, () => ({}));
+    if (s.state !== "over") for (const sp of s.spawns) waiting[sp.lane][sp.type] = (waiting[sp.lane][sp.type] || 0) + 1;
+    waiting.forEach((m, r) => {
+        const types = Object.keys(m);
+        types.forEach((t, i) => {
+            const y = oy + r * T + (i + 0.5) * T / types.length, sz = Math.min(T * 0.42, T / types.length * 0.8);
+            ctx.globalAlpha = s.state === "build" ? 1 : 0.55;
+            ggEmoji(ctx, GG_BUGS[t].pic, X(GG_COLS) + T * 0.45, y, sz, GG_BUGS[t].flip);
+            ctx.font = `bold ${Math.round(sz * 0.62)}px system-ui, sans-serif`;
+            ctx.fillStyle = "#17233d"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+            ctx.fillText("×" + m[t], X(GG_COLS) + T * 0.78, y);
+        });
+    });
+    ctx.globalAlpha = 1;
+
+    // helpers
+    for (const row of s.grid) for (const u of row) {
+        if (!u) continue;
+        const U = GG_UNITS[u.n], cx = X(u.c + 0.5), cy = Y(u.r);
+        const sz = T * 0.62 * (0.6 + 0.4 * u.grow) * (u.act ? 1.1 : 1);
+        ggEmoji(ctx, U.pic, cx + (u.hurt ? Math.sin(s.time * 60) * T * 0.03 : 0), cy, sz);
+        if (u.hp < u.max) ggBar(ctx, cx, cy + T * 0.36, T * 0.6, u.hp / u.max, "#45b969");
+        if (U.id === "frog" && u.cd > 0 && s.state === "wave") {
+            ctx.strokeStyle = "rgba(23,35,61,.35)"; ctx.lineWidth = Math.max(2, T * 0.04);
+            ctx.beginPath(); ctx.arc(cx + T * 0.34, cy - T * 0.34, T * 0.09, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - u.cd / 5)); ctx.stroke();
+        }
+    }
+
+    // spikes
+    ctx.fillStyle = "#2e7d3c";
+    for (const sp of s.spikes) {
+        const x = X(sp.x), y = Y(sp.lane);
+        ctx.beginPath(); ctx.moveTo(x + T * 0.14, y); ctx.lineTo(x - T * 0.08, y - T * 0.05); ctx.lineTo(x - T * 0.08, y + T * 0.05); ctx.closePath(); ctx.fill();
+    }
+
+    // bugs
+    for (const b of s.bugs) {
+        const B = GG_BUGS[b.type], x = X(b.x);
+        const y = Y(b.lane) + (b.eat ? 0 : Math.sin(s.time * 9 + b.ph) * T * 0.03);
+        ctx.save();
+        if (b.eat) { ctx.translate(x, y); ctx.rotate(Math.sin(s.time * 14 + b.ph) * 0.12); ctx.translate(-x, -y); }
+        if (b.hit) ctx.globalAlpha = 0.6;
+        ggEmoji(ctx, B.pic, x, y, T * 0.56, B.flip);
+        ctx.restore();
+        if (b.hp < b.max) ggBar(ctx, x, Y(b.lane) - T * 0.44, T * 0.5, Math.max(0, b.hp / b.max), "#e95c55");
+    }
+
+    // effects
+    for (const f of s.fx) {
+        const k = f.t / f.life;
+        ctx.globalAlpha = 1 - k;
+        if (f.kind === "puff") {
+            ctx.fillStyle = "#d9b8f0";
+            ctx.beginPath(); ctx.ellipse(X(f.x + 1.3), Y(f.r), T * (0.4 + 1.1 * k), T * (0.3 + 0.12 * k), 0, 0, Math.PI * 2); ctx.fill();
+        } else if (f.kind === "tongue") {
+            ctx.strokeStyle = "#e86a8c"; ctx.lineWidth = Math.max(3, T * 0.07); ctx.lineCap = "round";
+            ctx.beginPath(); ctx.moveTo(X(f.x0), Y(f.r)); ctx.lineTo(X(f.x1), Y(f.r)); ctx.stroke();
+        } else if (f.kind === "poof") {
+            ctx.fillStyle = "#fffdf7";
+            for (let i = 0; i < 6; i++) {
+                const a = i * Math.PI / 3, d = T * 0.35 * k;
+                ctx.beginPath(); ctx.arc(X(f.x) + Math.cos(a) * d, Y(f.r) + Math.sin(a) * d, T * 0.09 * (1 - k), 0, Math.PI * 2); ctx.fill();
+            }
+        } else if (f.kind === "text") {
+            ctx.font = `bold ${Math.round(T * 0.26)}px system-ui, sans-serif`;
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.lineWidth = 4; ctx.strokeStyle = "white";
+            const y = Y(f.r) - T * 0.2 - k * T * 0.4;
+            ctx.strokeText(f.text, X(f.x), y);
+            ctx.fillStyle = "#2f7fb0"; ctx.fillText(f.text, X(f.x), y);
+        } else if (f.kind === "no") {
+            ctx.strokeStyle = "#e95c55"; ctx.lineWidth = Math.max(4, T * 0.07);
+            ctx.strokeRect(X(f.c) + 4, oy + f.r * T + 4, T - 8, T - 8);
+        } else if (f.kind === "carrot") {
+            ctx.fillStyle = "#e95c55";
+            ctx.fillRect(ox - T, oy + f.r * T, T, T);
+        }
+    }
+    ctx.globalAlpha = 1;
+
+    // the cursor: where the next helper goes (faint while START has the focus)
+    if (s.state !== "over") {
+        const x = X(s.cur.c), y = oy + s.cur.r * T, lw = Math.max(5, T * 0.08);
+        const pulse = 0.75 + 0.25 * Math.sin(s.time * 5);
+        ctx.globalAlpha = ggUi === "go" ? 0.3 : 1;
+        ctx.lineWidth = lw + 4; ctx.strokeStyle = "#17233d";
+        ctx.strokeRect(x + lw / 2, y + lw / 2, T - lw, T - lw);
+        ctx.lineWidth = lw; ctx.strokeStyle = `rgba(255,216,77,${pulse})`;
+        ctx.strokeRect(x + lw / 2, y + lw / 2, T - lw, T - lw);
+        ctx.globalAlpha = 1;
+    }
+}
+window.addEventListener("resize", () => { if (screen === "gg" && gg) { ggResize(); ggDraw(); } });
+
+/* ================= remote + keyboard input ================= */
+// The Android TV wrapper calls these directly (see android/garden).
+window.gardenRemote = {
+    left: () => act("left"),
+    right: () => act("right"),
+    up: () => act("up"),
+    down: () => act("down"),
+    select: () => act("select"),
+    back: () => act("back"),
+    playPause: () => act("play"),
+    // the app went to the background: pause a running wave
+    hold() { if (gg && gg.state === "wave" && !gg.paused) { gg.paused = true; ggHud(); } return true; }
+};
+document.addEventListener("visibilitychange", () => { if (document.hidden) window.gardenRemote.hold(); });
+// The same actions from a keyboard or a TV browser's key events. Android key
+// codes are included for TV browsers that report them instead of key names.
+function actionOf(e) {
+    const k = e.key, c = e.keyCode;
+    if (k === "ArrowLeft" || c === 21) return "left";
+    if (k === "ArrowRight" || c === 22) return "right";
+    if (k === "ArrowUp" || c === 19) return "up";
+    if (k === "ArrowDown" || c === 20) return "down";
+    if (k === "Enter" || c === 23 || c === 66) return "select";
+    if (k === "Escape" || k === "Backspace" || k === "GoBack" || k === "BrowserBack" || c === 4) return "back";
+    if (k === " " || k === "MediaPlayPause" || k === "MediaPlay" || k === "MediaPause" || c === 85 || c === 126 || c === 127 || c === 179) return "play";
+    return null;
+}
+document.addEventListener("keydown", e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const a = actionOf(e);
+    if (a) {
+        e.preventDefault();
+        // holding a D-pad direction keeps moving; other buttons fire once
+        if (e.repeat && !["left", "right", "up", "down"].includes(a)) return;
+        act(a);
+        return;
+    }
+    if (e.repeat) return;
+    // keyboard shortcuts from keys.html, for desktop testing
+    const k = e.key.toUpperCase();
+    if (screen === "gg-level" && !busy && GG_KEYS.includes(k)) { audio(); lvPick(k); return; }
+    if (screen === "gg" && gg && gg.state !== "over" && (ggUi === "board" || ggUi === "go")) {
+        audio();
+        if (/^[1-5]$/.test(k)) ggPlant(+k);
+        else if (k === "X" || k === "DELETE") ggDig();
+    }
+});
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+if (/Android/i.test(navigator.userAgent)) document.body.classList.add("android");
+startGarden();
+</script>
+</body>
+</html>
